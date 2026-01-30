@@ -33,4 +33,12 @@ Skills are shared. Your setup is yours. Keeping them apart means you can update 
 
 ---
 
+## Pi-hole
+- **URL:** http://localhost/admin or http://192.168.0.217/admin
+- **API URL:** http://localhost/api
+- **Password:** clawd2026!
+- **Version:** v6.3
+
+---
+
 Add whatever helps you do your job. This is your cheat sheet.

@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "skills": {
+    "pi-admin": {
+      "version": "1.0.0",
+      "installedAt": 1769808425028
+    },
+    "remotion-best-practices": {
+      "version": "1.0.0",
+      "installedAt": 1769808460412
+    },
+    "pm2": {
+      "version": "1.0.0",
+      "installedAt": 1769808483930
+    },
+    "frontend-design": {
+      "version": "1.0.0",
+      "installedAt": 1769808485943
+    },
+    "conventional-commits": {
+      "version": "1.0.1",
+      "installedAt": 1769808487792
+    },
+    "pollinations": {
+      "version": "1.0.0",
+      "installedAt": 1769808510631
+    },
+    "arxiv-watcher": {
+      "version": "1.0.0",
+      "installedAt": 1769808534050
+    },
+    "youtube-summarizer": {
+      "version": "1.0.0",
+      "installedAt": 1769808563694
+    },
+    "sysadmin-toolbox": {
+      "version": "1.1.0",
+      "installedAt": 1769808565892
+    },
+    "ui-skills": {
+      "version": "1.0.0",
+      "installedAt": 1769808582610
+    },
+    "homeassistant": {
+      "version": "1.0.0",
+      "installedAt": 1769808757230
+    },
+    "pihole": {
+      "version": "2.0.1",
+      "installedAt": 1769808780629
+    }
+  }
+}
