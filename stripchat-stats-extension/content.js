@@ -79,6 +79,9 @@
   const floatingBtn = createFloatingButton();
   const scanModal = createScanModal();
   
+  // Cache for scan results
+  let cachedScanResults = null;
+  
   function getModelDataFromCard(card) {
     return new Promise((resolve) => {
       const requestId = 'sc-' + Date.now() + '-' + Math.random();
@@ -123,9 +126,48 @@
     }
   }
   
+  function displayScanResults(models) {
+    const body = scanModal.querySelector('.sc-scan-modal-body');
+    
+    if (models.length === 0) {
+      body.innerHTML = '<div class="sc-stats-error">No models found on this page</div>';
+      return;
+    }
+    
+    let html = '<div class="sc-scan-results">';
+    html += `<div class="sc-scan-summary">Found ${models.length} models · Sorted by lowest viewers + followers</div>`;
+    html += '<div class="sc-scan-list">';
+    
+    models.forEach((m, i) => {
+      html += `
+        <a href="/${m.username}" target="_blank" class="sc-scan-item">
+          <div class="sc-scan-rank">#${i + 1}</div>
+          <div class="sc-scan-info">
+            <span class="sc-scan-name">${m.username}</span>
+            <span class="sc-scan-status sc-status-${m.status}">${m.isLive ? '🟢' : '⚫'} ${m.status || 'unknown'}</span>
+          </div>
+          <div class="sc-scan-stats">
+            <span>👁️ ${formatNumber(m.viewers)}</span>
+            <span>❤️ ${formatNumber(m.followers)}</span>
+          </div>
+        </a>
+      `;
+    });
+    
+    html += '</div></div>';
+    body.innerHTML = html;
+  }
+  
   async function scanAllModels() {
     scanModal.style.display = 'flex';
     const body = scanModal.querySelector('.sc-scan-modal-body');
+    
+    // If we have cached results, show them immediately
+    if (cachedScanResults) {
+      displayScanResults(cachedScanResults);
+      return;
+    }
+    
     body.innerHTML = '<div class="sc-stats-loading"><div class="sc-spinner"></div><span>Scanning models...</span></div>';
     
     const cards = Array.from(document.querySelectorAll('.model-list-item'));
@@ -175,36 +217,11 @@
     // Sort by combined (viewers + followers), least to most
     models.sort((a, b) => a.combined - b.combined);
     
-    // Take top 100
-    const top25 = models.slice(0, 100);
+    // Cache the results
+    cachedScanResults = models;
     
-    if (top25.length === 0) {
-      body.innerHTML = '<div class="sc-stats-error">No models found on this page</div>';
-      return;
-    }
-    
-    let html = '<div class="sc-scan-results">';
-    html += `<div class="sc-scan-summary">Found ${models.length} models · Showing top 100 with lowest viewers + followers</div>`;
-    html += '<div class="sc-scan-list">';
-    
-    top25.forEach((m, i) => {
-      html += `
-        <a href="/${m.username}" target="_blank" class="sc-scan-item">
-          <div class="sc-scan-rank">#${i + 1}</div>
-          <div class="sc-scan-info">
-            <span class="sc-scan-name">${m.username}</span>
-            <span class="sc-scan-status sc-status-${m.status}">${m.isLive ? '🟢' : '⚫'} ${m.status || 'unknown'}</span>
-          </div>
-          <div class="sc-scan-stats">
-            <span>👁️ ${formatNumber(m.viewers)}</span>
-            <span>❤️ ${formatNumber(m.followers)}</span>
-          </div>
-        </a>
-      `;
-    });
-    
-    html += '</div></div>';
-    body.innerHTML = html;
+    // Display all results
+    displayScanResults(models);
   }
   
   function formatNumber(num) {
