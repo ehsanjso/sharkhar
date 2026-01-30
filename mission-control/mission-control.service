@@ -1,0 +1,16 @@
+[Unit]
+Description=Mission Control - Clawd Second Brain Dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=ehsanjso
+WorkingDirectory=/home/ehsanjso/clawd/mission-control
+Environment=NODE_ENV=production
+Environment=PORT=3000
+ExecStart=/usr/bin/npm run start
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
