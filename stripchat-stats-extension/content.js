@@ -139,6 +139,11 @@
     html += '<div class="sc-scan-list">';
     
     models.forEach((m, i) => {
+      const tipperHtml = m.topTipper 
+        ? `<span class="sc-scan-stat">👑 ${m.topTipper.name} (${formatNumber(m.topTipper.amount)})</span>` 
+        : '';
+      const goalHtml = m.goal > 0 ? `<span class="sc-scan-stat">🎯 ${formatNumber(m.goal)}</span>` : '';
+      
       html += `
         <a href="/${m.username}" target="_blank" class="sc-scan-item">
           <div class="sc-scan-rank">#${i + 1}</div>
@@ -146,9 +151,14 @@
             <span class="sc-scan-name">${m.username}</span>
             <span class="sc-scan-status sc-status-${m.status}">${m.isLive ? '🟢' : '⚫'} ${m.status || 'unknown'}</span>
           </div>
-          <div class="sc-scan-stats">
-            <span>👁️ ${formatNumber(m.viewers)}</span>
-            <span>❤️ ${formatNumber(m.followers)}</span>
+          <div class="sc-scan-stats-grid">
+            <span class="sc-scan-stat">👁️ ${formatNumber(m.viewers)}</span>
+            <span class="sc-scan-stat">❤️ ${formatNumber(m.followers)}</span>
+            <span class="sc-scan-stat">📷 ${m.photos}</span>
+            <span class="sc-scan-stat">🎬 ${m.videos}</span>
+            <span class="sc-scan-stat">💎 ${m.privateRate}/min</span>
+            ${tipperHtml}
+            ${goalHtml}
           </div>
         </a>
       `;
@@ -192,13 +202,31 @@
         const details = await fetchModelDetails(username);
         if (details?.user?.user) {
           const user = details.user.user;
+          const cam = details.cam || {};
+          
+          // Get top tipper info
+          const topTipper = cam.topBestMembers?.[0] || cam.topTipper || cam.kingTipper || cam.bestMember;
+          let topTipperInfo = null;
+          if (topTipper) {
+            topTipperInfo = {
+              name: topTipper.username || topTipper.user?.username || topTipper.name || 'Anon',
+              amount: topTipper.amount || topTipper.tokens || topTipper.tipped || topTipper.total || 0
+            };
+          }
+          
           return {
             username,
             viewers: viewersCount,
             followers: user.favoritedCount || 0,
             combined: viewersCount + (user.favoritedCount || 0),
             status: user.status,
-            isLive: user.isLive
+            isLive: user.isLive,
+            photos: details.user.photosCount || 0,
+            videos: details.user.videosCount || 0,
+            privateRate: user.privateRate || 0,
+            topTipper: topTipperInfo,
+            goal: cam.goalTip || cam.broadcastSettings?.goalTip || 0,
+            topic: cam.topic || ''
           };
         }
       } catch (e) {}

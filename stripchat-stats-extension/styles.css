@@ -433,3 +433,51 @@
   align-items: center;
   gap: 4px;
 }
+
+/* Rich stats grid for scan results */
+.sc-scan-stats-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  font-size: 11px;
+  color: hsl(0 0% 63.9%);
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid hsl(0 0% 14.9%);
+}
+
+.sc-scan-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+/* Adjust scan item layout for richer content */
+.sc-scan-item {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: hsl(0 0% 7%);
+  border: 1px solid hsl(0 0% 14.9%);
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 150ms;
+}
+
+.sc-scan-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 120px;
+}
+
+.sc-scan-stats-grid {
+  width: 100%;
+  flex-basis: 100%;
+}
