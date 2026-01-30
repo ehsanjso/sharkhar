@@ -74,20 +74,30 @@ def parse_amount_range(amount_str: str) -> tuple:
 
 
 def fetch_13f_summary(cik: str, fund_name: str) -> Dict:
-    """Fetch 13F filing summary from SEC EDGAR"""
+    """Fetch 13F filing summary from SEC EDGAR with rate limiting"""
     try:
-        cik_padded = cik.lstrip('0').zfill(10)
-        url = f"https://data.sec.gov/submissions/CIK{cik_padded}.json"
-        
-        req = urllib.request.Request(url, headers={
-            'User-Agent': 'InvestorTracker/1.0 (investor.tracker@example.com)',
-            'Accept': 'application/json'
-        })
-        
-        with urllib.request.urlopen(req, timeout=30) as response:
-            data = json.loads(response.read().decode())
-        
-        # Find most recent 13F-HR filing
+        from rate_limiter import fetch_13f_data
+        data = fetch_13f_data(cik)
+        if not data:
+            return None
+    except ImportError:
+        # Fallback without rate limiter
+        try:
+            cik_padded = cik.lstrip('0').zfill(10)
+            url = f"https://data.sec.gov/submissions/CIK{cik_padded}.json"
+            
+            req = urllib.request.Request(url, headers={
+                'User-Agent': 'InvestorTracker/1.0 (investor.tracker@example.com)',
+                'Accept': 'application/json'
+            })
+            
+            with urllib.request.urlopen(req, timeout=30) as response:
+                data = json.loads(response.read().decode())
+        except Exception as e:
+            print(f"Error fetching 13F for {fund_name}: {e}")
+            return None
+    
+    # Find most recent 13F-HR filing
         filings = data.get('filings', {}).get('recent', {})
         forms = filings.get('form', [])
         accessions = filings.get('accessionNumber', [])
@@ -107,10 +117,8 @@ def fetch_13f_summary(cik: str, fund_name: str) -> Dict:
                 break
         
         return recent_13f
-                
-    except Exception as e:
-        print(f"Error fetching 13F for {fund_name}: {e}")
-        return None
+    
+    return None
 
 
 def fetch_all_13f_summaries() -> List[Dict]:

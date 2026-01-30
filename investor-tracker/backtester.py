@@ -82,22 +82,27 @@ def init_backtest_db():
 
 
 def get_stock_price(ticker: str) -> Optional[float]:
-    """Get current stock price from Yahoo Finance"""
+    """Get current stock price with rate limiting"""
     try:
-        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=1d"
-        req = urllib.request.Request(url, headers={
-            'User-Agent': 'Mozilla/5.0'
-        })
-        with urllib.request.urlopen(req, timeout=10) as response:
-            data = json.loads(response.read().decode())
-        
-        result = data.get('chart', {}).get('result', [])
-        if result:
-            meta = result[0].get('meta', {})
-            return meta.get('regularMarketPrice')
-    except Exception as e:
-        print(f"Error fetching price for {ticker}: {e}")
-    return None
+        from rate_limiter import fetch_stock_price
+        return fetch_stock_price(ticker)
+    except ImportError:
+        # Fallback if rate_limiter not available
+        try:
+            url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=1d"
+            req = urllib.request.Request(url, headers={
+                'User-Agent': 'Mozilla/5.0'
+            })
+            with urllib.request.urlopen(req, timeout=10) as response:
+                data = json.loads(response.read().decode())
+            
+            result = data.get('chart', {}).get('result', [])
+            if result:
+                meta = result[0].get('meta', {})
+                return meta.get('regularMarketPrice')
+        except Exception as e:
+            print(f"Error fetching price for {ticker}: {e}")
+        return None
 
 
 def get_historical_price(ticker: str, date: str) -> Optional[float]:
