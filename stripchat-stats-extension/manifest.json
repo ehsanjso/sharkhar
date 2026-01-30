@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Stripchat Stats Viewer",
+  "version": "2.0",
+  "description": "View model viewers and followers on hover without opening the room",
+  "permissions": [],
+  "host_permissions": [
+    "https://stripchat.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://stripchat.com/*"],
+      "js": ["inject.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://stripchat.com/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
