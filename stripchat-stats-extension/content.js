@@ -126,7 +126,7 @@
     }
   }
   
-  function displayScanResults(models) {
+  function displayScanResults(models, filter = '') {
     const body = scanModal.querySelector('.sc-scan-modal-body');
     
     if (models.length === 0) {
@@ -134,11 +134,18 @@
       return;
     }
     
+    const filteredModels = filter 
+      ? models.filter(m => m.username.toLowerCase().includes(filter.toLowerCase()))
+      : models;
+    
     let html = '<div class="sc-scan-results">';
-    html += `<div class="sc-scan-summary">Found ${models.length} models · Sorted by lowest viewers + followers</div>`;
+    html += `<div class="sc-scan-search-box">
+      <input type="text" id="sc-search-input" placeholder="Search models..." value="${filter}">
+    </div>`;
+    html += `<div class="sc-scan-summary">Showing ${filteredModels.length} of ${models.length} models · Sorted by lowest viewers + followers</div>`;
     html += '<div class="sc-scan-list">';
     
-    models.forEach((m, i) => {
+    filteredModels.forEach((m, i) => {
       const tipperHtml = m.topTipper 
         ? `<span class="sc-scan-stat-secondary">👑 ${m.topTipper.name} (${formatNumber(m.topTipper.amount)})</span>` 
         : '';
@@ -168,6 +175,19 @@
     
     html += '</div></div>';
     body.innerHTML = html;
+    
+    // Add search listener
+    const searchInput = body.querySelector('#sc-search-input');
+    if (searchInput) {
+      searchInput.focus();
+      let debounceTimer;
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          displayScanResults(models, e.target.value);
+        }, 200);
+      });
+    }
   }
   
   async function scanAllModels() {

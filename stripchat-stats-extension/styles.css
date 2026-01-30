@@ -349,6 +349,32 @@
   gap: 12px;
 }
 
+/* Search box */
+.sc-scan-search-box {
+  margin-bottom: 12px;
+}
+
+#sc-search-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: hsl(0 0% 7%);
+  border: 1px solid hsl(0 0% 20%);
+  border-radius: 8px;
+  color: hsl(0 0% 98%);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 150ms;
+}
+
+#sc-search-input::placeholder {
+  color: hsl(0 0% 45%);
+}
+
+#sc-search-input:focus {
+  border-color: hsl(280 87% 55%);
+}
+
 .sc-scan-summary {
   font-size: 13px;
   color: hsl(0 0% 63.9%);
