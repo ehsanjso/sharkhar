@@ -180,8 +180,8 @@ def check_stop_loss_take_profit():
     return results
 
 
-def generate_daily_report() -> str:
-    """Generate comprehensive daily report"""
+def generate_daily_report(include_charts: bool = True) -> dict:
+    """Generate comprehensive daily report with optional charts"""
     # Process new trades first
     trade_results = process_new_trades()
     
@@ -193,6 +193,15 @@ def generate_daily_report() -> str:
     
     # Generate performance report
     report = generate_performance_report()
+    
+    # Generate charts
+    chart_paths = {}
+    if include_charts:
+        try:
+            from charts import generate_all_charts
+            chart_paths = generate_all_charts()
+        except Exception as e:
+            print(f"Chart generation error: {e}")
     
     lines = [report, ""]
     
@@ -210,7 +219,12 @@ def generate_daily_report() -> str:
         for sell in sl_tp_results['sells']:
             lines.append(f"- AUTO SELL {sell['ticker']} ({sell['reason']}) @ {sell['pnl_pct']:+.1f}%")
     
-    return "\n".join(lines)
+    return {
+        'text': "\n".join(lines),
+        'charts': chart_paths,
+        'trades': trade_results,
+        'stops': sl_tp_results
+    }
 
 
 if __name__ == "__main__":
@@ -224,4 +238,9 @@ if __name__ == "__main__":
         for b in results['buys_executed']:
             print(f"  BUY {b['ticker']} @ ${b['price']}")
     else:
-        print(generate_daily_report())
+        result = generate_daily_report()
+        print(result['text'])
+        if result.get('charts'):
+            print("\nCharts generated:")
+            for name, path in result['charts'].items():
+                print(f"  {name}: {path}")
