@@ -126,7 +126,7 @@
     }
   }
   
-  function displayScanResults(models, filter = '') {
+  function displayScanResults(models, filter = '', isUpdate = false) {
     const body = scanModal.querySelector('.sc-scan-modal-body');
     
     if (models.length === 0) {
@@ -137,6 +137,45 @@
     const filteredModels = filter 
       ? models.filter(m => m.username.toLowerCase().includes(filter.toLowerCase()))
       : models;
+    
+    // If updating, only replace the list and summary, not the search box
+    if (isUpdate) {
+      const summaryEl = body.querySelector('.sc-scan-summary');
+      const listEl = body.querySelector('.sc-scan-list');
+      if (summaryEl) summaryEl.textContent = `Showing ${filteredModels.length} of ${models.length} models · Sorted by lowest viewers + followers`;
+      if (listEl) {
+        let listHtml = '';
+        filteredModels.forEach((m, i) => {
+          const tipperHtml = m.topTipper 
+            ? `<span class="sc-scan-stat-secondary">👑 ${m.topTipper.name} (${formatNumber(m.topTipper.amount)})</span>` 
+            : '';
+          const goalHtml = m.goal > 0 ? `<span class="sc-scan-stat-secondary">🎯 ${formatNumber(m.goal)}</span>` : '';
+          
+          listHtml += `
+            <a href="/${m.username}" target="_blank" class="sc-scan-item">
+              <div class="sc-scan-rank">#${i + 1}</div>
+              <div class="sc-scan-info">
+                <span class="sc-scan-name">${m.username}</span>
+                <span class="sc-scan-status sc-status-${m.status}">${m.isLive ? '🟢' : '⚫'} ${m.status || 'unknown'}</span>
+              </div>
+              <div class="sc-scan-primary-stats">
+                <span class="sc-scan-stat-primary">👁️ ${formatNumber(m.viewers)}</span>
+                <span class="sc-scan-stat-primary">❤️ ${formatNumber(m.followers)}</span>
+              </div>
+              <div class="sc-scan-secondary-stats">
+                <span class="sc-scan-stat-secondary">📷 ${m.photos}</span>
+                <span class="sc-scan-stat-secondary">🎬 ${m.videos}</span>
+                <span class="sc-scan-stat-secondary">💎 ${m.privateRate}/min</span>
+                ${tipperHtml}
+                ${goalHtml}
+              </div>
+            </a>
+          `;
+        });
+        listEl.innerHTML = listHtml;
+      }
+      return;
+    }
     
     let html = '<div class="sc-scan-results">';
     html += `<div class="sc-scan-search-box">
@@ -184,7 +223,7 @@
       searchInput.addEventListener('input', (e) => {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
-          displayScanResults(models, e.target.value);
+          displayScanResults(models, e.target.value, true);
         }, 200);
       });
     }
