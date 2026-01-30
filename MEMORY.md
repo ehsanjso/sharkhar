@@ -67,6 +67,22 @@ My second brain app for viewing and organizing memories, journals, and documents
 - Uses Telegram for communication
 - Values proactive help over waiting to be asked
 
+### 🐛 Ralph Wiggum Approach (ALWAYS use for coding!)
+
+Work in small, iterative loops. "I'm helping!" one tiny step at a time.
+
+1. **Pick ONE small task** — Not a whole feature
+2. **Smallest possible piece** — What's the tiniest next step?
+3. **Verify it works** — Test before moving on
+4. **Commit frequently** — Each commit = one small thing
+5. **Loop** — Back to step 1
+
+**Rules:**
+- NO big rewrites in one go
+- If stuck, make the step SMALLER
+- "I'm helping!" > "I'll fix everything"
+- Compound small wins into big progress
+
 ---
 
 ## Lessons Learned
