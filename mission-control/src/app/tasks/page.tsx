@@ -37,9 +37,12 @@ const initialTasks: Task[] = [
   { id: '14', title: 'Video clips (ffmpeg)', status: 'done', tags: ['video'] },
   { id: '15', title: 'Remotion video creation', status: 'done', tags: ['video'] },
   
+  // From Tonight's Build (2026-01-30)
+  { id: '16', title: 'Mission Control systemd service', status: 'done', tags: ['app'] },
+  { id: '17', title: 'Test Remotion on ARM (Pi 5)', status: 'done', tags: ['video'] },
+  
   // TODO
-  { id: '16', title: 'Add Last30Days API keys', status: 'todo', tags: ['automation'] },
-  { id: '17', title: 'Mission Control systemd service', status: 'todo', tags: ['app'] },
+  { id: '18', title: 'Add Last30Days API keys', status: 'todo', tags: ['automation'] },
 ];
 
 const columnConfig = [
