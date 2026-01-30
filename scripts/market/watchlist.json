@@ -1,0 +1,15 @@
+{
+  "indices": [
+    {"symbol": "^GSPC", "name": "S&P 500"},
+    {"symbol": "^DJI", "name": "Dow Jones"},
+    {"symbol": "^IXIC", "name": "NASDAQ"}
+  ],
+  "etfs": [
+    {"symbol": "SPY", "name": "S&P 500 ETF"},
+    {"symbol": "QQQ", "name": "NASDAQ ETF"}
+  ],
+  "alerts": {
+    "daily_change_threshold": 2.0,
+    "volume_spike_threshold": 1.5
+  }
+}

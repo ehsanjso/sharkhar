@@ -128,32 +128,48 @@
     const body = scanModal.querySelector('.sc-scan-modal-body');
     body.innerHTML = '<div class="sc-stats-loading"><div class="sc-spinner"></div><span>Scanning models...</span></div>';
     
-    const cards = document.querySelectorAll('.model-list-item');
+    const cards = Array.from(document.querySelectorAll('.model-list-item'));
     const models = [];
     let processed = 0;
     
+    // First, quickly get all usernames from React fiber (fast, no network)
+    const usernames = [];
     for (const card of cards) {
       const modelData = await getModelDataFromCard(card);
-      if (!modelData || !modelData.username) continue;
-      
-      const details = await fetchModelDetails(modelData.username);
-      if (details?.user?.user) {
-        const user = details.user.user;
-        models.push({
-          username: modelData.username,
-          viewers: modelData.viewersCount || 0,
-          followers: user.favoritedCount || 0,
-          combined: (modelData.viewersCount || 0) + (user.favoritedCount || 0),
-          status: user.status,
-          isLive: user.isLive
-        });
+      if (modelData?.username) {
+        usernames.push({ username: modelData.username, viewersCount: modelData.viewersCount || 0 });
       }
-      
-      processed++;
-      body.innerHTML = `<div class="sc-stats-loading"><div class="sc-spinner"></div><span>Scanning... ${processed}/${cards.length}</span></div>`;
-      
-      // Small delay to avoid rate limiting
-      await new Promise(r => setTimeout(r, 100));
+    }
+    
+    body.innerHTML = `<div class="sc-stats-loading"><div class="sc-spinner"></div><span>Found ${usernames.length} models, fetching stats...</span></div>`;
+    
+    // Parallel fetch with concurrency limit
+    const CONCURRENCY = 15;
+    const fetchModel = async ({ username, viewersCount }) => {
+      try {
+        const details = await fetchModelDetails(username);
+        if (details?.user?.user) {
+          const user = details.user.user;
+          return {
+            username,
+            viewers: viewersCount,
+            followers: user.favoritedCount || 0,
+            combined: viewersCount + (user.favoritedCount || 0),
+            status: user.status,
+            isLive: user.isLive
+          };
+        }
+      } catch (e) {}
+      return null;
+    };
+    
+    // Process in batches
+    for (let i = 0; i < usernames.length; i += CONCURRENCY) {
+      const batch = usernames.slice(i, i + CONCURRENCY);
+      const results = await Promise.all(batch.map(fetchModel));
+      results.forEach(r => r && models.push(r));
+      processed += batch.length;
+      body.innerHTML = `<div class="sc-stats-loading"><div class="sc-spinner"></div><span>Fetching... ${processed}/${usernames.length}</span></div>`;
     }
     
     // Sort by combined (viewers + followers), least to most
@@ -242,12 +258,34 @@
       html += `<div class="sc-stat-item"><div class="sc-stat-icon">🎬</div><div class="sc-stat-data"><span class="sc-stat-value">${details.user.videosCount || 0}</span><span class="sc-stat-label">Videos</span></div></div>`;
       html += `<div class="sc-stat-item"><div class="sc-stat-icon">💎</div><div class="sc-stat-data"><span class="sc-stat-value">${user.privateRate || 0}</span><span class="sc-stat-label">Tokens/min</span></div></div>`;
       
-      // Highest tipper (if available)
-      const topTipper = details.cam?.topBestMembers?.[0] || details.topTipper || user.topTipper;
+      // Highest tipper (check multiple possible locations)
+      const cam = details.cam || {};
+      const topTipper = cam.topBestMembers?.[0] 
+        || cam.topTipper 
+        || cam.kingTipper
+        || cam.bestMember
+        || user.topTipper
+        || details.topBestMembers?.[0]
+        || details.lastTipperInChat;
+      
+      // Log for debugging (can remove later)
+      console.log('SC Stats - API response for tipper check:', { 
+        cam: Object.keys(cam), 
+        topBestMembers: cam.topBestMembers,
+        broadcastSettings: cam.broadcastSettings,
+        goals: cam.goals
+      });
+      
       if (topTipper) {
-        const tipperName = topTipper.username || topTipper.name || 'Anonymous';
-        const tipperAmount = topTipper.amount || topTipper.tokens || topTipper.tipped || 0;
+        const tipperName = topTipper.username || topTipper.user?.username || topTipper.name || 'Anonymous';
+        const tipperAmount = topTipper.amount || topTipper.tokens || topTipper.tipped || topTipper.total || 0;
         html += `<div class="sc-stat-item sc-stat-full"><div class="sc-stat-icon">👑</div><div class="sc-stat-data"><span class="sc-stat-value">${tipperName} (${formatNumber(tipperAmount)})</span><span class="sc-stat-label">Top Tipper</span></div></div>`;
+      }
+      
+      // Show goal/tip menu highest if available
+      const goalTip = cam.goalTip || cam.broadcastSettings?.goalTip;
+      if (goalTip && goalTip > 0) {
+        html += `<div class="sc-stat-item sc-stat-full"><div class="sc-stat-icon">🎯</div><div class="sc-stat-data"><span class="sc-stat-value">${formatNumber(goalTip)} tokens</span><span class="sc-stat-label">Goal Amount</span></div></div>`;
       }
       
       html += '</div>';

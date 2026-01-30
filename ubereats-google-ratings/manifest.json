@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Uber Eats Google Ratings",
+  "version": "2.0",
+  "description": "See Google ratings for restaurants on Uber Eats",
+  "permissions": [],
+  "host_permissions": [
+    "https://www.ubereats.com/*",
+    "https://www.google.com/*",
+    "https://maps.googleapis.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.ubereats.com/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
