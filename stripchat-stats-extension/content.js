@@ -140,9 +140,9 @@
     
     models.forEach((m, i) => {
       const tipperHtml = m.topTipper 
-        ? `<span class="sc-scan-stat">👑 ${m.topTipper.name} (${formatNumber(m.topTipper.amount)})</span>` 
+        ? `<span class="sc-scan-stat-secondary">👑 ${m.topTipper.name} (${formatNumber(m.topTipper.amount)})</span>` 
         : '';
-      const goalHtml = m.goal > 0 ? `<span class="sc-scan-stat">🎯 ${formatNumber(m.goal)}</span>` : '';
+      const goalHtml = m.goal > 0 ? `<span class="sc-scan-stat-secondary">🎯 ${formatNumber(m.goal)}</span>` : '';
       
       html += `
         <a href="/${m.username}" target="_blank" class="sc-scan-item">
@@ -151,12 +151,14 @@
             <span class="sc-scan-name">${m.username}</span>
             <span class="sc-scan-status sc-status-${m.status}">${m.isLive ? '🟢' : '⚫'} ${m.status || 'unknown'}</span>
           </div>
-          <div class="sc-scan-stats-grid">
-            <span class="sc-scan-stat">👁️ ${formatNumber(m.viewers)}</span>
-            <span class="sc-scan-stat">❤️ ${formatNumber(m.followers)}</span>
-            <span class="sc-scan-stat">📷 ${m.photos}</span>
-            <span class="sc-scan-stat">🎬 ${m.videos}</span>
-            <span class="sc-scan-stat">💎 ${m.privateRate}/min</span>
+          <div class="sc-scan-primary-stats">
+            <span class="sc-scan-stat-primary">👁️ ${formatNumber(m.viewers)}</span>
+            <span class="sc-scan-stat-primary">❤️ ${formatNumber(m.followers)}</span>
+          </div>
+          <div class="sc-scan-secondary-stats">
+            <span class="sc-scan-stat-secondary">📷 ${m.photos}</span>
+            <span class="sc-scan-stat-secondary">🎬 ${m.videos}</span>
+            <span class="sc-scan-stat-secondary">💎 ${m.privateRate}/min</span>
             ${tipperHtml}
             ${goalHtml}
           </div>
