@@ -1,22 +1,43 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #0f1419;
-  --background-secondary: #15202b;
-  --card: #192734;
-  --card-hover: #1e2d3d;
-  --border: #2f3b47;
-  --foreground: #e7e9ea;
-  --muted: #8899a6;
-  --accent: #1d9bf0;
-  --accent-muted: #1a8cd8;
-  --success: #00ba7c;
-  --warning: #ffad1f;
-  --danger: #f4212e;
-  --journal: #1d9bf0;
-  --content: #7856ff;
-  --newsletters: #f91880;
-  --other: #00ba7c;
+  --radius: 0.5rem;
+  
+  /* Navy Dark Theme */
+  --background: #0d1117;
+  --background-secondary: #161b22;
+  --foreground: #e6edf3;
+  --card: #21262d;
+  --card-foreground: #e6edf3;
+  --popover: #21262d;
+  --popover-foreground: #e6edf3;
+  --primary: #238636;
+  --primary-foreground: #ffffff;
+  --secondary: #21262d;
+  --secondary-foreground: #e6edf3;
+  --muted: #21262d;
+  --muted-foreground: #8b949e;
+  --accent: #1f6feb;
+  --accent-foreground: #ffffff;
+  --destructive: #f85149;
+  --border: #30363d;
+  --input: #21262d;
+  --ring: #1f6feb;
+  
+  /* Semantic Colors */
+  --success: #3fb950;
+  --warning: #d29922;
+  --danger: #f85149;
+  
+  /* Tag Colors */
+  --journal: #58a6ff;
+  --content: #a371f7;
+  --newsletters: #f778ba;
+  --other: #3fb950;
+  --notes: #d29922;
 }
 
 * {
@@ -38,10 +59,14 @@
   border-radius: 3px;
 }
 
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted-foreground);
+}
+
 body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   background: var(--background);
   color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
 }
 
 /* Markdown Styles */
@@ -55,14 +80,18 @@ body {
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
   color: var(--foreground);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
 }
 
 .markdown-content h2 {
   font-size: 1.25rem;
   font-weight: 600;
-  margin-top: 1.25rem;
+  margin-top: 1.5rem;
   margin-bottom: 0.5rem;
   color: var(--foreground);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.375rem;
 }
 
 .markdown-content h3 {
@@ -75,26 +104,31 @@ body {
 
 .markdown-content p {
   margin-bottom: 0.75rem;
-  color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 .markdown-content ul,
 .markdown-content ol {
   margin-bottom: 0.75rem;
-  padding-left: 1.25rem;
+  padding-left: 1.5rem;
 }
 
 .markdown-content li {
   margin-bottom: 0.25rem;
-  color: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.markdown-content li::marker {
+  color: var(--accent);
 }
 
 .markdown-content code {
   background: var(--card);
   padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
-  font-size: 0.85rem;
-  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 0.85em;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+  border: 1px solid var(--border);
 }
 
 .markdown-content pre {
@@ -102,20 +136,25 @@ body {
   padding: 1rem;
   border-radius: 0.5rem;
   overflow-x: auto;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
 }
 
 .markdown-content pre code {
   background: transparent;
   padding: 0;
+  border: none;
 }
 
 .markdown-content blockquote {
   border-left: 3px solid var(--accent);
   padding-left: 1rem;
-  margin: 0.75rem 0;
-  color: var(--muted);
+  margin: 1rem 0;
+  color: var(--muted-foreground);
   font-style: italic;
+  background: var(--card);
+  padding: 0.75rem 1rem;
+  border-radius: 0 0.25rem 0.25rem 0;
 }
 
 .markdown-content a {
@@ -132,22 +171,92 @@ body {
   font-weight: 600;
 }
 
-/* Tag colors */
-.tag-journal { background: rgba(29, 155, 240, 0.15); color: #1d9bf0; }
-.tag-content { background: rgba(120, 86, 255, 0.15); color: #7856ff; }
-.tag-newsletters { background: rgba(249, 24, 128, 0.15); color: #f91880; }
-.tag-other { background: rgba(0, 186, 124, 0.15); color: #00ba7c; }
-.tag-notes { background: rgba(255, 173, 31, 0.15); color: #ffad1f; }
-
-/* Filter button states */
-.filter-btn {
-  transition: all 0.15s ease;
+.markdown-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.5rem 0;
 }
 
-.filter-btn.active {
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.markdown-content th {
+  background: var(--card);
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.markdown-content td {
+  color: var(--muted-foreground);
+}
+
+/* Task checkbox styles */
+.markdown-content input[type="checkbox"] {
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.25rem;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  cursor: pointer;
   background: var(--card);
 }
 
-.filter-btn:hover:not(.active) {
-  background: var(--card-hover);
+.markdown-content input[type="checkbox"]:checked {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.markdown-content input[type="checkbox"]:checked::after {
+  content: "✓";
+  display: block;
+  text-align: center;
+  color: white;
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

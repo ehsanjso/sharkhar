@@ -1,28 +1,35 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Send, Plus, Pause, Bell, FileText, Users, ListTodo, X } from 'lucide-react';
+import { Search, Send, FileText, Users, ListTodo, Zap, MoreHorizontal } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { format, parseISO } from 'date-fns';
 import { Document } from '@/lib/types';
 
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+
 type TabType = 'docs' | 'tasks' | 'people';
 type FilterType = 'all' | 'journal' | 'other' | 'content' | 'newsletters';
 
-const filterColors: Record<string, string> = {
-  journal: 'tag-journal',
-  content: 'tag-content',
-  newsletters: 'tag-newsletters',
-  other: 'tag-other',
-  notes: 'tag-notes',
-  memory: 'tag-other',
-  document: 'tag-other',
-  task: 'tag-content',
+const tagVariants: Record<string, string> = {
+  journal: 'bg-blue-500/15 text-blue-400 hover:bg-blue-500/25',
+  content: 'bg-purple-500/15 text-purple-400 hover:bg-purple-500/25',
+  newsletters: 'bg-pink-500/15 text-pink-400 hover:bg-pink-500/25',
+  other: 'bg-green-500/15 text-green-400 hover:bg-green-500/25',
+  notes: 'bg-yellow-500/15 text-yellow-400 hover:bg-yellow-500/25',
+  memory: 'bg-green-500/15 text-green-400 hover:bg-green-500/25',
+  document: 'bg-green-500/15 text-green-400 hover:bg-green-500/25',
 };
 
-function getTagClass(type: string): string {
-  return filterColors[type.toLowerCase()] || 'tag-other';
+function getTagVariant(type: string): string {
+  return tagVariants[type.toLowerCase()] || tagVariants.other;
 }
 
 function formatDocDate(dateStr: string): string {
@@ -70,11 +77,9 @@ export default function MissionControl() {
   ];
 
   const filteredDocuments = documents.filter((doc) => {
-    // Search filter
     if (searchQuery && !doc.title.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
-    // Type filter
     if (activeFilter === 'all') return true;
     if (activeFilter === 'journal') return doc.type === 'journal';
     if (activeFilter === 'other') return doc.type === 'memory' || doc.type === 'document';
@@ -83,133 +88,123 @@ export default function MissionControl() {
     return true;
   });
 
-  const tabs = [
-    { id: 'tasks' as TabType, label: 'Tasks', icon: ListTodo },
-    { id: 'docs' as TabType, label: 'Docs', icon: FileText },
-    { id: 'people' as TabType, label: 'People', icon: Users },
-  ];
-
   return (
     <div className="h-screen flex flex-col bg-[var(--background)]">
-      {/* Top Header */}
-      <header className="flex items-center justify-between px-4 py-2 border-b border-[var(--border)] bg-[var(--background-secondary)]">
-        <div className="flex items-center gap-4">
+      {/* Header */}
+      <header className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] bg-[var(--background-secondary)]">
+        <div className="flex items-center gap-6">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-gradient-to-br from-[var(--accent)] to-blue-600 flex items-center justify-center text-white text-xs font-bold">
-              ⚡
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+              <Zap className="w-4 h-4 text-white" />
             </div>
-            <span className="font-semibold text-sm">Mission Control</span>
+            <span className="font-semibold">Mission Control</span>
           </div>
           
           {/* Tabs */}
-          <nav className="flex items-center gap-1 ml-4">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors ${
-                    activeTab === tab.id
-                      ? 'bg-[var(--card)] text-[var(--foreground)]'
-                      : 'text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--card-hover)]'
-                  }`}
-                >
-                  <Icon size={14} />
-                  {tab.label}
-                </button>
-              );
-            })}
-          </nav>
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabType)}>
+            <TabsList className="bg-[var(--card)]">
+              <TabsTrigger value="tasks" className="gap-1.5 data-[state=active]:bg-[var(--background)]">
+                <ListTodo className="w-4 h-4" />
+                Tasks
+              </TabsTrigger>
+              <TabsTrigger value="docs" className="gap-1.5 data-[state=active]:bg-[var(--background)]">
+                <FileText className="w-4 h-4" />
+                Docs
+              </TabsTrigger>
+              <TabsTrigger value="people" className="gap-1.5 data-[state=active]:bg-[var(--background)]">
+                <Users className="w-4 h-4" />
+                People
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
         
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--card-hover)] transition-colors">
-            <Pause size={14} />
+          <Button variant="ghost" size="sm">
             Pause
-          </button>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm bg-[var(--accent)] text-white hover:bg-[var(--accent-muted)] transition-colors">
-            <Bell size={14} />
+          </Button>
+          <Button size="sm" className="bg-[var(--accent)] hover:bg-[var(--accent)]/80">
             Ping Henry
-          </button>
+          </Button>
         </div>
       </header>
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-72 border-r border-[var(--border)] flex flex-col bg-[var(--background-secondary)]">
+        <aside className="w-80 border-r border-[var(--border)] flex flex-col bg-[var(--background-secondary)]">
           {/* Search */}
-          <div className="p-3">
-            <div className="flex items-center gap-2 px-3 py-2 bg-[var(--card)] rounded-lg border border-[var(--border)]">
-              <Search size={14} className="text-[var(--muted)]" />
-              <input
+          <div className="p-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-foreground)]" />
+              <Input
                 type="text"
-                placeholder="Search documents"
+                placeholder="Search documents..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent text-sm outline-none flex-1 placeholder:text-[var(--muted)]"
+                className="pl-9 bg-[var(--card)] border-[var(--border)]"
               />
             </div>
           </div>
 
           {/* Filters */}
-          <div className="px-3 pb-3 flex gap-1.5 flex-wrap">
+          <div className="px-4 pb-4 flex gap-2 flex-wrap">
             {filters.map((filter) => (
-              <button
+              <Badge
                 key={filter.id}
-                onClick={() => setActiveFilter(activeFilter === filter.id ? 'all' : filter.id)}
-                className={`filter-btn px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                variant="secondary"
+                className={`cursor-pointer transition-colors ${
                   activeFilter === filter.id
-                    ? `${getTagClass(filter.id)} active`
-                    : 'text-[var(--muted)] bg-transparent'
+                    ? getTagVariant(filter.id)
+                    : 'bg-[var(--card)] text-[var(--muted-foreground)] hover:bg-[var(--card)]/80'
                 }`}
+                onClick={() => setActiveFilter(activeFilter === filter.id ? 'all' : filter.id)}
               >
                 {filter.label}
-              </button>
+              </Badge>
             ))}
           </div>
 
-          {/* Sort toggle */}
-          <div className="px-3 pb-2 flex items-center gap-2 text-xs text-[var(--muted)]">
-            <span>Sort</span>
-            <button className="flex items-center gap-1 hover:text-[var(--foreground)]">
-              ↓ Recent first
-            </button>
-          </div>
+          <Separator />
 
           {/* Document List */}
-          <div className="flex-1 overflow-y-auto">
-            {isLoading ? (
-              <div className="p-4 text-center text-[var(--muted)]">Loading...</div>
-            ) : filteredDocuments.length === 0 ? (
-              <div className="p-4 text-center text-[var(--muted)]">No documents found</div>
-            ) : (
-              filteredDocuments.map((doc) => (
-                <button
-                  key={doc.slug}
-                  onClick={() => setSelectedDoc(doc)}
-                  className={`w-full text-left px-3 py-2.5 border-l-2 transition-colors ${
-                    selectedDoc?.slug === doc.slug
-                      ? 'bg-[var(--card)] border-[var(--accent)]'
-                      : 'border-transparent hover:bg-[var(--card-hover)]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <FileText size={14} className="text-[var(--muted)] flex-shrink-0" />
-                    <span className="text-sm truncate">{doc.title}</span>
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded flex-shrink-0 ${getTagClass(doc.type)}`}>
-                      {doc.type}
-                    </span>
-                  </div>
-                  <div className="text-xs text-[var(--muted)] mt-1 ml-6 truncate">
-                    {doc.path}
-                  </div>
-                </button>
-              ))
-            )}
-          </div>
+          <ScrollArea className="flex-1">
+            <div className="p-2">
+              {isLoading ? (
+                <div className="p-4 text-center text-[var(--muted-foreground)]">Loading...</div>
+              ) : filteredDocuments.length === 0 ? (
+                <div className="p-4 text-center text-[var(--muted-foreground)]">No documents found</div>
+              ) : (
+                filteredDocuments.map((doc) => (
+                  <button
+                    key={doc.slug}
+                    onClick={() => setSelectedDoc(doc)}
+                    className={`w-full text-left p-3 rounded-lg mb-1 transition-all ${
+                      selectedDoc?.slug === doc.slug
+                        ? 'bg-[var(--accent)]/10 border border-[var(--accent)]/30'
+                        : 'hover:bg-[var(--card)] border border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <FileText className="w-4 h-4 text-[var(--muted-foreground)] mt-0.5 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium truncate">{doc.title}</span>
+                          <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 h-5 flex-shrink-0 ${getTagVariant(doc.type)}`}>
+                            {doc.type}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-[var(--muted-foreground)] mt-1 truncate">
+                          {doc.path}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          </ScrollArea>
         </aside>
 
         {/* Main Content Area */}
@@ -217,64 +212,70 @@ export default function MissionControl() {
           {selectedDoc ? (
             <>
               {/* Document Header */}
-              <div className="p-4 border-b border-[var(--border)] bg-[var(--background-secondary)]">
-                <div className="flex items-center gap-3">
-                  <h1 className="text-lg font-medium">{selectedDoc.title}</h1>
-                  <span className={`text-xs px-2 py-0.5 rounded ${getTagClass(selectedDoc.type)}`}>
-                    {selectedDoc.type}
-                  </span>
+              <div className="px-6 py-4 border-b border-[var(--border)] bg-[var(--background-secondary)]">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-lg font-semibold">{selectedDoc.title}</h1>
+                    <Badge variant="secondary" className={getTagVariant(selectedDoc.type)}>
+                      {selectedDoc.type}
+                    </Badge>
+                  </div>
+                  <Button variant="ghost" size="icon">
+                    <MoreHorizontal className="w-4 h-4" />
+                  </Button>
                 </div>
-                <p className="text-sm text-[var(--muted)] mt-1">{selectedDoc.path}</p>
+                <p className="text-sm text-[var(--muted-foreground)] mt-1">{selectedDoc.path}</p>
               </div>
 
               {/* Document Content */}
-              <div className="flex-1 overflow-y-auto p-6">
-                <div className="max-w-3xl">
-                  {/* Date Header */}
-                  <h2 className="text-xl font-semibold mb-6">
-                    {formatDocDate(selectedDoc.date)}
-                  </h2>
-                  
-                  {/* Timeline Entry */}
-                  <div className="space-y-4">
-                    <article className="markdown-content">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {selectedDoc.content}
-                      </ReactMarkdown>
-                    </article>
-                  </div>
+              <ScrollArea className="flex-1">
+                <div className="p-6 max-w-4xl">
+                  <Card className="bg-transparent border-none shadow-none">
+                    <CardHeader className="px-0 pt-0">
+                      <CardTitle className="text-xl">
+                        {formatDocDate(selectedDoc.date)}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-0">
+                      <article className="markdown-content">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {selectedDoc.content}
+                        </ReactMarkdown>
+                      </article>
+                    </CardContent>
+                  </Card>
                 </div>
-              </div>
+              </ScrollArea>
 
               {/* Input Bar */}
               <div className="p-4 border-t border-[var(--border)] bg-[var(--background-secondary)]">
                 <div className="flex items-center gap-3">
-                  <button className="p-2 text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--card)] rounded-lg transition-colors">
-                    <span className="text-xs">Debug</span>
-                  </button>
-                  <div className="flex-1 flex items-center gap-2 px-4 py-2.5 bg-[var(--card)] rounded-lg border border-[var(--border)]">
-                    <input
+                  <Button variant="ghost" size="sm" className="text-[var(--muted-foreground)]">
+                    Debug
+                  </Button>
+                  <div className="flex-1 relative">
+                    <Input
                       type="text"
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
                       placeholder="Send a message to Henry..."
-                      className="flex-1 bg-transparent text-sm outline-none placeholder:text-[var(--muted)]"
+                      className="bg-[var(--card)] border-[var(--border)] pr-24"
                     />
                   </div>
-                  <button className="px-4 py-2 text-sm text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--card)] rounded-lg transition-colors">
+                  <Button variant="ghost" size="sm" className="text-[var(--muted-foreground)]">
                     New session
-                  </button>
-                  <button className="px-4 py-2 text-sm bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-muted)] transition-colors flex items-center gap-1.5">
-                    <Send size={14} />
+                  </Button>
+                  <Button size="sm" className="bg-[var(--accent)] hover:bg-[var(--accent)]/80 gap-1.5">
+                    <Send className="w-4 h-4" />
                     Send
-                  </button>
+                  </Button>
                 </div>
               </div>
             </>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-[var(--muted)]">
-              <div className="text-center">
-                <FileText size={48} className="mx-auto mb-4 opacity-50" />
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center text-[var(--muted-foreground)]">
+                <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p>Select a document to view</p>
               </div>
             </div>
