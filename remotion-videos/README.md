@@ -11,6 +11,20 @@
 
 Welcome to your Remotion project!
 
+## ✅ ARM64 Support (Raspberry Pi 5)
+
+Tested and working on Raspberry Pi 5 (ARM64). Remotion automatically downloads the correct headless Chrome binary for `linux-arm64`.
+
+## Quick Render
+
+Use the included render script:
+
+```console
+./render.sh TextTitle --props '{"title":"Hello","subtitle":"World"}'
+```
+
+See `TEMPLATES.md` for available compositions.
+
 ## Commands
 
 **Install Dependencies**
