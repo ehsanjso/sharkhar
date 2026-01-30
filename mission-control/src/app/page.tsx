@@ -18,20 +18,6 @@ import { Separator } from '@/components/ui/separator';
 type TabType = 'docs' | 'tasks' | 'people';
 type FilterType = 'all' | 'journal' | 'other' | 'content' | 'newsletters';
 
-const tagVariants: Record<string, string> = {
-  journal: 'bg-blue-500/15 text-blue-400 hover:bg-blue-500/25',
-  content: 'bg-purple-500/15 text-purple-400 hover:bg-purple-500/25',
-  newsletters: 'bg-pink-500/15 text-pink-400 hover:bg-pink-500/25',
-  other: 'bg-green-500/15 text-green-400 hover:bg-green-500/25',
-  notes: 'bg-yellow-500/15 text-yellow-400 hover:bg-yellow-500/25',
-  memory: 'bg-green-500/15 text-green-400 hover:bg-green-500/25',
-  document: 'bg-green-500/15 text-green-400 hover:bg-green-500/25',
-};
-
-function getTagVariant(type: string): string {
-  return tagVariants[type.toLowerCase()] || tagVariants.other;
-}
-
 function formatDocDate(dateStr: string): string {
   try {
     const date = parseISO(dateStr);
@@ -89,30 +75,30 @@ export default function MissionControl() {
   });
 
   return (
-    <div className="h-screen flex flex-col bg-[var(--background)]">
+    <div className="dark h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] bg-[var(--background-secondary)]">
+      <header className="flex items-center justify-between px-4 py-3 border-b bg-card">
         <div className="flex items-center gap-6">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-              <Zap className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <Zap className="w-4 h-4 text-primary-foreground" />
             </div>
-            <span className="font-semibold">Mission Control</span>
+            <span className="font-semibold text-foreground">Mission Control</span>
           </div>
           
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabType)}>
-            <TabsList className="bg-[var(--card)]">
-              <TabsTrigger value="tasks" className="gap-1.5 data-[state=active]:bg-[var(--background)]">
+            <TabsList>
+              <TabsTrigger value="tasks" className="gap-1.5">
                 <ListTodo className="w-4 h-4" />
                 Tasks
               </TabsTrigger>
-              <TabsTrigger value="docs" className="gap-1.5 data-[state=active]:bg-[var(--background)]">
+              <TabsTrigger value="docs" className="gap-1.5">
                 <FileText className="w-4 h-4" />
                 Docs
               </TabsTrigger>
-              <TabsTrigger value="people" className="gap-1.5 data-[state=active]:bg-[var(--background)]">
+              <TabsTrigger value="people" className="gap-1.5">
                 <Users className="w-4 h-4" />
                 People
               </TabsTrigger>
@@ -124,7 +110,7 @@ export default function MissionControl() {
           <Button variant="ghost" size="sm">
             Pause
           </Button>
-          <Button size="sm" className="bg-[var(--accent)] hover:bg-[var(--accent)]/80">
+          <Button size="sm">
             Ping Henry
           </Button>
         </div>
@@ -133,17 +119,17 @@ export default function MissionControl() {
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-80 border-r border-[var(--border)] flex flex-col bg-[var(--background-secondary)]">
+        <aside className="w-80 border-r flex flex-col bg-card">
           {/* Search */}
           <div className="p-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-foreground)]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="Search documents..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-[var(--card)] border-[var(--border)]"
+                className="pl-9"
               />
             </div>
           </div>
@@ -153,12 +139,8 @@ export default function MissionControl() {
             {filters.map((filter) => (
               <Badge
                 key={filter.id}
-                variant="secondary"
-                className={`cursor-pointer transition-colors ${
-                  activeFilter === filter.id
-                    ? getTagVariant(filter.id)
-                    : 'bg-[var(--card)] text-[var(--muted-foreground)] hover:bg-[var(--card)]/80'
-                }`}
+                variant={activeFilter === filter.id ? "default" : "secondary"}
+                className="cursor-pointer"
                 onClick={() => setActiveFilter(activeFilter === filter.id ? 'all' : filter.id)}
               >
                 {filter.label}
@@ -172,30 +154,30 @@ export default function MissionControl() {
           <ScrollArea className="flex-1">
             <div className="p-2">
               {isLoading ? (
-                <div className="p-4 text-center text-[var(--muted-foreground)]">Loading...</div>
+                <div className="p-4 text-center text-muted-foreground">Loading...</div>
               ) : filteredDocuments.length === 0 ? (
-                <div className="p-4 text-center text-[var(--muted-foreground)]">No documents found</div>
+                <div className="p-4 text-center text-muted-foreground">No documents found</div>
               ) : (
                 filteredDocuments.map((doc) => (
                   <button
                     key={doc.slug}
                     onClick={() => setSelectedDoc(doc)}
-                    className={`w-full text-left p-3 rounded-lg mb-1 transition-all ${
+                    className={`w-full text-left p-3 rounded-lg mb-1 transition-colors ${
                       selectedDoc?.slug === doc.slug
-                        ? 'bg-[var(--accent)]/10 border border-[var(--accent)]/30'
-                        : 'hover:bg-[var(--card)] border border-transparent'
+                        ? 'bg-accent text-accent-foreground'
+                        : 'hover:bg-muted'
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <FileText className="w-4 h-4 text-[var(--muted-foreground)] mt-0.5 flex-shrink-0" />
+                      <FileText className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium truncate">{doc.title}</span>
-                          <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 h-5 flex-shrink-0 ${getTagVariant(doc.type)}`}>
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5 flex-shrink-0">
                             {doc.type}
                           </Badge>
                         </div>
-                        <p className="text-xs text-[var(--muted-foreground)] mt-1 truncate">
+                        <p className="text-xs text-muted-foreground mt-1 truncate">
                           {doc.path}
                         </p>
                       </div>
@@ -208,15 +190,15 @@ export default function MissionControl() {
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 flex flex-col overflow-hidden bg-background">
           {selectedDoc ? (
             <>
               {/* Document Header */}
-              <div className="px-6 py-4 border-b border-[var(--border)] bg-[var(--background-secondary)]">
+              <div className="px-6 py-4 border-b bg-card">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <h1 className="text-lg font-semibold">{selectedDoc.title}</h1>
-                    <Badge variant="secondary" className={getTagVariant(selectedDoc.type)}>
+                    <Badge variant="outline">
                       {selectedDoc.type}
                     </Badge>
                   </div>
@@ -224,13 +206,13 @@ export default function MissionControl() {
                     <MoreHorizontal className="w-4 h-4" />
                   </Button>
                 </div>
-                <p className="text-sm text-[var(--muted-foreground)] mt-1">{selectedDoc.path}</p>
+                <p className="text-sm text-muted-foreground mt-1">{selectedDoc.path}</p>
               </div>
 
               {/* Document Content */}
               <ScrollArea className="flex-1">
                 <div className="p-6 max-w-4xl">
-                  <Card className="bg-transparent border-none shadow-none">
+                  <Card className="border-0 shadow-none">
                     <CardHeader className="px-0 pt-0">
                       <CardTitle className="text-xl">
                         {formatDocDate(selectedDoc.date)}
@@ -248,24 +230,22 @@ export default function MissionControl() {
               </ScrollArea>
 
               {/* Input Bar */}
-              <div className="p-4 border-t border-[var(--border)] bg-[var(--background-secondary)]">
+              <div className="p-4 border-t bg-card">
                 <div className="flex items-center gap-3">
-                  <Button variant="ghost" size="sm" className="text-[var(--muted-foreground)]">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground">
                     Debug
                   </Button>
-                  <div className="flex-1 relative">
-                    <Input
-                      type="text"
-                      value={inputText}
-                      onChange={(e) => setInputText(e.target.value)}
-                      placeholder="Send a message to Henry..."
-                      className="bg-[var(--card)] border-[var(--border)] pr-24"
-                    />
-                  </div>
-                  <Button variant="ghost" size="sm" className="text-[var(--muted-foreground)]">
+                  <Input
+                    type="text"
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    placeholder="Send a message to Henry..."
+                    className="flex-1"
+                  />
+                  <Button variant="ghost" size="sm" className="text-muted-foreground">
                     New session
                   </Button>
-                  <Button size="sm" className="bg-[var(--accent)] hover:bg-[var(--accent)]/80 gap-1.5">
+                  <Button size="sm" className="gap-1.5">
                     <Send className="w-4 h-4" />
                     Send
                   </Button>
@@ -274,7 +254,7 @@ export default function MissionControl() {
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center">
-              <div className="text-center text-[var(--muted-foreground)]">
+              <div className="text-center text-muted-foreground">
                 <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p>Select a document to view</p>
               </div>

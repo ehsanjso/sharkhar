@@ -26,35 +26,26 @@ const initialTasks: Task[] = [
   { id: '5', title: 'Proactive Coder (11pm cron)', status: 'done', tags: ['automation'] },
   { id: '6', title: 'Match UI to video design', status: 'done', tags: ['app', 'design'] },
   { id: '7', title: 'Mission Control Next.js app', status: 'done', tags: ['app'] },
-  { id: '8', title: 'Dark theme (GitHub style)', status: 'done', tags: ['design'] },
+  { id: '8', title: 'Dark theme (shadcn default)', status: 'done', tags: ['design'] },
   { id: '9', title: 'Document list & viewer', status: 'done', tags: ['app'] },
   { id: '10', title: 'Memory folder structure', status: 'done', tags: ['app'] },
   { id: '11', title: 'Journal entry created', status: 'done', tags: ['app'] },
   { id: '12', title: 'Upgrade to shadcn/ui', status: 'done', tags: ['app', 'design'] },
   
-  // From Duncan Rogoff's 63 Use Cases Video - TODO
-  { id: '13', title: 'Competitor/Trend Scanning', status: 'todo', tags: ['automation'] },
-  { id: '14', title: 'Add Last30Days API keys', status: 'todo', tags: ['automation'] },
-  { id: '15', title: 'Mission Control systemd service', status: 'todo', tags: ['app'] },
+  // From Duncan Rogoff's 63 Use Cases Video
+  { id: '13', title: 'Deep Research templates', status: 'done', tags: ['automation'] },
+  { id: '14', title: 'Video clips (ffmpeg)', status: 'done', tags: ['video'] },
+  { id: '15', title: 'Remotion video creation', status: 'done', tags: ['video'] },
+  
+  // TODO
+  { id: '16', title: 'Add Last30Days API keys', status: 'todo', tags: ['automation'] },
+  { id: '17', title: 'Mission Control systemd service', status: 'todo', tags: ['app'] },
 ];
 
-const tagVariants: Record<string, string> = {
-  video: 'bg-purple-500/15 text-purple-400',
-  design: 'bg-pink-500/15 text-pink-400',
-  automation: 'bg-green-500/15 text-green-400',
-  app: 'bg-blue-500/15 text-blue-400',
-};
-
-const priorityVariants: Record<string, string> = {
-  high: 'bg-red-500/15 text-red-400',
-  medium: 'bg-yellow-500/15 text-yellow-400',
-  low: 'bg-zinc-500/15 text-zinc-400',
-};
-
 const columnConfig = [
-  { id: 'todo' as const, title: 'To Do', icon: Circle, dotColor: 'bg-yellow-500' },
-  { id: 'progress' as const, title: 'In Progress', icon: Clock, dotColor: 'bg-blue-500' },
-  { id: 'done' as const, title: 'Done', icon: CheckCircle, dotColor: 'bg-green-500' },
+  { id: 'todo' as const, title: 'To Do', icon: Circle },
+  { id: 'progress' as const, title: 'In Progress', icon: Clock },
+  { id: 'done' as const, title: 'Done', icon: CheckCircle },
 ];
 
 export default function TaskBoard() {
@@ -65,28 +56,28 @@ export default function TaskBoard() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+    <div className="dark min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="border-b border-[var(--border)] bg-[var(--background-secondary)]">
+      <header className="border-b bg-card">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link href="/">
-                <Button variant="ghost" size="icon" className="text-[var(--muted-foreground)]">
+                <Button variant="ghost" size="icon">
                   <ArrowLeft className="w-5 h-5" />
                 </Button>
               </Link>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-primary-foreground" />
                 </div>
                 <div>
                   <h1 className="text-xl font-semibold">Task Board</h1>
-                  <p className="text-sm text-[var(--muted-foreground)]">ClawdBot automation tasks</p>
+                  <p className="text-sm text-muted-foreground">ClawdBot automation tasks</p>
                 </div>
               </div>
             </div>
-            <Button size="sm" className="bg-[var(--accent)] hover:bg-[var(--accent)]/80 gap-1.5">
+            <Button size="sm" className="gap-1.5">
               <Plus className="w-4 h-4" />
               Add Task
             </Button>
@@ -102,12 +93,12 @@ export default function TaskBoard() {
             const Icon = column.icon;
             
             return (
-              <Card key={column.id} className="bg-[var(--background-secondary)] border-[var(--border)]">
+              <Card key={column.id}>
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-base font-medium">
-                    <div className={`w-2.5 h-2.5 rounded-full ${column.dotColor}`} />
+                    <Icon className="w-4 h-4" />
                     {column.title}
-                    <Badge variant="secondary" className="ml-auto bg-[var(--card)] text-[var(--muted-foreground)]">
+                    <Badge variant="secondary" className="ml-auto">
                       {columnTasks.length}
                     </Badge>
                   </CardTitle>
@@ -118,7 +109,7 @@ export default function TaskBoard() {
                       {columnTasks.map((task) => (
                         <Card
                           key={task.id}
-                          className="bg-[var(--card)] border-[var(--border)] hover:border-[var(--accent)]/50 transition-colors cursor-pointer group"
+                          className="cursor-pointer hover:bg-accent/50 transition-colors group"
                         >
                           <CardContent className="p-3">
                             <div className="text-sm font-medium mb-2">{task.title}</div>
@@ -126,16 +117,16 @@ export default function TaskBoard() {
                               {task.tags.map((tag) => (
                                 <Badge
                                   key={tag}
-                                  variant="secondary"
-                                  className={`text-[10px] px-1.5 py-0 h-5 ${tagVariants[tag] || 'bg-[var(--card)] text-[var(--muted-foreground)]'}`}
+                                  variant="outline"
+                                  className="text-[10px] px-1.5 py-0 h-5"
                                 >
                                   {tag}
                                 </Badge>
                               ))}
                               {task.priority && (
                                 <Badge
-                                  variant="secondary"
-                                  className={`text-[10px] px-1.5 py-0 h-5 ${priorityVariants[task.priority]}`}
+                                  variant={task.priority === 'high' ? 'destructive' : 'secondary'}
+                                  className="text-[10px] px-1.5 py-0 h-5"
                                 >
                                   {task.priority}
                                 </Badge>
@@ -144,12 +135,12 @@ export default function TaskBoard() {
                             
                             {/* Quick actions on hover */}
                             {column.id !== 'done' && (
-                              <div className="hidden group-hover:flex gap-2 mt-3 pt-3 border-t border-[var(--border)]">
+                              <div className="hidden group-hover:flex gap-2 mt-3 pt-3 border-t">
                                 {column.id === 'todo' && (
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-6 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 p-0 px-2"
+                                    className="h-6 text-xs px-2"
                                     onClick={() => moveTask(task.id, 'progress')}
                                   >
                                     → Start
@@ -158,7 +149,7 @@ export default function TaskBoard() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-6 text-xs text-green-400 hover:text-green-300 hover:bg-green-500/10 p-0 px-2"
+                                  className="h-6 text-xs px-2"
                                   onClick={() => moveTask(task.id, 'done')}
                                 >
                                   ✓ Done
@@ -170,7 +161,7 @@ export default function TaskBoard() {
                       ))}
                       
                       {columnTasks.length === 0 && (
-                        <div className="text-center py-8 text-[var(--muted-foreground)] text-sm">
+                        <div className="text-center py-8 text-muted-foreground text-sm">
                           No tasks
                         </div>
                       )}
@@ -184,9 +175,9 @@ export default function TaskBoard() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-[var(--border)] py-4 mt-6">
-        <p className="text-center text-[var(--muted-foreground)] text-xs">
-          Last updated: Jan 30, 2026 • Mission Control
+      <footer className="border-t py-4 mt-6">
+        <p className="text-center text-muted-foreground text-xs">
+          Mission Control • {new Date().toLocaleDateString()}
         </p>
       </footer>
     </div>
