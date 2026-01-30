@@ -175,8 +175,8 @@
     // Sort by combined (viewers + followers), least to most
     models.sort((a, b) => a.combined - b.combined);
     
-    // Take top 25
-    const top25 = models.slice(0, 25);
+    // Take top 100
+    const top25 = models.slice(0, 100);
     
     if (top25.length === 0) {
       body.innerHTML = '<div class="sc-stats-error">No models found on this page</div>';
@@ -184,7 +184,7 @@
     }
     
     let html = '<div class="sc-scan-results">';
-    html += `<div class="sc-scan-summary">Found ${models.length} models · Showing top 25 with lowest viewers + followers</div>`;
+    html += `<div class="sc-scan-summary">Found ${models.length} models · Showing top 100 with lowest viewers + followers</div>`;
     html += '<div class="sc-scan-list">';
     
     top25.forEach((m, i) => {
