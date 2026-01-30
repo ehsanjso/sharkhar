@@ -18,11 +18,12 @@ interface Task {
 }
 
 const initialTasks: Task[] = [
+  // Alex Finn Video Tasks - ALL DONE! 🎉
   { id: '1', title: 'Got screenshot of video UI', status: 'done', tags: ['video', 'design'] },
-  { id: '2', title: 'Set up Morning Brief (8am cron)', status: 'todo', tags: ['automation'], priority: 'high' },
-  { id: '3', title: 'Daily Research Report (afternoon)', status: 'todo', tags: ['automation'] },
-  { id: '4', title: 'Install Last30Days Skill', status: 'todo', tags: ['automation'] },
-  { id: '5', title: 'Proactive Coder (11pm build sessions)', status: 'todo', tags: ['automation'] },
+  { id: '2', title: 'Set up Morning Brief (8am cron)', status: 'done', tags: ['automation'] },
+  { id: '3', title: 'Daily Research Report (2pm cron)', status: 'done', tags: ['automation'] },
+  { id: '4', title: 'Install Last30Days Skill', status: 'done', tags: ['automation'] },
+  { id: '5', title: 'Proactive Coder (11pm cron)', status: 'done', tags: ['automation'] },
   { id: '6', title: 'Match UI to video design', status: 'done', tags: ['app', 'design'] },
   { id: '7', title: 'Mission Control Next.js app', status: 'done', tags: ['app'] },
   { id: '8', title: 'Dark theme (GitHub style)', status: 'done', tags: ['design'] },
@@ -30,6 +31,11 @@ const initialTasks: Task[] = [
   { id: '10', title: 'Memory folder structure', status: 'done', tags: ['app'] },
   { id: '11', title: 'Journal entry created', status: 'done', tags: ['app'] },
   { id: '12', title: 'Upgrade to shadcn/ui', status: 'done', tags: ['app', 'design'] },
+  
+  // From Duncan Rogoff's 63 Use Cases Video - TODO
+  { id: '13', title: 'Competitor/Trend Scanning', status: 'todo', tags: ['automation'] },
+  { id: '14', title: 'Add Last30Days API keys', status: 'todo', tags: ['automation'] },
+  { id: '15', title: 'Mission Control systemd service', status: 'todo', tags: ['app'] },
 ];
 
 const tagVariants: Record<string, string> = {
