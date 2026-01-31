@@ -48,6 +48,62 @@
     "pihole": {
       "version": "2.0.1",
       "installedAt": 1769808780629
+    },
+    "yahoo-finance": {
+      "version": "1.0.0",
+      "installedAt": 1769823441037
+    },
+    "google-calendar": {
+      "version": "1.0.0",
+      "installedAt": 1769823489805
+    },
+    "financial-market-analysis": {
+      "version": "1.0.0",
+      "installedAt": 1769823504596
+    },
+    "todoist": {
+      "version": "0.2.1",
+      "installedAt": 1769823525278
+    },
+    "linear": {
+      "version": "1.0.0",
+      "installedAt": 1769823548646
+    },
+    "plan-my-day": {
+      "version": "1.0.0",
+      "installedAt": 1769823574287
+    },
+    "task-tracker": {
+      "version": "1.0.0",
+      "installedAt": 1769823592777
+    },
+    "jq": {
+      "version": "1.2.0",
+      "installedAt": 1769823664841
+    },
+    "process-watch": {
+      "version": "1.0.0",
+      "installedAt": 1769823697125
+    },
+    "simple-backup": {
+      "version": "1.0.3",
+      "installedAt": 1769823714177
+    },
+    "tldr": {
+      "version": "1.0.1",
+      "installedAt": 1769823730943
+    },
+    "tmdb": {
+      "version": "1.0.0",
+      "installedAt": 1769823737734
+    },
+    "gifgrep": {
+      "version": "1.0.1",
+      "installedAt": 1769830635979
+    },
+    "bambu-cli": {
+      "version": "1.0.0",
+      "installedAt": 1769830872611
     }
   }
 }

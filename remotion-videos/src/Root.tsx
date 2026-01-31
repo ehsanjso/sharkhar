@@ -3,6 +3,7 @@ import { Composition } from "remotion";
 import { TextTitle } from "./compositions/TextTitle";
 import { StatsCounter } from "./compositions/StatsCounter";
 import { Announcement } from "./compositions/Announcement";
+import { Quote } from "./compositions/Quote";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -95,6 +96,40 @@ export const RemotionRoot: React.FC = () => {
           backgroundColor: "#0d1117",
           textColor: "#e6edf3",
           accentColor: "#1f6feb",
+        }}
+      />
+
+      {/* Quote - Inspirational quote with attribution */}
+      <Composition
+        id="Quote"
+        component={Quote}
+        durationInFrames={120}
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={{
+          quote: "The best way to predict the future is to create it.",
+          author: "Peter Drucker",
+          backgroundColor: "#0d1117",
+          textColor: "#e6edf3",
+          accentColor: "#58a6ff",
+        }}
+      />
+
+      {/* Quote Vertical (TikTok/Reels) */}
+      <Composition
+        id="QuoteVertical"
+        component={Quote}
+        durationInFrames={120}
+        fps={30}
+        width={1080}
+        height={1920}
+        defaultProps={{
+          quote: "Stay hungry. Stay foolish.",
+          author: "Steve Jobs",
+          backgroundColor: "#0d1117",
+          textColor: "#e6edf3",
+          accentColor: "#58a6ff",
         }}
       />
     </>

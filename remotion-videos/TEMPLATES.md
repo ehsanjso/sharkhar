@@ -65,6 +65,26 @@ Props:
 ### 5. AnnouncementVertical
 Same as Announcement but 9:16 for stories/reels.
 
+### 6. Quote
+Elegant quote display with large decorative quotation mark and author attribution.
+
+```bash
+./render.sh Quote --props '{
+  "quote": "The best way to predict the future is to create it.",
+  "author": "Peter Drucker"
+}'
+```
+
+Props:
+- `quote` (required): The quote text
+- `author`: Attribution (prefixed with "—")
+- `backgroundColor`: Background color (default: #0d1117)
+- `textColor`: Quote text color (default: #e6edf3)
+- `accentColor`: Quote mark and author color (default: #58a6ff)
+
+### 7. QuoteVertical
+Same as Quote but 9:16 for stories/reels.
+
 ## Quick Commands
 
 ```bash
