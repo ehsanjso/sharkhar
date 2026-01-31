@@ -41,8 +41,11 @@ const initialTasks: Task[] = [
   { id: '16', title: 'Mission Control systemd service', status: 'done', tags: ['app'] },
   { id: '17', title: 'Test Remotion on ARM (Pi 5)', status: 'done', tags: ['video'] },
   
+  // Tonight's Build (2026-01-31)
+  { id: '18', title: 'Quote template for Remotion', status: 'done', tags: ['video'] },
+  
   // TODO
-  { id: '18', title: 'Add Last30Days API keys', status: 'todo', tags: ['automation'] },
+  { id: '19', title: 'Add Last30Days API keys', status: 'todo', tags: ['automation'] },
 ];
 
 const columnConfig = [
