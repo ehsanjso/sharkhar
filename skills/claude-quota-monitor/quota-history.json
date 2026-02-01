@@ -1,0 +1,20 @@
+[
+  {
+    "timestamp": "2026-02-01T15:37:55.468Z",
+    "sessionLimit": {
+      "used": 99,
+      "resetIn": "2h 21m",
+      "resetTime": "12:57 PM EST"
+    },
+    "weeklyLimits": {
+      "sonnetOnly": {
+        "used": 5,
+        "resetTime": "Sat 5:00 AM"
+      },
+      "allModels": {
+        "used": 14,
+        "resetTime": "Thu 11:00 PM"
+      }
+    }
+  }
+]

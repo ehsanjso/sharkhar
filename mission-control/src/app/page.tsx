@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Send, FileText, Users, ListTodo, Zap, MoreHorizontal } from 'lucide-react';
+import Link from 'next/link';
+import { Search, Send, FileText, Users, ListTodo, Zap, MoreHorizontal, Brain, Clock } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { format, parseISO } from 'date-fns';
@@ -90,17 +91,27 @@ export default function MissionControl() {
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabType)}>
             <TabsList>
-              <TabsTrigger value="tasks" className="gap-1.5">
-                <ListTodo className="w-4 h-4" />
-                Tasks
-              </TabsTrigger>
               <TabsTrigger value="docs" className="gap-1.5">
                 <FileText className="w-4 h-4" />
                 Docs
               </TabsTrigger>
-              <TabsTrigger value="people" className="gap-1.5">
-                <Users className="w-4 h-4" />
-                People
+              <TabsTrigger value="tasks" className="gap-1.5" asChild>
+                <Link href="/tasks">
+                  <ListTodo className="w-4 h-4" />
+                  Tasks
+                </Link>
+              </TabsTrigger>
+              <TabsTrigger value="agent" className="gap-1.5" asChild>
+                <Link href="/agent">
+                  <Brain className="w-4 h-4" />
+                  Agent
+                </Link>
+              </TabsTrigger>
+              <TabsTrigger value="crons" className="gap-1.5" asChild>
+                <Link href="/crons">
+                  <Clock className="w-4 h-4" />
+                  Crons
+                </Link>
               </TabsTrigger>
             </TabsList>
           </Tabs>

@@ -128,6 +128,10 @@
     "excalidraw-flowchart": {
       "version": "1.0.3",
       "installedAt": 1769900845170
+    },
+    "antigravity-quota": {
+      "version": "1.1.0",
+      "installedAt": 1769959029424
     }
   }
 }
