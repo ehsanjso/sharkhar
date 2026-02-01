@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mission Control
 
-## Getting Started
+Second Brain dashboard for ClawdBot - view memory files, manage tasks, and track your AI assistant's work.
 
-First, run the development server:
+## Features
+
+- 📝 **Document Viewer** - Browse and read all memory files (journals, research, builds)
+- ✅ **Task Board** - Kanban board for tracking automation projects
+- 🔍 **Type Filters** - Filter by document type (journal, research, content, etc.)
+- 🎨 **Dark Theme** - GitHub-inspired dark UI with shadcn/ui components
+
+## Quick Start
+
+### Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Production (Systemd Service)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Mission Control runs as a systemd service on Raspberry Pi:
 
-## Learn More
+```bash
+# Install and start service
+sudo ./setup-service.sh
 
-To learn more about Next.js, take a look at the following resources:
+# Check status
+sudo systemctl status mission-control
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# View logs
+journalctl -u mission-control -f
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Access at: `http://192.168.0.217:3000` or `http://localhost:3000`
 
-## Deploy on Vercel
+## Architecture
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Framework:** Next.js 16 with App Router
+- **UI:** shadcn/ui components + Tailwind CSS
+- **Data Source:** Memory files from `~/clawd/memory/`
+- **Deployment:** Standalone server via systemd
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## File Structure
+
+```
+src/
+├── app/
+│   ├── page.tsx          # Documents viewer (main page)
+│   └── tasks/page.tsx    # Task board
+└── components/ui/        # shadcn/ui components
+```
+
+## Memory Files
+
+Mission Control reads from:
+- `~/clawd/memory/*.md` - Daily journals
+- `~/clawd/memory/research/` - Research documents
+- `~/clawd/memory/builds/` - Nightly build logs
+
+Files use YAML frontmatter for metadata:
+```yaml
+---
+type: journal
+tags: [clawdbot, automation]
+---
+```
+
+## Inspired By
+
+Alex Finn's "5 insane ClawdBot use cases" video - Mission Control is the visual second brain for your AI assistant.
+
+## Tech Stack
+
+- Next.js 16.1.6
+- React 19
+- shadcn/ui (Zinc theme)
+- Tailwind CSS 4.0
+- Lucide Icons
