@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Navigation } from "@/components/navigation";
 
 export const metadata: Metadata = {
   title: "Mission Control",
@@ -13,8 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className="antialiased bg-background text-foreground">
-        {children}
+      <body className="antialiased bg-background text-foreground min-h-screen">
+        <Navigation />
+        <main>{children}</main>
       </body>
     </html>
   );

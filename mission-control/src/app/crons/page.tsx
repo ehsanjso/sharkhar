@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { 
-  ArrowLeft, 
   Clock, 
   CheckCircle, 
   XCircle, 
@@ -90,25 +88,18 @@ export default function CronJobsPage() {
   const failedJobs = jobs.filter(j => j.lastStatus === 'error');
 
   return (
-    <div className="dark min-h-screen bg-background text-foreground">
-      {/* Header */}
-      <header className="border-b bg-card">
+    <div className="min-h-[calc(100vh-3.5rem)]">
+      {/* Page Header */}
+      <div className="border-b bg-card/50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/agent">
-                <Button variant="ghost" size="icon">
-                  <ArrowLeft className="w-5 h-5" />
-                </Button>
-              </Link>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-semibold">Cron Jobs</h1>
-                  <p className="text-sm text-muted-foreground">Scheduled automation tasks</p>
-                </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                <Clock className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-semibold">Cron Jobs</h1>
+                <p className="text-sm text-muted-foreground">Scheduled automation tasks</p>
               </div>
             </div>
             <Button 
@@ -123,7 +114,7 @@ export default function CronJobsPage() {
             </Button>
           </div>
         </div>
-      </header>
+      </div>
 
       <main className="max-w-7xl mx-auto p-6">
         {/* Summary Cards */}
@@ -181,7 +172,7 @@ export default function CronJobsPage() {
             <CardDescription>Click a job to see details</CardDescription>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[600px]">
+            <ScrollArea className="h-[calc(100vh-400px)]">
               <div className="space-y-4">
                 {isLoading ? (
                   <div className="flex items-center justify-center py-12">

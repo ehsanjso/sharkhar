@@ -3,12 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
-  ArrowLeft, 
-  Zap, 
   Clock, 
   CheckCircle, 
   XCircle, 
-  AlertTriangle,
   Brain,
   Calendar,
   GitCommit,
@@ -111,25 +108,18 @@ export default function AgentDashboard() {
   const cronJobsTotal = context?.cronJobs.length || 0;
 
   return (
-    <div className="dark min-h-screen bg-background text-foreground">
-      {/* Header */}
-      <header className="border-b bg-card">
+    <div className="min-h-[calc(100vh-3.5rem)]">
+      {/* Page Header */}
+      <div className="border-b bg-card/50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/">
-                <Button variant="ghost" size="icon">
-                  <ArrowLeft className="w-5 h-5" />
-                </Button>
-              </Link>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                  <Brain className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-semibold">Agent Dashboard</h1>
-                  <p className="text-sm text-muted-foreground">Context recovery & status</p>
-                </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                <Brain className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-semibold">Agent Dashboard</h1>
+                <p className="text-sm text-muted-foreground">Context recovery & status</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -149,7 +139,7 @@ export default function AgentDashboard() {
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       <main className="max-w-7xl mx-auto p-6">
         {isLoading && !context ? (
@@ -327,6 +317,11 @@ export default function AgentDashboard() {
                         )}
                       </div>
                     ))}
+                    {(!context?.cronJobs || context.cronJobs.length === 0) && (
+                      <p className="text-sm text-muted-foreground text-center py-8">
+                        No cron jobs configured
+                      </p>
+                    )}
                   </div>
                 </ScrollArea>
               </CardContent>

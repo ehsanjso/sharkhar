@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import { ArrowLeft, CheckCircle, Circle, Clock, Zap, Plus } from 'lucide-react';
+import { CheckCircle, Circle, Clock, Zap, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -66,25 +65,18 @@ export default function TaskBoard() {
   };
 
   return (
-    <div className="dark min-h-screen bg-background text-foreground">
-      {/* Header */}
-      <header className="border-b bg-card">
+    <div className="min-h-[calc(100vh-3.5rem)]">
+      {/* Page Header */}
+      <div className="border-b bg-card/50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/">
-                <Button variant="ghost" size="icon">
-                  <ArrowLeft className="w-5 h-5" />
-                </Button>
-              </Link>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-primary-foreground" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-semibold">Task Board</h1>
-                  <p className="text-sm text-muted-foreground">ClawdBot automation tasks</p>
-                </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
+                <Zap className="w-5 h-5 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-xl font-semibold">Task Board</h1>
+                <p className="text-sm text-muted-foreground">ClawdBot automation tasks</p>
               </div>
             </div>
             <Button size="sm" className="gap-1.5">
@@ -93,7 +85,7 @@ export default function TaskBoard() {
             </Button>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Board */}
       <main className="max-w-7xl mx-auto p-6">
@@ -114,7 +106,7 @@ export default function TaskBoard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <ScrollArea className="h-[calc(100vh-280px)]">
+                  <ScrollArea className="h-[calc(100vh-320px)]">
                     <div className="space-y-3 pr-2">
                       {columnTasks.map((task) => (
                         <Card
@@ -183,13 +175,6 @@ export default function TaskBoard() {
           })}
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t py-4 mt-6">
-        <p className="text-center text-muted-foreground text-xs">
-          Mission Control • {new Date().toLocaleDateString()}
-        </p>
-      </footer>
     </div>
   );
 }
