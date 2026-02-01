@@ -44,7 +44,7 @@ const initialTasks: Task[] = [
   // Tonight's Build (2026-01-31)
   { id: '18', title: 'Quote template for Remotion', status: 'done', tags: ['video'] },
   
-  // TODO
+  // Future Tasks
   { id: '19', title: 'Add Last30Days API keys', status: 'todo', tags: ['automation'] },
 ];
 
