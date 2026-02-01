@@ -166,14 +166,14 @@ export default function MissionControl() {
 
             {/* Document Content */}
             <ScrollArea className="flex-1">
-              <div className="p-8 max-w-4xl mx-auto">
+              <div className="p-8 pb-16 max-w-4xl mx-auto">
                 <Card className="bg-card/50 border border-border/50">
                   <CardHeader className="pb-4">
                     <CardTitle className="text-2xl font-bold">
                       {formatDocDate(selectedDoc.date)}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-0">
+                  <CardContent className="pt-0 pb-8">
                     <article className="prose prose-invert prose-base max-w-none 
                       prose-headings:text-foreground prose-headings:font-semibold
                       prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-border/50 prose-h2:pb-2
