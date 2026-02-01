@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 
 type FilterType = 'all' | 'journal' | 'other' | 'content' | 'newsletters';
@@ -72,11 +71,11 @@ export default function MissionControl() {
   });
 
   return (
-    <div className="h-[calc(100vh-3.5rem)] flex bg-background">
+    <div className="h-[calc(100vh-3.5rem)] flex bg-background overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-80 border-r flex flex-col bg-card">
+      <aside className="w-80 border-r flex flex-col bg-card shrink-0">
         {/* Search */}
-        <div className="p-4">
+        <div className="p-4 shrink-0">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -90,7 +89,7 @@ export default function MissionControl() {
         </div>
 
         {/* Filters */}
-        <div className="px-4 pb-4 flex gap-2 flex-wrap">
+        <div className="px-4 pb-4 flex gap-2 flex-wrap shrink-0">
           {filters.map((filter) => (
             <Badge
               key={filter.id}
@@ -103,10 +102,10 @@ export default function MissionControl() {
           ))}
         </div>
 
-        <Separator />
+        <Separator className="shrink-0" />
 
-        {/* Document List */}
-        <ScrollArea className="flex-1">
+        {/* Document List - scrollable */}
+        <div className="flex-1 overflow-y-auto min-h-0">
           <div className="p-2">
             {isLoading ? (
               <div className="p-4 text-center text-muted-foreground">Loading...</div>
@@ -141,15 +140,15 @@ export default function MissionControl() {
               ))
             )}
           </div>
-        </ScrollArea>
+        </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col overflow-hidden bg-background">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {selectedDoc ? (
           <>
-            {/* Document Header */}
-            <div className="px-6 py-4 border-b bg-card/50">
+            {/* Document Header - fixed */}
+            <div className="px-6 py-4 border-b bg-card/50 shrink-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <h1 className="text-lg font-semibold">{selectedDoc.title}</h1>
@@ -164,8 +163,8 @@ export default function MissionControl() {
               <p className="text-sm text-muted-foreground mt-1">{selectedDoc.path}</p>
             </div>
 
-            {/* Document Content */}
-            <ScrollArea className="flex-1">
+            {/* Document Content - scrollable */}
+            <div className="flex-1 overflow-y-auto min-h-0">
               <div className="p-8 pb-16 max-w-4xl mx-auto">
                 <Card className="bg-card/50 border border-border/50">
                   <CardHeader className="pb-4">
@@ -193,10 +192,10 @@ export default function MissionControl() {
                   </CardContent>
                 </Card>
               </div>
-            </ScrollArea>
+            </div>
 
-            {/* Input Bar */}
-            <div className="p-4 border-t bg-card/50">
+            {/* Input Bar - fixed */}
+            <div className="p-4 border-t bg-card/50 shrink-0">
               <div className="flex items-center gap-3">
                 <Button variant="ghost" size="sm" className="text-muted-foreground">
                   Debug
