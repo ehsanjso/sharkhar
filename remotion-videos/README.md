@@ -33,6 +33,12 @@ For faster, more efficient renders on Raspberry Pi, use the `--pi-optimize` flag
 ./render.sh TextTitle --pi-optimize
 ```
 
+Or use the npm script:
+
+```console
+npm run render:pi TextTitle out/video.mp4
+```
+
 **Performance gains:**
 - ⚡ **30% faster** rendering
 - 📦 **25% smaller** file sizes

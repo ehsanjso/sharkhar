@@ -11,6 +11,12 @@ For faster rendering on Raspberry Pi, add the `--pi-optimize` (or `--pi`) flag t
 ./render.sh Quote --pi --props '{"quote":"Fast rendering!"}'
 ```
 
+Or use the npm script:
+
+```bash
+npm run render:pi TextTitle out/video.mp4
+```
+
 **Performance gains:** 30% faster rendering, 25% smaller files
 
 ## Available Templates

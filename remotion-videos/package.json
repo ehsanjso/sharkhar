@@ -24,6 +24,8 @@
   "scripts": {
     "dev": "remotion studio",
     "build": "remotion bundle",
+    "render": "remotion render",
+    "render:pi": "remotion render --concurrency 2 --image-format jpeg --jpeg-quality 90 --crf 25",
     "upgrade": "remotion upgrade",
     "lint": "eslint src && tsc"
   },
