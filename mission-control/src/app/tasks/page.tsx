@@ -43,6 +43,10 @@ const initialTasks: Task[] = [
   
   // Tonight's Build (2026-01-31)
   { id: '18', title: 'Quote template for Remotion', status: 'done', tags: ['video'] },
+  { id: '20', title: 'Baseline Remotion render test (30% faster)', status: 'done', tags: ['video', 'optimization'] },
+  { id: '21', title: 'Add --pi-optimize flag to render.sh', status: 'done', tags: ['video', 'automation'] },
+  { id: '22', title: 'Document Pi optimization in README', status: 'done', tags: ['docs'] },
+  { id: '23', title: 'Clean up Mission Control TODO comments', status: 'done', tags: ['app', 'refactor'] },
   
   // Future Tasks
   { id: '19', title: 'Add Last30Days API keys', status: 'todo', tags: ['automation'] },
