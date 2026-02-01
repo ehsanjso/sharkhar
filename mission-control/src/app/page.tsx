@@ -174,7 +174,7 @@ export default function MissionControl() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="px-0">
-                    <article className="markdown-content">
+                    <article className="prose prose-invert prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground/80 prose-li:text-foreground/80 prose-strong:text-foreground prose-a:text-primary prose-code:text-primary prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {selectedDoc.content}
                       </ReactMarkdown>
