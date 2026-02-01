@@ -88,48 +88,64 @@
 
 /* Markdown Styles */
 .markdown-content {
-  @apply leading-relaxed;
+  @apply leading-relaxed text-[15px];
+}
+
+.markdown-content > *:first-child {
+  @apply mt-0;
 }
 
 .markdown-content h1 {
-  @apply text-2xl font-semibold mt-6 mb-3 text-foreground border-b border-border pb-2;
+  @apply text-2xl font-bold mt-8 mb-4 text-foreground border-b border-border pb-3;
 }
 
 .markdown-content h2 {
-  @apply text-xl font-semibold mt-5 mb-2 text-foreground border-b border-border pb-1.5;
+  @apply text-xl font-bold mt-8 mb-4 text-foreground border-b border-border pb-2;
 }
 
 .markdown-content h3 {
-  @apply text-lg font-semibold mt-4 mb-2 text-foreground;
+  @apply text-lg font-semibold mt-6 mb-3 text-foreground;
+}
+
+.markdown-content h4 {
+  @apply text-base font-semibold mt-5 mb-2 text-foreground;
 }
 
 .markdown-content p {
-  @apply mb-3 text-muted-foreground;
+  @apply mb-4 text-foreground/90 leading-7;
 }
 
-.markdown-content ul,
+.markdown-content ul {
+  @apply mb-4 pl-6 list-disc space-y-2;
+}
+
 .markdown-content ol {
-  @apply mb-3 pl-6;
+  @apply mb-4 pl-6 list-decimal space-y-2;
 }
 
 .markdown-content li {
-  @apply mb-1 text-muted-foreground;
+  @apply text-foreground/90 leading-7;
+}
+
+.markdown-content li > ul,
+.markdown-content li > ol {
+  @apply mt-2 mb-0;
 }
 
 .markdown-content code {
-  @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono;
+  @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-primary;
 }
 
 .markdown-content pre {
-  @apply bg-muted p-4 rounded-lg overflow-x-auto mb-4;
+  @apply bg-muted p-4 rounded-lg overflow-x-auto mb-4 border border-border;
 }
 
 .markdown-content pre code {
-  @apply bg-transparent p-0;
+  @apply bg-transparent p-0 text-foreground;
 }
 
 .markdown-content blockquote {
-  @apply border-l-4 border-primary pl-4 my-4 text-muted-foreground italic bg-muted/50 py-2 pr-4 rounded-r;
+  @apply border-l-4 border-primary/50 pl-4 my-6 text-foreground/80 bg-muted/30 py-3 pr-4 rounded-r-lg;
 }
 
 .markdown-content a {
