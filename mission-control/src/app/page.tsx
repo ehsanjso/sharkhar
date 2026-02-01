@@ -166,15 +166,26 @@ export default function MissionControl() {
 
             {/* Document Content */}
             <ScrollArea className="flex-1">
-              <div className="p-6 max-w-4xl">
-                <Card className="border-0 shadow-none">
-                  <CardHeader className="px-0 pt-0">
-                    <CardTitle className="text-xl">
+              <div className="p-8 max-w-4xl mx-auto">
+                <Card className="bg-card/50 border border-border/50">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-2xl font-bold">
                       {formatDocDate(selectedDoc.date)}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="px-0">
-                    <article className="prose prose-invert prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground/80 prose-li:text-foreground/80 prose-strong:text-foreground prose-a:text-primary prose-code:text-primary prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none">
+                  <CardContent className="pt-0">
+                    <article className="prose prose-invert prose-base max-w-none 
+                      prose-headings:text-foreground prose-headings:font-semibold
+                      prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-border/50 prose-h2:pb-2
+                      prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-3
+                      prose-p:text-foreground/85 prose-p:leading-7 prose-p:mb-4
+                      prose-li:text-foreground/85 prose-li:leading-7 prose-li:my-1
+                      prose-ul:my-4 prose-ul:pl-6 prose-ol:my-4 prose-ol:pl-6
+                      prose-strong:text-foreground prose-strong:font-semibold
+                      prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+                      prose-code:text-primary prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
+                      prose-pre:bg-muted prose-pre:border prose-pre:border-border
+                      prose-blockquote:border-l-primary/50 prose-blockquote:bg-muted/30 prose-blockquote:py-1 prose-blockquote:not-italic">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {selectedDoc.content}
                       </ReactMarkdown>
