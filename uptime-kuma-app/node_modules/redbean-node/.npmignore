@@ -1,0 +1,12 @@
+node_modules
+.idea
+/dist
+dbfile.db
+/dev_*.ts
+/dev_*.js
+lib/model/
+/.nyc_output/
+/coverage/
+.coveralls.yml
+.env
+.env.json

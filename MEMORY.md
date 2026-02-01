@@ -1,6 +1,6 @@
 # 🧠 Long-term Memory
 
-*Last updated: 2026-01-30*
+*Last updated: 2026-01-31*
 
 ## About Ehsan
 
@@ -10,6 +10,52 @@
 - **Platform:** Raspberry Pi 5
 
 ## Our Projects
+
+### Uptime Kuma (Service Monitoring)
+
+Monitoring all services on the Raspberry Pi via Docker.
+
+**Access:**
+- URL: http://192.168.0.217:3001
+- Username: admin
+- Password: clawd2026!
+
+**Running in Docker:**
+- Container: `uptime-kuma`
+- Auto-restart: enabled
+- Data: persisted in Docker volume
+- Stable version (no SQL bugs)
+
+**Monitors (9 total, all UP):**
+1. Pi-hole Web Interface (HTTP)
+2. Pi-hole DNS Port (53)
+3. ClawdBot Web (port 3000)
+4. SSH Service (port 22)
+5. Raspberry Pi 5 (ping)
+6. Uptime Kuma (self-monitoring)
+7. Router/Gateway (192.168.0.1)
+8. Internet Connectivity (8.8.8.8)
+9. External Web Access (google.com)
+
+**Docker commands:**
+```bash
+sudo docker ps                    # Check status
+sudo docker logs uptime-kuma      # View logs
+sudo docker restart uptime-kuma   # Restart
+sudo docker stop uptime-kuma      # Stop
+sudo docker start uptime-kuma     # Start
+```
+
+**API management:**
+```bash
+# Using the kuma.py skill script
+export UPTIME_KUMA_URL="http://localhost:3001"
+export UPTIME_KUMA_USERNAME="admin"
+export UPTIME_KUMA_PASSWORD="clawd2026!"
+python /home/ehsanjso/clawd/skills/uptime-kuma/scripts/kuma.py list
+```
+
+---
 
 ### Mission Control (Second Brain)
 
@@ -23,8 +69,8 @@ My second brain app for viewing and organizing memories, journals, and documents
 - Input bar for sending messages (UI ready)
 
 **Access:**
-- App: http://192.168.0.217:3456
-- Tasks: http://192.168.0.217:3456/tasks
+- App: http://192.168.0.217:3000
+- Tasks: http://192.168.0.217:3000/tasks
 
 **How I use it:**
 1. Create daily journal entries in `memory/YYYY-MM-DD.md`

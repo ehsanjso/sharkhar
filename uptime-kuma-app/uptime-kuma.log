@@ -1,0 +1,174 @@
+Welcome to Uptime Kuma
+Your Node.js version: 22.22.0
+2026-01-31T18:25:31-05:00 [SERVER] INFO: Welcome to Uptime Kuma
+2026-01-31T18:25:31-05:00 [SERVER] INFO: Node Env: production
+2026-01-31T18:25:31-05:00 [SERVER] INFO: Inside Container: false
+2026-01-31T18:25:31-05:00 [SERVER] INFO: Importing Node libraries
+2026-01-31T18:25:31-05:00 [SERVER] INFO: Importing 3rd-party libraries
+2026-01-31T18:25:32-05:00 [SERVER] INFO: Creating express and socket.io instance
+2026-01-31T18:25:32-05:00 [SERVER] INFO: Server Type: HTTP
+2026-01-31T18:25:32-05:00 [SERVER] INFO: Importing this project modules
+2026-01-31T18:25:32-05:00 [NOTIFICATION] INFO: Prepare Notification Providers
+2026-01-31T18:25:32-05:00 [SERVER] INFO: Version: 2.0.0-dev.0
+2026-01-31T18:25:32-05:00 [DB] INFO: Data Dir: /home/ehsanjso/.local/share/uptime-kuma/
+2026-01-31T18:25:32-05:00 [SETUP-DATABASE] INFO: db-config.json is not found or invalid: ENOENT: no such file or directory, open '/home/ehsanjso/.local/share/uptime-kuma/db-config.json'
+2026-01-31T18:25:32-05:00 [SETUP-DATABASE] INFO: Starting Setup Database on 3001
+2026-01-31T18:25:32-05:00 [SETUP-DATABASE] INFO: Open http://localhost:3001 in your browser
+2026-01-31T18:25:32-05:00 [SETUP-DATABASE] INFO: Waiting for user action...
+Request /setup-database-info
+Request /setup-database-info
+2026-01-31T18:29:14-05:00 [SETUP-DATABASE] INFO: Database is configured, close the setup-database server and start the main server now.
+2026-01-31T18:29:14-05:00 [SETUP-DATABASE] INFO: The setup-database server is closed
+2026-01-31T18:29:14-05:00 [SERVER] INFO: Connecting to the Database
+2026-01-31T18:29:14-05:00 [DB] INFO: Database Type: sqlite
+2026-01-31T18:29:14-05:00 [SERVER] INFO: Copying Database
+2026-01-31T18:29:14-05:00 [DB] INFO: SQLite config:
+[ { journal_mode: 'wal' } ]
+[ { cache_size: -12000 } ]
+2026-01-31T18:29:14-05:00 [DB] INFO: SQLite Version: 3.41.1
+2026-01-31T18:29:14-05:00 [SERVER] INFO: Connected
+2026-01-31T18:29:14-05:00 [DB] INFO: Your database version: 0
+2026-01-31T18:29:14-05:00 [DB] INFO: Latest database version: 10
+2026-01-31T18:29:14-05:00 [DB] INFO: Database patch is needed
+2026-01-31T18:29:14-05:00 [DB] INFO: Patching ./db/old_migrations/patch1.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patched ./db/old_migrations/patch1.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patching ./db/old_migrations/patch2.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patched ./db/old_migrations/patch2.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patching ./db/old_migrations/patch3.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patched ./db/old_migrations/patch3.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patching ./db/old_migrations/patch4.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patched ./db/old_migrations/patch4.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patching ./db/old_migrations/patch5.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patched ./db/old_migrations/patch5.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patching ./db/old_migrations/patch6.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patched ./db/old_migrations/patch6.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patching ./db/old_migrations/patch7.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patched ./db/old_migrations/patch7.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patching ./db/old_migrations/patch8.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patched ./db/old_migrations/patch8.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patching ./db/old_migrations/patch9.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patched ./db/old_migrations/patch9.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patching ./db/old_migrations/patch10.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Patched ./db/old_migrations/patch10.sql
+2026-01-31T18:29:14-05:00 [DB] INFO: Database Patch 2.0 Process
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-setting-value-type.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-setting-value-type.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-setting-value-type.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-improve-performance.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-improve-performance.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-improve-performance.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-2fa.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-2fa.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-2fa.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-retry-interval-monitor.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-retry-interval-monitor.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-retry-interval-monitor.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-incident-table.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-incident-table.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-incident-table.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-group-table.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-group-table.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-group-table.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-monitor-push_token.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-monitor-push_token.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-monitor-push_token.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-http-monitor-method-body-and-headers.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-http-monitor-method-body-and-headers.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-http-monitor-method-body-and-headers.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-2fa-invalidate-used-token.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-2fa-invalidate-used-token.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-2fa-invalidate-used-token.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-notification_sent_history.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-notification_sent_history.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-notification_sent_history.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-monitor-basic-auth.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-monitor-basic-auth.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-monitor-basic-auth.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-docker-columns.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-docker-columns.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-docker-columns.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-status-page.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-status-page.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-status-page.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-proxy.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-proxy.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-proxy.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-monitor-expiry-notification.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-monitor-expiry-notification.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-monitor-expiry-notification.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-status-page-footer-css.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-status-page-footer-css.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-status-page-footer-css.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-added-mqtt-monitor.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-added-mqtt-monitor.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-added-mqtt-monitor.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-clickable-status-page-link.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-clickable-status-page-link.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-clickable-status-page-link.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-sqlserver-monitor.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-sqlserver-monitor.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-sqlserver-monitor.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-other-auth.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-other-auth.sql need parents
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-other-auth.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-other-auth.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-grpc-monitor.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-grpc-monitor.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-grpc-monitor.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-radius-monitor.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-radius-monitor.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-radius-monitor.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-monitor-add-resend-interval.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-monitor-add-resend-interval.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-monitor-add-resend-interval.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-ping-packet-size.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-ping-packet-size.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-ping-packet-size.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-maintenance-table2.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-maintenance-table2.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-maintenance-table2.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-gamedig-monitor.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-gamedig-monitor.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-gamedig-monitor.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-google-analytics-status-page-tag.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-google-analytics-status-page-tag.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-google-analytics-status-page-tag.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-http-body-encoding.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-http-body-encoding.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-http-body-encoding.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-description-monitor.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-description-monitor.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-description-monitor.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-api-key-table.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-api-key-table.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-api-key-table.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-monitor-tls.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-monitor-tls.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-monitor-tls.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-maintenance-cron.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-maintenance-cron.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-maintenance-cron.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-parent-monitor.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-parent-monitor.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-parent-monitor.sql was patched successfully
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-invert-keyword.sql is not patched
+2026-01-31T18:29:14-05:00 [DB] INFO: patch-add-invert-keyword.sql is patching
+2026-01-31T18:29:14-05:00 [DB] INFO: Closing the database
+2026-01-31T18:29:16-05:00 [DB] INFO: SQLite closed
+Error: ENOENT: no such file or directory, open './db/old_migrations/patch-add-invert-keyword.sql'
+    at Object.openSync (node:fs:560:18)
+    at Object.readFileSync (node:fs:444:35)
+    at Database.importSQLFile (/home/ehsanjso/clawd/uptime-kuma-app/node_modules/uptime-kuma/server/database.js:548:23)
+    at async Database.patch2Recursion (/home/ehsanjso/clawd/uptime-kuma-app/node_modules/uptime-kuma/server/database.js:530:13)
+    at async Database.patchSqlite2 (/home/ehsanjso/clawd/uptime-kuma-app/node_modules/uptime-kuma/server/database.js:412:17)
+    at async Database.patchSqlite (/home/ehsanjso/clawd/uptime-kuma-app/node_modules/uptime-kuma/server/database.js:388:9)
+    at async Database.patch (/home/ehsanjso/clawd/uptime-kuma-app/node_modules/uptime-kuma/server/database.js:323:13)
+    at async initDatabase (/home/ehsanjso/clawd/uptime-kuma-app/node_modules/uptime-kuma/server/server.js:1773:5)
+    at async /home/ehsanjso/clawd/uptime-kuma-app/node_modules/uptime-kuma/server/server.js:195:9 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: './db/old_migrations/patch-add-invert-keyword.sql'
+}
+2026-01-31T18:29:16-05:00 [DB] ERROR: Start Uptime-Kuma failed due to issue patching the database
+2026-01-31T18:29:16-05:00 [DB] ERROR: Please submit the bug report if you still encounter the problem after restart: https://github.com/louislam/uptime-kuma/issues

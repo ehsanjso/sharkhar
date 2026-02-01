@@ -104,6 +104,30 @@
     "bambu-cli": {
       "version": "1.0.0",
       "installedAt": 1769830872611
+    },
+    "playwright-cli": {
+      "version": "1.0.1",
+      "installedAt": 1769900816927
+    },
+    "auto-updater": {
+      "version": "1.0.0",
+      "installedAt": 1769900822751
+    },
+    "uptime-kuma": {
+      "version": "1.0.0",
+      "installedAt": 1769900828178
+    },
+    "tavily": {
+      "version": "1.0.0",
+      "installedAt": 1769900832822
+    },
+    "exa-plus": {
+      "version": "1.0.0",
+      "installedAt": 1769900839934
+    },
+    "excalidraw-flowchart": {
+      "version": "1.0.3",
+      "installedAt": 1769900845170
     }
   }
 }
