@@ -33,6 +33,13 @@ Skills are shared. Your setup is yours. Keeping them apart means you can update 
 
 ---
 
+## Whisper (Voice Transcription)
+- **Model:** tiny (larger models OOM on Pi 5)
+- **Command:** `whisper <file> --model tiny --output_format txt --output_dir /tmp`
+- **Note:** CPU-only (FP32), takes ~30-60s for short clips
+
+---
+
 ## Pi-hole
 - **URL:** http://localhost/admin or http://192.168.0.217/admin
 - **API URL:** http://localhost/api
