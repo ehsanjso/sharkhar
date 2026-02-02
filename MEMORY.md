@@ -1,6 +1,6 @@
 # 🧠 Long-term Memory
 
-*Last updated: 2026-01-31*
+*Last updated: 2026-02-02*
 
 ## About Ehsan
 
@@ -57,6 +57,22 @@ python /home/ehsanjso/clawd/skills/uptime-kuma/scripts/kuma.py list
 
 ---
 
+### Claude Quota Monitoring
+
+Automated tracking to pace Claude usage optimally.
+
+**Cron job:** "Claude Quota Monitor" runs 9am, 3pm, 9pm daily
+**Cache:** `memory/quota-cache.json` (session, weeklyAll, weeklySonnet)
+
+**Reset windows:**
+- Session: ~every 5 hours
+- Weekly All: Thursday 10:59 PM
+- Weekly Sonnet: Saturday 4:59 PM
+
+**Goal:** Pace to hit ~80% at each reset (maximize value without wasting quota)
+
+---
+
 ### Mission Control (Second Brain)
 
 My second brain app for viewing and organizing memories, journals, and documents.
@@ -77,6 +93,12 @@ My second brain app for viewing and organizing memories, journals, and documents
 2. Flesh out important concepts in separate docs
 3. Review past conversations to maintain context
 4. Track tasks and progress visually
+
+**New pages (Feb 2026):**
+- `/agent` — Agent Dashboard for context recovery (quota, crons, recent activity)
+- `/crons` — Detailed cron job viewer with success/failure tracking
+
+The Agent Dashboard helps me wake up each session knowing what happened.
 
 ---
 
@@ -112,6 +134,25 @@ My second brain app for viewing and organizing memories, journals, and documents
 - Interested in AI tooling and automation
 - Uses Telegram for communication
 - Values proactive help over waiting to be asked
+
+---
+
+## Integration Opportunities (Discovered Feb 2026)
+
+### MCP Servers
+- **mcporter** already installed at `/home/ehsanjso/.npm-global/bin/mcporter`
+- MCP = "USB-C for AI" — standardized tool access protocol
+- **Quick wins:** Home Assistant MCP, SQLite queries via chat, enhanced Git ops
+- **Pipedream MCP** gives access to 2,500+ APIs at once
+- Research: `memory/research/2026-02-02-mcp-servers-ecosystem.md`
+
+### Pi-hole Advanced Features
+- **CLI:** Full control via `pihole` command
+- **REST API:** Modern API at `http://pi.hole/api/`
+- **Local DNS:** Can create custom `.local` domains (mission-control.local, etc.)
+- **Regex filtering:** mmotti/pihole-regex for pattern-based blocking
+- Potential: Pi-hole stats page in Mission Control
+- Research: `memory/research/2026-02-01-pihole-advanced-features.md`
 
 ### 🐛 Ralph Wiggum Approach (ALWAYS use for coding!)
 
