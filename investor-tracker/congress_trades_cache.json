@@ -1,17 +1,63 @@
 [
   {
-    "politician": "Dale Strong",
+    "politician": "Tina Smith",
+    "party": "Democrat",
+    "chamber": "Senate",
+    "state": "MN",
+    "ticker": "BRK/B",
+    "company": "Berkshire Hathaway Inc",
+    "transaction_type": "sale",
+    "disclosure_date": "2026-01-30",
+    "transaction_date": "2026-01-26",
+    "amount_low": 100000,
+    "amount_high": 250000,
+    "price": 474.67,
+    "owner": "Spouse"
+  },
+  {
+    "politician": "Tina Smith",
+    "party": "Democrat",
+    "chamber": "Senate",
+    "state": "MN",
+    "ticker": "MRSH",
+    "company": "Marsh & McLennan Companies Inc",
+    "transaction_type": "sale",
+    "disclosure_date": "2026-01-30",
+    "transaction_date": "2026-01-26",
+    "amount_low": 50000,
+    "amount_high": 100000,
+    "price": 179.18,
+    "owner": "Spouse"
+  },
+  {
+    "politician": "Max Miller",
     "party": "Republican",
     "chamber": "House",
-    "state": "AL",
-    "ticker": "IREN",
-    "company": "IREN LIMITED",
+    "state": "OH",
+    "ticker": "N/A",
+    "company": "ALPINE INVESTORS IX LP",
     "transaction_type": "purchase",
-    "disclosure_date": "2026-01-29",
-    "transaction_date": "2026-01-27",
+    "disclosure_date": "2026-01-30",
+    "transaction_date": "2026-01-06",
     "amount_low": 1000,
     "amount_high": 15000,
-    "price": 62.94
+    "price": null,
+    "owner": "Undisclosed"
+  },
+  {
+    "politician": "Max Miller",
+    "party": "Republican",
+    "chamber": "House",
+    "state": "OH",
+    "ticker": "N/A",
+    "company": "GLASFUNDS LP",
+    "transaction_type": "purchase",
+    "disclosure_date": "2026-01-30",
+    "transaction_date": "2026-01-06",
+    "amount_low": 1000,
+    "amount_high": 15000,
+    "price": null,
+    "owner": "Undisclosed"
   },
   {
     "politician": "Katie Britt",
@@ -25,7 +71,23 @@
     "transaction_date": "2026-01-27",
     "amount_low": 1000,
     "amount_high": 15000,
-    "price": 300.77
+    "price": 300.77,
+    "owner": "Spouse"
+  },
+  {
+    "politician": "Dale Strong",
+    "party": "Republican",
+    "chamber": "House",
+    "state": "AL",
+    "ticker": "IREN",
+    "company": "IREN LIMITED",
+    "transaction_type": "purchase",
+    "disclosure_date": "2026-01-29",
+    "transaction_date": "2026-01-27",
+    "amount_low": 1000,
+    "amount_high": 15000,
+    "price": 62.94,
+    "owner": "Joint"
   },
   {
     "politician": "Steve Cohen",
@@ -39,7 +101,8 @@
     "transaction_date": "2025-12-28",
     "amount_low": 15000,
     "amount_high": 50000,
-    "price": 40.40
+    "price": 40.40,
+    "owner": "Undisclosed"
   },
   {
     "politician": "Steve Cohen",
@@ -53,7 +116,8 @@
     "transaction_date": "2025-12-28",
     "amount_low": 15000,
     "amount_high": 50000,
-    "price": 577.78
+    "price": 577.78,
+    "owner": "Undisclosed"
   },
   {
     "politician": "Katie Britt",
@@ -67,7 +131,8 @@
     "transaction_date": "2025-04-13",
     "amount_low": 1000,
     "amount_high": 15000,
-    "price": 103.39
+    "price": 103.39,
+    "owner": "Spouse"
   },
   {
     "politician": "Katie Britt",
@@ -81,7 +146,8 @@
     "transaction_date": "2025-04-13",
     "amount_low": 1000,
     "amount_high": 15000,
-    "price": 234.72
+    "price": 234.72,
+    "owner": "Spouse"
   },
   {
     "politician": "Katie Britt",
@@ -95,7 +161,8 @@
     "transaction_date": "2025-04-13",
     "amount_low": 1000,
     "amount_high": 15000,
-    "price": 161.47
+    "price": 161.47,
+    "owner": "Spouse"
   },
   {
     "politician": "Katie Britt",
@@ -109,7 +176,8 @@
     "transaction_date": "2025-04-13",
     "amount_low": 1000,
     "amount_high": 15000,
-    "price": 107.64
+    "price": 107.64,
+    "owner": "Spouse"
   },
   {
     "politician": "Katie Britt",
@@ -123,7 +191,8 @@
     "transaction_date": "2025-04-13",
     "amount_low": 1000,
     "amount_high": 15000,
-    "price": 202.52
+    "price": 202.52,
+    "owner": "Spouse"
   },
   {
     "politician": "Katie Britt",
@@ -137,7 +206,8 @@
     "transaction_date": "2025-04-13",
     "amount_low": 1000,
     "amount_high": 15000,
-    "price": 182.12
+    "price": 182.12,
+    "owner": "Spouse"
   },
   {
     "politician": "Katie Britt",
@@ -151,7 +221,8 @@
     "transaction_date": "2025-04-13",
     "amount_low": 1000,
     "amount_high": 15000,
-    "price": 94.73
+    "price": 94.73,
+    "owner": "Spouse"
   },
   {
     "politician": "Katie Britt",
@@ -165,7 +236,8 @@
     "transaction_date": "2025-04-13",
     "amount_low": 1000,
     "amount_high": 15000,
-    "price": 335.18
+    "price": 335.18,
+    "owner": "Spouse"
   },
   {
     "politician": "Katie Britt",
@@ -179,7 +251,8 @@
     "transaction_date": "2025-04-13",
     "amount_low": 1000,
     "amount_high": 15000,
-    "price": 387.81
+    "price": 387.81,
+    "owner": "Spouse"
   },
   {
     "politician": "Katie Britt",
@@ -193,7 +266,8 @@
     "transaction_date": "2025-04-13",
     "amount_low": 1000,
     "amount_high": 15000,
-    "price": 587.06
+    "price": 587.06,
+    "owner": "Spouse"
   },
   {
     "politician": "Katie Britt",
@@ -207,7 +281,8 @@
     "transaction_date": "2025-04-13",
     "amount_low": 1000,
     "amount_high": 15000,
-    "price": 110.71
+    "price": 110.71,
+    "owner": "Spouse"
   },
   {
     "politician": "Katie Britt",
@@ -221,7 +296,8 @@
     "transaction_date": "2025-11-06",
     "amount_low": 1000,
     "amount_high": 15000,
-    "price": 188.15
+    "price": 188.15,
+    "owner": "Spouse"
   },
   {
     "politician": "Katie Britt",
@@ -235,6 +311,7 @@
     "transaction_date": "2025-11-06",
     "amount_low": 1000,
     "amount_high": 15000,
-    "price": 268.47
+    "price": 268.47,
+    "owner": "Spouse"
   }
 ]
