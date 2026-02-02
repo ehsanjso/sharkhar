@@ -85,7 +85,31 @@ Window 5 (20:00-01:00): 1 heavy job (Coder2-Sonnet)
 - NFT Monitor moved to 11 AM (better window distribution)
 - Schedule aligned with 5-hour quota windows
 - Proactive Coder focus updated (tools & optimization, not Remotion)
+- **MODEL OPTIMIZATION COMPLETE (2026-02-01):**
+  * Morning Brief → Haiku ✅
+  * Clawdbot Backup → Haiku ✅
+  * Session Pruning → Haiku ✅
+  * NFT Monitor → Haiku ✅
+  * Claude Quota Monitor → Haiku ✅
+  * Created switch-cron-model.js for safe model updates
+  * Automatic backups and dry-run mode included
 
-🔮 **Future Optimization (if needed):**
-- Add "light" agent with Haiku model for backup/monitoring jobs
-- Currently monitoring quota usage with current setup
+**Current Distribution (Optimized):**
+```
+Window 1 (00:00-05:00): Backup-Haiku ✅
+Window 2 (05:00-10:00): Brief-Haiku, Investor-Sonnet, Market-Sonnet ✅
+Window 3 (10:00-15:00): NFT-Haiku, Research-Sonnet ✅
+Window 4 (15:00-20:00): Coder1-Sonnet ✅
+Window 5 (20:00-01:00): Coder2-Sonnet ✅
+```
+
+**Expected Impact:**
+- ~60% reduction in quota usage for light jobs
+- Window 2 congestion reduced significantly
+- More quota available for intelligence-requiring tasks
+- Should eliminate rate limit failures on monitoring jobs
+
+🔮 **Future Monitoring:**
+- Watch first runs with new models (Feb 2+)
+- Track quota usage patterns for 1 week
+- Fine-tune if needed
