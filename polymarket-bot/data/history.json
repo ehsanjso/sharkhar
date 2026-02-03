@@ -1,0 +1,142 @@
+[
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 50.0,
+    "total_value": 50.0,
+    "pnl": 0.0,
+    "timestamp": "2026-02-02T02:25:06.401221+00:00"
+  },
+  {
+    "type": "BET_PLACED",
+    "bet_id": "bet_20260202_022558_540234",
+    "market_id": "540234",
+    "question": "Will the Seattle Seahawks win Super Bowl 2026?",
+    "outcome": "Yes",
+    "side": "YES",
+    "amount": 4.63,
+    "price": 0.6825,
+    "shares": 6.783882783882784,
+    "timestamp": "2026-02-02T02:25:58.528481+00:00"
+  },
+  {
+    "type": "BET_PLACED",
+    "bet_id": "bet_20260202_022558_540227",
+    "market_id": "540227",
+    "question": "Will the New England Patriots win Super Bowl 2026?",
+    "outcome": "No",
+    "side": "YES",
+    "amount": 4.6,
+    "price": 0.6835,
+    "shares": 6.730065837600585,
+    "timestamp": "2026-02-02T02:25:58.531917+00:00"
+  },
+  {
+    "type": "BET_PLACED",
+    "bet_id": "bet_20260202_022558_537484",
+    "market_id": "537484",
+    "question": "Will the U.S. collect less than $100b in revenue i",
+    "outcome": "Yes",
+    "side": "YES",
+    "amount": 2.44,
+    "price": 0.7515,
+    "shares": 3.246839654025283,
+    "timestamp": "2026-02-02T02:25:58.535775+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 3,
+    "bets_placed": 3,
+    "cash": 38.33,
+    "total_value": 50.0,
+    "pnl": -11.670000000000002,
+    "timestamp": "2026-02-02T02:25:58.537222+00:00"
+  },
+  {
+    "type": "BET_PLACED",
+    "bet_id": "bet_20260202_050005_540234",
+    "market_id": "540234",
+    "question": "Will the Seattle Seahawks win Super Bowl 2026?",
+    "outcome": "Yes",
+    "side": "YES",
+    "amount": 3.54,
+    "price": 0.683,
+    "shares": 5.183016105417276,
+    "timestamp": "2026-02-02T05:00:05.437343+00:00"
+  },
+  {
+    "type": "BET_PLACED",
+    "bet_id": "bet_20260202_050005_540227",
+    "market_id": "540227",
+    "question": "Will the New England Patriots win Super Bowl 2026?",
+    "outcome": "No",
+    "side": "YES",
+    "amount": 3.53,
+    "price": 0.6835,
+    "shares": 5.164594001463057,
+    "timestamp": "2026-02-02T05:00:05.439469+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 3,
+    "bets_placed": 2,
+    "cash": 31.259999999999998,
+    "total_value": 50.0,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-02T05:00:05.440317+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 3,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 50.0,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-02T11:00:04.625863+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 3,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 50.0,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-02T17:00:04.492562+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 2,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 50.0,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-02T23:00:04.507108+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 2,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 50.0,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-03T05:00:05.334185+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 2,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 50.0,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-03T11:00:05.480684+00:00"
+  }
+]

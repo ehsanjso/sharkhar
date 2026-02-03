@@ -1,0 +1,15 @@
+#!/bin/bash
+# Airdrop Tracker CLI
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+[ -d "venv" ] && source venv/bin/activate
+export PYTHONIOENCODING=utf-8
+
+case "$1" in
+    check|daily)
+        python3 bot.py "${@:2}"
+        ;;
+    *)
+        python3 tracker.py "$@"
+        ;;
+esac

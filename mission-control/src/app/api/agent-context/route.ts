@@ -30,35 +30,22 @@ interface RecentActivity {
 
 async function getCronJobs(): Promise<CronJob[]> {
   try {
-    // Try to get cron jobs from clawdbot gateway API
-    const gatewayUrl = 'http://127.0.0.1:18789';
-    const tokenPath = path.join(CLAWDBOT_STATE, 'clawdbot.json');
+    // Use clawdbot CLI to get cron jobs
+    const { stdout } = await execAsync('clawdbot cron list --json 2>/dev/null || echo "[]"');
+    const data = JSON.parse(stdout.trim() || '[]');
+    const jobs = data.jobs || data || [];
     
-    let token = '';
-    try {
-      const config = JSON.parse(await fs.readFile(tokenPath, 'utf-8'));
-      token = config.gateway?.auth?.token || '';
-    } catch {
-      // Token not found
-    }
-    
-    const response = await fetch(`${gatewayUrl}/api/cron/list`, {
-      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      return (data.jobs || []).map((job: any) => ({
-        id: job.id,
-        name: job.name,
-        enabled: job.enabled,
-        schedule: job.schedule?.expr || job.schedule?.kind || 'unknown',
-        lastRunAt: job.state?.lastRunAtMs,
-        lastStatus: job.state?.lastStatus,
-        lastError: job.state?.lastError,
-        nextRunAt: job.state?.nextRunAtMs,
-      }));
-    }
+    return jobs.map((job: any) => ({
+      id: job.id,
+      name: job.name,
+      enabled: job.enabled,
+      schedule: job.schedule?.expr || job.schedule?.kind || 'unknown',
+      lastRunAt: job.state?.lastRunAtMs,
+      lastStatus: job.state?.lastStatus,
+      lastError: job.state?.lastError,
+      lastDurationMs: job.state?.lastDurationMs,
+      nextRunAt: job.state?.nextRunAtMs,
+    }));
   } catch (error) {
     console.error('Failed to fetch cron jobs:', error);
   }

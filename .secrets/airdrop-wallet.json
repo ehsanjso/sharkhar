@@ -1,0 +1,8 @@
+{
+  "name": "Airdrop Farm 1",
+  "address": "0x10EBe664a4f6F77f82e4167Eb6642fDe4f788416",
+  "private_key": "0x544da43215e477b7e217550bb4fdaae82fd3f42e7e40f0da8baa82960f026edc",
+  "created": "2026-02-02",
+  "purpose": "Airdrop farming",
+  "chains": ["ethereum", "arbitrum", "optimism", "base", "scroll", "linea", "zksync"]
+}

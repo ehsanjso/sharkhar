@@ -18,6 +18,7 @@
 ## Preferences
 
 - **$incognito$ mode** — When a message contains `$incognito$`, treat it as private: no logging to memory files, close browser tabs and clean up any resources used, leave no trace.
+- **Design System** — Always use **shadcn/ui** and **reactbits** for frontend projects. No custom component implementations.
 
 ---
 

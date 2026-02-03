@@ -1,15 +1,6 @@
 {
-  "session": {
-    "used": 12,
-    "resetIn": "2h 59min"
-  },
-  "weeklyAll": {
-    "used": 17,
-    "resetAt": "Thu 10:59 PM"
-  },
-  "weeklySonnet": {
-    "used": 7,
-    "resetAt": "Sat 4:59 PM"
-  },
-  "lastChecked": "2026-02-01T15:00:00-05:00"
+  "session": { "used": 0, "resetIn": "4 hr 59 min" },
+  "weeklyAll": { "used": 23, "resetAt": "Thu 11:00 PM" },
+  "weeklySonnet": { "used": 7, "resetAt": "Sat 5:00 PM" },
+  "lastChecked": "2026-02-03T02:00:00.000Z"
 }
