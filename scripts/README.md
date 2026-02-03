@@ -5,7 +5,21 @@ Utility scripts for ClawdBot maintenance, automation, and content creation.
 ## Maintenance Scripts
 
 ### backup-clawdbot.sh
-Backup ClawdBot configuration and data.
+Backup ClawdBot configuration and essential data. Excludes cache directories 
+(browser, skills, media) for ~93% smaller backups.
+
+**What's backed up:**
+- `cron/` - Job configurations
+- `agents/` - Session logs
+- `credentials/` - Auth tokens
+- `identity/` - Bot identity
+- `devices/` - Paired devices
+- `clawdbot.json` - Main config
+
+**What's excluded (regeneratable):**
+- `browser/` - Chromium profile (~300MB)
+- `skills/` - Downloaded from ClawdHub
+- `media/` - Cached Telegram media
 
 ```bash
 ./backup-clawdbot.sh
