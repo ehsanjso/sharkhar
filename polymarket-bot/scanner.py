@@ -5,12 +5,33 @@ Fetches active markets and identifies close-to-resolution opportunities.
 """
 
 import json
+import logging
 import requests
 from datetime import datetime, timezone
 from typing import Optional
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Polymarket Gamma API (public, no auth needed)
 GAMMA_API = "https://gamma-api.polymarket.com"
+REQUEST_TIMEOUT = 30  # seconds
+
+def get_session_with_retries(retries: int = 3, backoff: float = 0.5) -> requests.Session:
+    """Create a requests session with retry logic."""
+    session = requests.Session()
+    retry_strategy = Retry(
+        total=retries,
+        backoff_factor=backoff,
+        status_forcelist=[429, 500, 502, 503, 504],
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    return session
 
 def fetch_markets(limit: int = 100, active: bool = True) -> list:
     """Fetch markets from Polymarket Gamma API."""
@@ -20,9 +41,17 @@ def fetch_markets(limit: int = 100, active: bool = True) -> list:
         "closed": "false",
     }
     
-    resp = requests.get(f"{GAMMA_API}/markets", params=params)
-    resp.raise_for_status()
-    return resp.json()
+    session = get_session_with_retries()
+    try:
+        resp = session.get(f"{GAMMA_API}/markets", params=params, timeout=REQUEST_TIMEOUT)
+        resp.raise_for_status()
+        return resp.json()
+    except requests.exceptions.Timeout:
+        logger.error("Request timed out while fetching markets")
+        return []
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Failed to fetch markets: {e}")
+        return []
 
 def parse_end_date(end_date_str: Optional[str]) -> Optional[datetime]:
     """Parse end date string to datetime."""
@@ -30,7 +59,8 @@ def parse_end_date(end_date_str: Optional[str]) -> Optional[datetime]:
         return None
     try:
         return datetime.fromisoformat(end_date_str.replace('Z', '+00:00'))
-    except:
+    except (ValueError, AttributeError) as e:
+        logger.debug(f"Failed to parse date '{end_date_str}': {e}")
         return None
 
 def get_time_until_resolution(end_date: Optional[datetime]) -> tuple:
@@ -66,7 +96,8 @@ def parse_outcomes_and_prices(market: dict) -> list:
     try:
         outcomes = json.loads(outcomes_str) if isinstance(outcomes_str, str) else outcomes_str
         prices = json.loads(prices_str) if isinstance(prices_str, str) else prices_str
-    except:
+    except (json.JSONDecodeError, TypeError) as e:
+        logger.debug(f"Failed to parse outcomes/prices: {e}")
         return []
     
     result = []
@@ -109,6 +140,10 @@ def scan_markets(limit: int = 50, sort_by: str = "ending_soon",
         min_volume: Minimum trading volume
     """
     markets = fetch_markets(limit=limit * 3)  # Fetch extra to filter
+    
+    if not markets:
+        logger.warning("No markets returned from API")
+        return []
     
     opportunities = []
     
