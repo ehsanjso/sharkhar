@@ -5,11 +5,32 @@ Fetches active markets and identifies betting opportunities.
 """
 
 import json
+import logging
 import requests
 from datetime import datetime, timezone
 from typing import Optional
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 MANIFOLD_API = "https://api.manifold.markets/v0"
+REQUEST_TIMEOUT = 30  # seconds
+
+def get_session_with_retries(retries: int = 3, backoff: float = 0.5) -> requests.Session:
+    """Create a requests session with retry logic."""
+    session = requests.Session()
+    retry_strategy = Retry(
+        total=retries,
+        backoff_factor=backoff,
+        status_forcelist=[429, 500, 502, 503, 504],
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    return session
 
 def fetch_markets(limit: int = 50, sort: str = "liquidity") -> list:
     """Fetch markets from Manifold API."""
@@ -19,9 +40,17 @@ def fetch_markets(limit: int = 50, sort: str = "liquidity") -> list:
         "filter": "open",
     }
     
-    resp = requests.get(f"{MANIFOLD_API}/search-markets", params=params)
-    resp.raise_for_status()
-    return resp.json()
+    session = get_session_with_retries()
+    try:
+        resp = session.get(f"{MANIFOLD_API}/search-markets", params=params, timeout=REQUEST_TIMEOUT)
+        resp.raise_for_status()
+        return resp.json()
+    except requests.exceptions.Timeout:
+        logger.error("Request timed out while fetching markets")
+        return []
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Failed to fetch markets: {e}")
+        return []
 
 def get_time_until_close(close_time_ms: Optional[int]) -> tuple:
     """Get human-readable time until market closes."""
@@ -37,7 +66,8 @@ def get_time_until_close(close_time_ms: Optional[int]) -> tuple:
         close = datetime.fromtimestamp(close_time_ms / 1000, tz=timezone.utc)
         diff = close - now
         total_seconds = diff.total_seconds()
-    except (ValueError, OSError):
+    except (ValueError, OSError) as e:
+        logger.debug(f"Failed to parse close time {close_time_ms}: {e}")
         return "Unknown", float('inf')
     
     if total_seconds < 0:
@@ -81,6 +111,10 @@ def scan_markets(limit: int = 30, sort_by: str = "volume",
     # Map sort options to API params
     api_sort = "24-hour-vol" if sort_by == "volume" else "liquidity"
     markets = fetch_markets(limit=limit * 3, sort=api_sort)
+    
+    if not markets:
+        logger.warning("No markets returned from API")
+        return []
     
     opportunities = []
     
