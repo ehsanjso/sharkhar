@@ -8,10 +8,10 @@
     "probability": 0.86079298801814,
     "shares": 31.366426511168342,
     "placed_at": "2026-02-02T05:08:44.721166+00:00",
-    "resolved": false,
-    "won": null,
-    "payout": 0.0,
-    "resolved_at": null,
+    "resolved": true,
+    "won": true,
+    "payout": 31.366426511168342,
+    "resolved_at": "2026-02-03T23:30:03.735769+00:00",
     "notes": "Auto: 86% consensus, M$17,117 volume. Ends 1d."
   },
   {
@@ -88,5 +88,20 @@
     "payout": 0.0,
     "resolved_at": null,
     "notes": "Auto: High volume M$27,958, 227 bettors, 75% consensus."
+  },
+  {
+    "id": "mf_20260203_233005_EnTvGW1d",
+    "market_id": "EnTvGW1d736JUXMMvFN3",
+    "market_question": "Will pop-up shops become the dominant hub of offline commerce by 2026?",
+    "side": "NO",
+    "amount": 15.0,
+    "probability": 0.17999999999999994,
+    "shares": 18.29268292682927,
+    "placed_at": "2026-02-03T23:30:05.744693+00:00",
+    "resolved": false,
+    "won": null,
+    "payout": 0.0,
+    "resolved_at": null,
+    "notes": "Auto: 82% consensus, M$5,934 volume. Ends 5h."
   }
 ]

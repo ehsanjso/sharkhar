@@ -175,5 +175,47 @@
     "total_value": 501.81105634700145,
     "pnl": -138.18894365299855,
     "timestamp": "2026-02-03T11:30:05.134395+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 8,
+    "bets_placed": 0,
+    "mana": 361.81105634700145,
+    "total_value": 501.81105634700145,
+    "pnl": -138.18894365299855,
+    "timestamp": "2026-02-03T17:30:04.834579+00:00"
+  },
+  {
+    "type": "BET_RESOLVED",
+    "bet_id": "mf_20260202_050844_UOIuQRtL",
+    "market_id": "UOIuQRtL0C",
+    "won": true,
+    "amount": 27.0,
+    "payout": 31.366426511168342,
+    "profit": 4.366426511168342,
+    "final_resolution": "YES",
+    "timestamp": "2026-02-03T23:30:03.738525+00:00"
+  },
+  {
+    "type": "BET_PLACED",
+    "bet_id": "mf_20260203_233005_EnTvGW1d",
+    "market_id": "EnTvGW1d736JUXMMvFN3",
+    "question": "Will pop-up shops become the dominant hub of offli",
+    "side": "NO",
+    "amount": 15.0,
+    "probability": 0.17999999999999994,
+    "shares": 18.29268292682927,
+    "timestamp": "2026-02-03T23:30:05.753525+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 1,
+    "signals": 12,
+    "bets_placed": 1,
+    "mana": 378.1774828581698,
+    "total_value": 506.1774828581698,
+    "pnl": -121.82251714183019,
+    "timestamp": "2026-02-03T23:30:05.758922+00:00"
   }
 ]

@@ -11,7 +11,10 @@ import {
   GitCommit,
   RefreshCw,
   Activity,
-  Gauge
+  Gauge,
+  Server,
+  Wifi,
+  WifiOff
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -52,6 +55,26 @@ interface AgentContext {
   activeProjects: string[];
 }
 
+interface ServiceStatus {
+  id: number;
+  name: string;
+  type: string;
+  enabled: boolean;
+  status: 'up' | 'down' | 'paused' | 'pending';
+  url?: string;
+  hostname?: string;
+}
+
+interface ServiceHealth {
+  services: ServiceStatus[];
+  lastChecked: string;
+  allUp: boolean;
+  upCount: number;
+  downCount: number;
+  total: number;
+  error?: string;
+}
+
 function formatRelativeTime(timestamp: number): string {
   const now = Date.now();
   const diff = now - timestamp;
@@ -79,18 +102,26 @@ function formatNextRun(timestamp: number): string {
 
 export default function AgentDashboard() {
   const [context, setContext] = useState<AgentContext | null>(null);
+  const [serviceHealth, setServiceHealth] = useState<ServiceHealth | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
   const fetchContext = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/agent-context');
-      const data = await res.json();
-      setContext(data);
+      const [contextRes, healthRes] = await Promise.all([
+        fetch('/api/agent-context'),
+        fetch('/api/service-health'),
+      ]);
+      const [contextData, healthData] = await Promise.all([
+        contextRes.json(),
+        healthRes.json(),
+      ]);
+      setContext(contextData);
+      setServiceHealth(healthData);
       setLastRefresh(new Date());
     } catch (error) {
-      console.error('Failed to fetch agent context:', error);
+      console.error('Failed to fetch data:', error);
     } finally {
       setIsLoading(false);
     }
@@ -262,6 +293,72 @@ export default function AgentDashboard() {
                     <span className="text-muted-foreground">Active projects</span>
                     <span>{context?.activeProjects.length || 0}</span>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* Service Health */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Server className="w-4 h-4" />
+                    Services
+                  </CardTitle>
+                  <CardDescription>
+                    {serviceHealth?.lastChecked || 'Not checked yet'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {serviceHealth?.error ? (
+                    <div className="flex items-center gap-2 text-red-500">
+                      <WifiOff className="w-4 h-4" />
+                      <span className="text-sm">Failed to fetch status</span>
+                    </div>
+                  ) : serviceHealth ? (
+                    <>
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="flex items-center gap-1.5">
+                          {serviceHealth.allUp ? (
+                            <Wifi className="w-4 h-4 text-green-500" />
+                          ) : (
+                            <WifiOff className="w-4 h-4 text-red-500" />
+                          )}
+                          <span className="text-sm font-medium">
+                            {serviceHealth.allUp ? 'All systems operational' : `${serviceHealth.downCount} down`}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        {serviceHealth.services.slice(0, 5).map((service) => (
+                          <div key={service.id} className="flex items-center gap-2 text-sm">
+                            <div className={`w-2 h-2 rounded-full ${
+                              service.status === 'up' ? 'bg-green-500' :
+                              service.status === 'down' ? 'bg-red-500' :
+                              service.status === 'paused' ? 'bg-yellow-500' :
+                              'bg-gray-500'
+                            }`} />
+                            <span className="truncate flex-1">{service.name}</span>
+                          </div>
+                        ))}
+                        {serviceHealth.services.length > 5 && (
+                          <p className="text-xs text-muted-foreground pl-4">
+                            +{serviceHealth.services.length - 5} more
+                          </p>
+                        )}
+                      </div>
+                      <a 
+                        href="http://192.168.0.217:3001" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="block mt-3"
+                      >
+                        <Button variant="outline" size="sm" className="w-full">
+                          Open Uptime Kuma
+                        </Button>
+                      </a>
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Loading...</p>
+                  )}
                 </CardContent>
               </Card>
             </div>

@@ -1,10 +1,10 @@
 {
-  "mana": 361.81105634700145,
+  "mana": 378.1774828581698,
   "starting_mana": 500.0,
   "created_at": "2026-02-02T05:06:34.943394+00:00",
-  "last_updated": "2026-02-03T05:30:05.551878+00:00",
-  "total_bets": 6,
-  "total_wins": 1,
+  "last_updated": "2026-02-03T23:30:05.745219+00:00",
+  "total_bets": 7,
+  "total_wins": 2,
   "total_losses": 0,
   "total_pending": 5
 }
