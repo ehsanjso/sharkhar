@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * Mobbin Design Scraper
- * Searches Mobbin.com and downloads screen design images.
- * Requires: clawd browser profile logged into Mobbin.
- *
+ * Mobbin Design Scraper v2
+ * 
  * Usage:
- *   node mobbin-scraper.js "dashboard"
- *   node mobbin-scraper.js "onboarding" --platform web --limit 20
+ *   node mobbin-scraper.js search "fintech"           → list matching apps
+ *   node mobbin-scraper.js app-flows <app-url>         → list flows for an app
+ *   node mobbin-scraper.js download-flow <app-url> <N> → download Nth flow as zip
+ *   node mobbin-scraper.js screens "dashboard"         → download screens matching query
  */
 
 const fs = require('fs');
@@ -15,174 +15,190 @@ const archiver = require('archiver');
 
 const BROWSER_API = 'http://127.0.0.1:18791';
 const PROFILE = 'clawd';
-const DEFAULT_LIMIT = 15;
 
-async function browserPost(endpoint, body = {}) {
-  const res = await fetch(`${BROWSER_API}/${endpoint}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+async function api(ep, body = {}) {
+  const r = await fetch(`${BROWSER_API}/${ep}`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ profile: PROFILE, ...body }),
   });
-  const data = await res.json();
-  if (data.error) throw new Error(`Browser ${endpoint}: ${data.error}`);
-  return data;
+  const d = await r.json();
+  if (d.error) throw new Error(`${ep}: ${d.error}`);
+  return d;
 }
-
-async function navigate(url) {
-  return browserPost('navigate', { url });
-}
-
-async function evaluate(fn, targetId) {
-  const body = { kind: 'evaluate', fn };
-  if (targetId) body.targetId = targetId;
-  return browserPost('act', body);
-}
-
+const nav = (url) => api('navigate', { url });
+const evalJs = (fn, tid) => api('act', { kind: 'evaluate', fn, ...(tid && { targetId: tid }) });
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-async function searchMobbin(query, platform, contentType) {
-  const searchUrl = `https://mobbin.com/search/apps/${platform}?content_type=${contentType}&q=${encodeURIComponent(query)}`;
-  console.log(`🔍 Searching: ${searchUrl}`);
-
-  const nav = await navigate(searchUrl);
-  const targetId = nav.targetId;
-  await sleep(5000);
-
-  const extractFn = `() => {
-    const results = [];
-    const seen = new Set();
-    const links = document.querySelectorAll('a[href*="/screens/"]');
-    for (const link of links) {
-      const href = link.getAttribute('href');
-      if (!href || seen.has(href)) continue;
-      seen.add(href);
-      const screenId = href.split('/screens/')[1];
-      if (!screenId) continue;
-      const img = link.querySelector('img[src*="bytescale"]');
-      if (!img) continue;
-      if (img.src.includes('app_logos') || img.src.includes('dictionary') || img.src.includes('trending_filter')) continue;
-      const parent = link.closest('li') || link.parentElement?.parentElement;
-      const nameEl = parent?.querySelector('h3') || parent?.querySelector('a[href*="/apps/"]');
-      const appName = nameEl ? nameEl.textContent.trim() : 'screen';
-      results.push({
-        screenId,
-        imageUrl: img.src,
-        appName: appName.replace(/[^a-zA-Z0-9 _-]/g, '').trim().slice(0, 40),
-      });
-    }
-    if (results.length === 0) {
-      const imgs = document.querySelectorAll('img[src*="bytescale.mobbin.com"]');
-      for (const img of imgs) {
-        if (img.src.includes('app_logos') || img.src.includes('dictionary') || img.src.includes('trending_filter')) continue;
-        if (img.naturalHeight < 300 || img.naturalWidth < 100) continue;
-        const ratio = img.naturalHeight / img.naturalWidth;
-        if (ratio < 1.3) continue;
-        if (seen.has(img.src)) continue;
-        seen.add(img.src);
-        results.push({
-          screenId: 'img-' + results.length,
-          imageUrl: img.src,
-          appName: (img.alt || 'screen').replace(' screen', '').replace(/[^a-zA-Z0-9 _-]/g, '').trim().slice(0, 40),
-        });
-      }
-    }
-    return results;
-  }`;
-
-  const result = await evaluate(extractFn, targetId);
-  return { screens: result.result || [], targetId };
+function upgradeUrl(url) {
+  try { const u = new URL(url); u.searchParams.set('w', '1080'); u.searchParams.set('q', '90'); u.searchParams.set('f', 'png'); return u.toString(); } catch { return url; }
 }
 
-function upgradeImageUrl(url) {
+async function downloadImage(url, dest) {
   try {
-    const u = new URL(url);
-    u.searchParams.set('w', '1080');
-    u.searchParams.set('q', '90');
-    u.searchParams.set('f', 'png');
-    return u.toString();
-  } catch { return url; }
+    const r = await fetch(url); if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const b = Buffer.from(await r.arrayBuffer()); fs.writeFileSync(dest, b); return b.length;
+  } catch (e) { console.error(`  ⚠ ${e.message}`); return 0; }
 }
 
-async function downloadImage(url, destPath) {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const buf = Buffer.from(await res.arrayBuffer());
-    fs.writeFileSync(destPath, buf);
-    return buf.length;
-  } catch (err) {
-    console.error(`  ⚠ Failed: ${err.message}`);
-    return 0;
-  }
-}
-
-async function createZip(sourceDir, zipPath) {
-  return new Promise((resolve, reject) => {
-    const output = fs.createWriteStream(zipPath);
-    const archive = archiver('zip', { zlib: { level: 6 } });
-    output.on('close', () => resolve(archive.pointer()));
-    archive.on('error', reject);
-    archive.pipe(output);
-    archive.directory(sourceDir, path.basename(sourceDir));
-    archive.finalize();
+async function zipDir(dir, zipPath) {
+  return new Promise((res, rej) => {
+    const o = fs.createWriteStream(zipPath); const a = archiver('zip', { zlib: { level: 6 } });
+    o.on('close', () => res(a.pointer())); a.on('error', rej); a.pipe(o);
+    a.directory(dir, path.basename(dir)); a.finalize();
   });
 }
 
+async function downloadScreens(images, label) {
+  const ts = Date.now(), safe = label.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+  const dir = `/tmp/mobbin-${safe}-${ts}`, zip = `${dir}.zip`;
+  fs.mkdirSync(dir, { recursive: true });
+  
+  let ok = 0;
+  for (let i = 0; i < images.length; i++) {
+    const url = upgradeUrl(images[i]);
+    const name = `${String(i+1).padStart(2,'0')}.png`;
+    process.stdout.write(`  [${i+1}/${images.length}] `);
+    const sz = await downloadImage(url, path.join(dir, name));
+    if (sz > 0) { ok++; console.log(`✅ ${(sz/1024).toFixed(0)}KB`); }
+  }
+  
+  if (ok === 0) { fs.rmSync(dir, { recursive: true }); return null; }
+  const zs = await zipDir(dir, zip);
+  fs.rmSync(dir, { recursive: true });
+  console.log(`\n📦 ${ok} screens → ${zip} (${(zs/1024/1024).toFixed(1)}MB)`);
+  console.log(`ZIP_PATH:${zip}`);
+  return zip;
+}
+
+// --- Search apps ---
+async function searchApps(query, platform = 'ios') {
+  console.log(`🔍 Searching apps: "${query}"`);
+  const { targetId } = await nav(`https://mobbin.com/search/apps/${platform}?content_type=apps&q=${encodeURIComponent(query)}`);
+  await sleep(4000);
+  const r = await evalJs(`() => {
+    const apps = [];
+    document.querySelectorAll('h3').forEach(h3 => {
+      const li = h3.closest('li') || h3.parentElement;
+      const link = li?.querySelector('a[href*="/apps/"]');
+      const desc = li?.querySelector('p');
+      if (link) apps.push({ name: h3.textContent.trim(), desc: desc?.textContent?.trim() || '', url: 'https://mobbin.com' + link.getAttribute('href') });
+    });
+    return apps.slice(0, 15);
+  }`, targetId);
+  return r.result || [];
+}
+
+// --- Get flows from app page ---
+async function getAppFlows(appUrl) {
+  const flowsUrl = appUrl.replace(/\/(screens|ui-elements|flows).*$/, '') + '/flows';
+  const url = flowsUrl.includes('/flows') ? flowsUrl : appUrl + '/flows';
+  console.log(`📱 Loading flows: ${url}`);
+  const { targetId } = await nav(url);
+  await sleep(5000);
+  
+  const r = await evalJs(`() => {
+    const groups = {};
+    document.querySelectorAll('a[href*="/flows/"]').forEach(link => {
+      const href = link.getAttribute('href');
+      if (!href) return;
+      const fid = href.split('/flows/')[1];
+      if (!fid) return;
+      const img = link.querySelector('img[src*="bytescale"]');
+      if (!img || img.src.includes('app_logos')) return;
+      if (!groups[fid]) groups[fid] = { id: fid, url: 'https://mobbin.com/flows/' + fid, images: [] };
+      if (!groups[fid].images.includes(img.src)) groups[fid].images.push(img.src);
+    });
+    
+    // Get flow names from the page text near each flow strip
+    const results = Object.values(groups);
+    
+    // Try to get names from the sibling text elements
+    const strips = document.querySelectorAll('[class*="flow"], [class*="strip"]');
+    
+    return results;
+  }`, targetId);
+  
+  // Also get flow names from the sidebar tree
+  const names = await evalJs(`() => {
+    const items = [];
+    const btns = document.querySelectorAll('button[aria-expanded]');
+    btns.forEach(b => {
+      const t = b.textContent.trim();
+      if (t && t.length < 60) items.push(t);
+    });
+    return items;
+  }`, targetId);
+  
+  const flows = r.result || [];
+  const flowNames = names.result || [];
+  
+  // Match names to flows (they appear in order)
+  flows.forEach((f, i) => {
+    f.name = flowNames[i] || `Flow ${i+1}`;
+    f.screenCount = f.images.length;
+  });
+  
+  return flows;
+}
+
+// --- Search screens (legacy) ---
+async function searchScreens(query, platform = 'ios', limit = 15) {
+  console.log(`🔍 Searching screens: "${query}"`);
+  const { targetId } = await nav(`https://mobbin.com/search/apps/${platform}?content_type=screens&q=${encodeURIComponent(query)}`);
+  await sleep(5000);
+  const r = await evalJs(`() => {
+    const imgs = [];
+    document.querySelectorAll('a[href*="/screens/"]').forEach(link => {
+      const img = link.querySelector('img[src*="bytescale"]');
+      if (!img || img.src.includes('app_logos') || img.src.includes('dictionary') || img.src.includes('trending_filter')) return;
+      if (!imgs.includes(img.src)) imgs.push(img.src);
+    });
+    return imgs;
+  }`, targetId);
+  const images = (r.result || []).slice(0, limit);
+  if (images.length === 0) { console.log('❌ No screens found.'); return; }
+  console.log(`📱 Found ${images.length} screens`);
+  return downloadScreens(images, query);
+}
+
+// --- Main ---
 async function main() {
-  const args = process.argv.slice(2);
-  if (args.length === 0 || args[0] === '--help') {
-    console.log('Usage: node mobbin-scraper.js <query> [--platform ios|web] [--type screens|flows] [--limit N]');
+  const [mode, ...rest] = process.argv.slice(2);
+  if (!mode || mode === '--help') {
+    console.log('Usage:\n  search <query>\n  app-flows <app-url>\n  download-flow <app-url> [flow-index] [label]\n  screens <query> [--limit N]');
     process.exit(0);
   }
 
-  let query = args[0];
-  let platform = 'ios', contentType = 'screens', limit = DEFAULT_LIMIT;
-  for (let i = 1; i < args.length; i++) {
-    if (args[i] === '--platform') platform = args[++i];
-    else if (args[i] === '--type') contentType = args[++i];
-    else if (args[i] === '--limit') limit = parseInt(args[++i]);
+  if (mode === 'search') {
+    const apps = await searchApps(rest.join(' '));
+    apps.forEach((a, i) => console.log(`  ${i+1}. ${a.name} — ${a.desc}\n     ${a.url}`));
   }
-
-  const ts = Date.now();
-  const safeName = query.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
-  const dirName = `mobbin-${safeName}-${ts}`;
-  const downloadDir = `/tmp/${dirName}`;
-  const zipPath = `/tmp/${dirName}.zip`;
-
-  console.log(`\n🎨 Mobbin Scraper`);
-  console.log(`   Query: "${query}" | Platform: ${platform} | Limit: ${limit}\n`);
-
-  const { screens } = await searchMobbin(query, platform, contentType);
-  if (screens.length === 0) {
-    console.log('❌ No screens found.');
-    process.exit(1);
+  else if (mode === 'app-flows') {
+    const flows = await getAppFlows(rest[0]);
+    flows.forEach((f, i) => console.log(`  ${i+1}. ${f.name} (${f.screenCount} screens)\n     ${f.url}`));
   }
-
-  const toDownload = screens.slice(0, limit);
-  console.log(`📱 Found ${screens.length} screens, downloading ${toDownload.length}\n`);
-  fs.mkdirSync(downloadDir, { recursive: true });
-
-  let downloaded = 0;
-  for (let i = 0; i < toDownload.length; i++) {
-    const s = toDownload[i];
-    const hiRes = upgradeImageUrl(s.imageUrl);
-    const filename = `${String(i + 1).padStart(2, '0')}-${s.appName || 'screen'}.png`;
-    const dest = path.join(downloadDir, filename);
-    process.stdout.write(`  [${i + 1}/${toDownload.length}] ${s.appName}... `);
-    const size = await downloadImage(hiRes, dest);
-    if (size > 0) { downloaded++; console.log(`✅ ${(size / 1024).toFixed(0)}KB`); }
+  else if (mode === 'download-flow') {
+    const appUrl = rest[0];
+    const flowIdx = parseInt(rest[1] || '1') - 1;
+    const label = rest[2] || 'flow';
+    
+    const flows = await getAppFlows(appUrl);
+    if (flows.length === 0) { console.log('❌ No flows found.'); return; }
+    if (flowIdx >= flows.length) { console.log(`❌ Only ${flows.length} flows available.`); return; }
+    
+    const flow = flows[flowIdx];
+    console.log(`\n🎯 Downloading: ${flow.name} (${flow.screenCount} screens)\n`);
+    await downloadScreens(flow.images, label || flow.name);
   }
-
-  if (downloaded === 0) {
-    console.log('\n❌ No images downloaded.');
-    fs.rmSync(downloadDir, { recursive: true });
-    process.exit(1);
+  else if (mode === 'screens') {
+    let limit = 15, query = [];
+    for (let i = 0; i < rest.length; i++) {
+      if (rest[i] === '--limit') limit = parseInt(rest[++i]);
+      else query.push(rest[i]);
+    }
+    await searchScreens(query.join(' '), 'ios', limit);
   }
-
-  const zipSize = await createZip(downloadDir, zipPath);
-  fs.rmSync(downloadDir, { recursive: true });
-  console.log(`\n📦 ${downloaded} screens → ${zipPath} (${(zipSize / 1024 / 1024).toFixed(1)}MB)`);
-  console.log(`ZIP_PATH:${zipPath}`);
+  else { await searchScreens([mode, ...rest].join(' ')); }
 }
 
-main().catch(err => { console.error('❌ Error:', err.message); process.exit(1); });
+main().catch(e => { console.error('❌', e.message); process.exit(1); });
