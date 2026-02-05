@@ -6,31 +6,38 @@ Utility scripts for ClawdBot maintenance, automation, and content creation.
 
 ### backup-clawdbot.sh
 Backup ClawdBot configuration and essential data. Excludes cache directories 
-(browser, skills, media) for ~93% smaller backups.
-
-**What's backed up:**
-- `cron/` - Job configurations
-- `agents/` - Session logs
-- `credentials/` - Auth tokens
-- `identity/` - Bot identity
-- `devices/` - Paired devices
-- `clawdbot.json` - Main config
-
-**What's excluded (regeneratable):**
-- `browser/` - Chromium profile (~300MB)
-- `skills/` - Downloaded from ClawdHub
-- `media/` - Cached Telegram media
+(browser, skills, media) for ~90% smaller backups.
 
 ```bash
-./backup-clawdbot.sh
+./backup-clawdbot.sh              # Create backup, keep last 7
+./backup-clawdbot.sh --dry-run    # Preview without creating backup
+./backup-clawdbot.sh --keep 14    # Keep last 14 backups
+./backup-clawdbot.sh --help       # Show full usage
 ```
+
+**What's backed up:** cron/, agents/, credentials/, identity/, devices/, clawdbot.json
+
+**What's excluded (regeneratable):** browser/ (~300MB), skills/, media/
+
+Backups stored in `~/backups/clawdbot/`.
 
 ### prune-sessions.sh
-Clean up old ClawdBot session logs to save disk space.
+Clean up old ClawdBot session logs to save disk space. Archives files before
+deletion and supports preview mode.
 
 ```bash
-./prune-sessions.sh
+./prune-sessions.sh              # Prune sessions older than 7 days
+./prune-sessions.sh --dry-run    # Preview without deleting
+./prune-sessions.sh --days 14    # Keep last 14 days
+./prune-sessions.sh --help       # Show full usage
 ```
+
+**Directories cleaned:**
+- Main sessions (`~/.clawdbot/agents/main/sessions/`)
+- Subagent sessions (`~/.clawdbot/subagents/`)
+- Cron run logs (`~/.clawdbot/cron/runs/`)
+
+Archives kept for 30 days in `~/backups/clawdbot/archived-sessions/`.
 
 ## Automation Scripts
 
