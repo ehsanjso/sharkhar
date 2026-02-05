@@ -61,6 +61,32 @@ Monitor NFT prices and send notifications.
 node nft-price-monitor.js
 ```
 
+### mobbin-scraper.js
+Scrape design references from Mobbin.com. Supports searching apps, finding flows,
+and downloading screenshots for UI inspiration.
+
+```bash
+node mobbin-scraper.js search "Linear"              # Search for app
+node mobbin-scraper.js find-flows "Linear"          # List app flows
+node mobbin-scraper.js app-flows <app-url>          # Get flows from URL
+node mobbin-scraper.js download-flow <url> <N>      # Download flow N
+node mobbin-scraper.js screens "dashboard" --limit 15  # Search screens
+```
+
+**Platform auto-detection:** "web", "SaaS", "dashboard" → web; "mobile", "iOS" → ios
+
+Requires browser control server running (`clawdbot browser start`).
+
+### switch-cron-model.js
+Utility to bulk-update cron job models. Safely switches specific jobs to Haiku
+for cost optimization.
+
+```bash
+node switch-cron-model.js         # Apply model changes
+```
+
+Creates backup at `~/.clawdbot/cron/jobs.json.model-switch-backup` before changes.
+
 ## Subdirectories
 
 ### 📹 video/
