@@ -39,6 +39,19 @@ deletion and supports preview mode.
 
 Archives kept for 30 days in `~/backups/clawdbot/archived-sessions/`.
 
+### pi-health.sh
+Quick system health check for Raspberry Pi. Shows CPU temp, memory, disk,
+ClawdBot status, and uptime with color-coded status indicators.
+
+```bash
+./pi-health.sh              # Human-readable health report
+./pi-health.sh --json       # JSON output (for scripts/cron)
+./pi-health.sh --help       # Show full usage
+```
+
+**Checks:** CPU temperature, load average, memory/swap usage, disk space,
+ClawdBot process status, Node.js memory, system uptime.
+
 ## Automation Scripts
 
 ### nft-price-monitor.js
