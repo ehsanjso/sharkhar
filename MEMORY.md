@@ -1,6 +1,6 @@
 # 🧠 Long-term Memory
 
-*Last updated: 2026-02-02*
+*Last updated: 2026-02-05*
 
 ## About Ehsan
 
@@ -100,6 +100,10 @@ My second brain app for viewing and organizing memories, journals, and documents
 
 The Agent Dashboard helps me wake up each session knowing what happened.
 
+**API:**
+- `/api/agent-context` — Fetches live data from gateway (quota, crons, activity)
+- Quota data from `memory/quota-cache.json` (updated by quota monitor cron)
+
 ---
 
 ## ClawdBot Setup (from Alex Finn's video)
@@ -151,8 +155,27 @@ The Agent Dashboard helps me wake up each session knowing what happened.
 - **REST API:** Modern API at `http://pi.hole/api/`
 - **Local DNS:** Can create custom `.local` domains (mission-control.local, etc.)
 - **Regex filtering:** mmotti/pihole-regex for pattern-based blocking
+- **DHCP mode:** Can replace router DHCP for automatic DNS assignment
 - Potential: Pi-hole stats page in Mission Control
 - Research: `memory/research/2026-02-01-pihole-advanced-features.md`
+
+### Ollama / Local LLMs (Researched Feb 4)
+- **Viable on Pi 5** — 1-3B models run at 5-15 tokens/sec
+- **Install:** `curl -fsSL https://ollama.com/install.sh | sh`
+- **Best small models:** tinyllama (638MB), llama3.2:1b (1.3GB), phi4-mini (2.5GB)
+- **OpenAI-compatible API** at localhost:11434
+- **HA native integration** — Ollama as conversation agent for voice control
+- **Hybrid approach** — Local for simple queries, Claude for complex reasoning
+- **Benefits:** Quota relief, offline capability, privacy for sensitive queries
+- Research: `memory/research/2026-02-04-ollama-local-llms-raspberry-pi.md`
+
+### Home Assistant + AI (Researched Feb 3)
+- HA supports Claude, GPT-4o, Gemini, and Ollama as conversation agents
+- Device control via AI — lights, climate, scenes
+- Entity exposure security model (choose which devices AI can access)
+- Voice hardware options: $13-$59 for wake-word-triggered assistants
+- **Two paths:** HA AI for voice, ClawdBot homeassistant skill for text/cron
+- Research: `memory/research/2026-02-03-home-assistant-ai-integration.md`
 
 ### 🐛 Ralph Wiggum Approach (ALWAYS use for coding!)
 
@@ -172,9 +195,32 @@ Work in small, iterative loops. "I'm helping!" one tiny step at a time.
 
 ---
 
+## Spare Capacity Pattern (Working Well)
+
+The spare capacity cron runs at noon daily. Priority order:
+1. Memory maintenance (if >3 days since last review)
+2. Code improvements (polymarket-bot, manifold-bot, investor-tracker)
+3. Research (AI news, ArXiv, tools/skills)
+4. Documentation
+
+**Recent code improvements:**
+- Polymarket scanner: added timeouts, retry logic, specific exception handling, logging (Feb 3)
+- Scripts: enhanced backup-clawdbot.sh (dry-run, --keep, --help) and prune-sessions.sh (Feb 4)
+- Pi-health.sh system health check script (Feb 4)
+
+**Research archive:** `memory/research/` — accumulating nicely:
+- Remotion on Pi, competitor scanning, LLM routing (Jan 30-31)
+- Pi-hole advanced, MCP ecosystem, HA + AI, Ollama, ArXiv papers (Feb 1-4)
+- AI news digest with industry trends (Feb 3)
+
+---
+
 ## Lessons Learned
 
 - **Mission Control is MY tool** — Use it actively, not just build it
 - **Memory = continuity** — Write everything down, mental notes don't survive sessions
 - **Match the reference** — When building from a video, get actual screenshots
 - **Task board = visibility** — Helps both of us track progress
+- **Spare capacity cron works** — Good pattern for using downtime productively
+- **Research compounds** — Each topic builds on previous (MCP → HA → Ollama → all connect)
+- **Small code fixes matter** — Timeouts, retries, and proper error handling prevent silent failures
