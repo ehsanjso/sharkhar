@@ -526,3 +526,81 @@
   gap: 3px;
   white-space: nowrap;
 }
+
+/* Tip Menu */
+.sc-tip-menu {
+  margin-top: 12px;
+  background: hsl(0 0% 7%);
+  border: 1px solid hsl(0 0% 14.9%);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sc-tip-menu-header {
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: hsl(0 0% 98%);
+  background: hsl(0 0% 9%);
+  border-bottom: 1px solid hsl(0 0% 14.9%);
+}
+
+.sc-tip-menu-items {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.sc-tip-menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid hsl(0 0% 10%);
+  transition: background 150ms;
+}
+
+.sc-tip-menu-item:last-child {
+  border-bottom: none;
+}
+
+.sc-tip-menu-item:hover {
+  background: hsl(0 0% 10%);
+}
+
+.sc-tip-action {
+  font-size: 13px;
+  color: hsl(0 0% 83%);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 12px;
+}
+
+.sc-tip-price {
+  font-size: 12px;
+  font-weight: 600;
+  color: hsl(280 87% 65%);
+  background: hsl(280 87% 55% / 0.15);
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* Tip menu scrollbar */
+.sc-tip-menu-items::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sc-tip-menu-items::-webkit-scrollbar-track {
+  background: hsl(0 0% 10%);
+}
+
+.sc-tip-menu-items::-webkit-scrollbar-thumb {
+  background: hsl(0 0% 25%);
+  border-radius: 2px;
+}
+
+.sc-tip-menu-items::-webkit-scrollbar-thumb:hover {
+  background: hsl(0 0% 35%);
+}

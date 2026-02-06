@@ -166,6 +166,9 @@
                 <span class="sc-scan-stat-secondary">📷 ${m.photos}</span>
                 <span class="sc-scan-stat-secondary">🎬 ${m.videos}</span>
                 <span class="sc-scan-stat-secondary">💎 ${m.privateRate}/min</span>
+                ${m.earnings > 0 ? `<span class="sc-scan-stat-secondary">💰 ${formatNumber(m.earnings)}</span>` : ''}
+                ${m.sessionEarnings > 0 ? `<span class="sc-scan-stat-secondary">📈 ${formatNumber(m.sessionEarnings)}</span>` : ''}
+                ${m.tipMenuCount > 0 ? `<span class="sc-scan-stat-secondary">📋 ${m.tipMenuCount} items</span>` : ''}
                 ${tipperHtml}
                 ${goalHtml}
               </div>
@@ -205,6 +208,9 @@
             <span class="sc-scan-stat-secondary">📷 ${m.photos}</span>
             <span class="sc-scan-stat-secondary">🎬 ${m.videos}</span>
             <span class="sc-scan-stat-secondary">💎 ${m.privateRate}/min</span>
+            ${m.earnings > 0 ? `<span class="sc-scan-stat-secondary">💰 ${formatNumber(m.earnings)}</span>` : ''}
+            ${m.sessionEarnings > 0 ? `<span class="sc-scan-stat-secondary">📈 ${formatNumber(m.sessionEarnings)}</span>` : ''}
+            ${m.tipMenuCount > 0 ? `<span class="sc-scan-stat-secondary">📋 ${m.tipMenuCount} items</span>` : ''}
             ${tipperHtml}
             ${goalHtml}
           </div>
@@ -275,6 +281,17 @@
             };
           }
           
+          // Get earnings info
+          const earnings = user.totalEarned || user.earnings || user.tokensEarned || 
+                           details.user?.totalEarned || details.user?.earnings || 0;
+          const sessionEarnings = cam.sessionEarnings || cam.broadcastEarnings || 
+                                  cam.currentSessionEarned || 0;
+          
+          // Get tip menu
+          const tipMenu = cam.tipMenu || cam.tipMenuItems || cam.broadcastSettings?.tipMenu ||
+                          user.tipMenu || details.user?.tipMenu || [];
+          const tipMenuCount = Array.isArray(tipMenu) ? tipMenu.length : 0;
+          
           return {
             username,
             viewers: viewersCount,
@@ -287,7 +304,10 @@
             privateRate: user.privateRate || 0,
             topTipper: topTipperInfo,
             goal: cam.goalTip || cam.broadcastSettings?.goalTip || 0,
-            topic: cam.topic || ''
+            topic: cam.topic || '',
+            earnings: earnings,
+            sessionEarnings: sessionEarnings,
+            tipMenuCount: tipMenuCount
           };
         }
       } catch (e) {}
@@ -374,13 +394,11 @@
         || details.topBestMembers?.[0]
         || details.lastTipperInChat;
       
-      // Log for debugging (can remove later)
-      console.log('SC Stats - API response for tipper check:', { 
-        cam: Object.keys(cam), 
-        topBestMembers: cam.topBestMembers,
-        broadcastSettings: cam.broadcastSettings,
-        goals: cam.goals
-      });
+      // Log full API response for debugging/discovery
+      console.log('SC Stats - Full API response:', JSON.stringify(details, null, 2));
+      console.log('SC Stats - cam keys:', Object.keys(cam));
+      console.log('SC Stats - user keys:', Object.keys(user));
+      if (details.user) console.log('SC Stats - details.user keys:', Object.keys(details.user));
       
       if (topTipper) {
         const tipperName = topTipper.username || topTipper.user?.username || topTipper.name || 'Anonymous';
@@ -394,7 +412,37 @@
         html += `<div class="sc-stat-item sc-stat-full"><div class="sc-stat-icon">🎯</div><div class="sc-stat-data"><span class="sc-stat-value">${formatNumber(goalTip)} tokens</span><span class="sc-stat-label">Goal Amount</span></div></div>`;
       }
       
+      // Earnings - check multiple possible locations
+      const earnings = user.totalEarned || user.earnings || user.tokensEarned || 
+                       details.user?.totalEarned || details.user?.earnings ||
+                       cam.totalEarned || cam.earnings || cam.sessionEarnings ||
+                       cam.broadcastSettings?.totalEarned;
+      if (earnings && earnings > 0) {
+        html += `<div class="sc-stat-item sc-stat-full"><div class="sc-stat-icon">💰</div><div class="sc-stat-data"><span class="sc-stat-value">${formatNumber(earnings)} tokens</span><span class="sc-stat-label">Total Earned</span></div></div>`;
+      }
+      
+      // Session earnings (current stream)
+      const sessionEarnings = cam.sessionEarnings || cam.broadcastEarnings || cam.currentSessionEarned;
+      if (sessionEarnings && sessionEarnings > 0) {
+        html += `<div class="sc-stat-item sc-stat-full"><div class="sc-stat-icon">📈</div><div class="sc-stat-data"><span class="sc-stat-value">${formatNumber(sessionEarnings)} tokens</span><span class="sc-stat-label">Session Earned</span></div></div>`;
+      }
+      
       html += '</div>';
+      
+      // Tip Menu - check multiple possible locations
+      const tipMenu = cam.tipMenu || cam.tipMenuItems || cam.broadcastSettings?.tipMenu ||
+                      user.tipMenu || details.user?.tipMenu || details.tipMenu;
+      if (tipMenu && Array.isArray(tipMenu) && tipMenu.length > 0) {
+        html += `<div class="sc-tip-menu">`;
+        html += `<div class="sc-tip-menu-header">📋 Tip Menu</div>`;
+        html += `<div class="sc-tip-menu-items">`;
+        tipMenu.slice(0, 10).forEach(item => {
+          const action = item.action || item.name || item.label || item.text || 'Action';
+          const price = item.price || item.tokens || item.amount || item.cost || 0;
+          html += `<div class="sc-tip-menu-item"><span class="sc-tip-action">${action}</span><span class="sc-tip-price">${formatNumber(price)} 💎</span></div>`;
+        });
+        html += `</div></div>`;
+      }
       
       // Status badge
       html += `<div class="sc-status-badge sc-status-${user.status}">${user.status || 'unknown'}</div>`;
