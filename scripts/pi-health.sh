@@ -20,7 +20,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -j, --json     Output as JSON (for scripts/cron)"
             echo "  -h, --help     Show this help message"
             echo ""
-            echo "Checks: CPU temp, throttling, load, memory, disk, uptime, ClawdBot status"
+            echo "Checks: CPU temp/freq, throttling, load, memory, disk, uptime, ClawdBot status"
             exit 0
             ;;
         *)
@@ -73,6 +73,23 @@ NODE_COUNT=$(pgrep -c node 2>/dev/null || echo 0)
 NODE_MEM=$(ps -C node -o rss= 2>/dev/null | awk '{sum+=$1} END{printf "%.0f", sum/1024}')
 [ -z "$NODE_MEM" ] && NODE_MEM=0
 
+# CPU frequency monitoring
+CPU_FREQ_HZ=$(vcgencmd measure_clock arm 2>/dev/null | cut -d= -f2)
+CPU_FREQ_MHZ=""
+CPU_FREQ_MAX_MHZ=""
+CPU_FREQ_PCT=""
+if [ -n "$CPU_FREQ_HZ" ] && [ "$CPU_FREQ_HZ" != "0" ]; then
+    CPU_FREQ_MHZ=$((CPU_FREQ_HZ / 1000000))
+    # Get max freq from cpufreq (in kHz) or default to 2400 MHz for Pi 5
+    CPU_FREQ_MAX_KHZ=$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 2>/dev/null)
+    if [ -n "$CPU_FREQ_MAX_KHZ" ]; then
+        CPU_FREQ_MAX_MHZ=$((CPU_FREQ_MAX_KHZ / 1000))
+    else
+        CPU_FREQ_MAX_MHZ=2400  # Pi 5 default
+    fi
+    CPU_FREQ_PCT=$(echo "scale=1; $CPU_FREQ_MHZ * 100 / $CPU_FREQ_MAX_MHZ" | bc)
+fi
+
 # CPU throttling check (vcgencmd get_throttled)
 # Bit meanings:
 # 0: Under-voltage detected (now)    16: Under-voltage has occurred
@@ -120,6 +137,9 @@ if $JSON_OUTPUT; then
   "timestamp": "$(date -Iseconds)",
   "cpu": {
     "temp_c": ${CPU_TEMP_C:-null},
+    "freq_mhz": ${CPU_FREQ_MHZ:-null},
+    "freq_max_mhz": ${CPU_FREQ_MAX_MHZ:-null},
+    "freq_pct": ${CPU_FREQ_PCT:-null},
     "load_1m": $LOAD_1,
     "load_5m": $LOAD_5,
     "load_15m": $LOAD_15
@@ -217,10 +237,25 @@ echo -e "${BLUE}         🍓 Pi Health Report           ${NC}"
 echo -e "${BLUE}═══════════════════════════════════════${NC}"
 echo ""
 
+# Helper for frequency status
+freq_status() {
+    local pct=$1
+    if (( $(echo "$pct >= 95" | bc -l) )); then
+        echo -e "${GREEN}✓${NC}"
+    elif (( $(echo "$pct >= 80" | bc -l) )); then
+        echo -e "${YELLOW}⚠${NC}"
+    else
+        echo -e "${RED}↓${NC}"
+    fi
+}
+
 # CPU & Temp
 echo -e "${GREEN}🌡️  CPU${NC}"
 if [ -n "$CPU_TEMP_C" ]; then
     echo -e "   Temperature: ${CPU_TEMP_C}°C $(temp_status $CPU_TEMP_C)"
+fi
+if [ -n "$CPU_FREQ_MHZ" ]; then
+    echo -e "   Frequency: ${CPU_FREQ_MHZ}MHz / ${CPU_FREQ_MAX_MHZ}MHz (${CPU_FREQ_PCT}%) $(freq_status $CPU_FREQ_PCT)"
 fi
 echo "   Load (1/5/15m): $LOAD_1 / $LOAD_5 / $LOAD_15"
 echo ""
