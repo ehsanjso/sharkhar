@@ -1,13 +1,15 @@
 ---
 name: design-research
-version: 1.0.0
+version: 2.0.0
 description: Best-of-breed design research using Mobbin. Analyzes a product URL or description, finds the best UX flows from multiple top-rated apps, downloads screenshots, and packages with a ready-to-use prompt for AI design agents.
 metadata: {"clawdbot":{"emoji":"🎨","requires":{"bins":["node"]}}}
 ---
 
 # Design Research Tool
 
-Find the best UX patterns for any product by analyzing top-rated apps on Mobbin.
+Find the best UX patterns for any product by combining:
+- **📱 Mobbin** — Real app UI flows (onboarding, dashboards, checkout, etc.)
+- **🏆 Design Galleries** — Award-winning websites (Awwwards, Godly, Land-book, etc.)
 
 ## When to Use
 
@@ -16,15 +18,17 @@ Trigger on:
 - "Find design inspiration for [product description]"
 - "Best UX patterns for [type of app]"
 - "Get Mobbin flows for [app concept]"
+- "Award-winning designs for [category]"
 - User shares a URL and asks for design help
 
 ## How It Works
 
 1. **Analyze** — Read the URL/description to understand the product type
 2. **Categorize** — Determine what flows are needed (onboarding, dashboard, checkout, etc.)
-3. **Find best-of-breed** — Search Mobbin across iOS + Web for apps with the best flows for each category
-4. **Download** — Get sequential screenshots from each flow
-5. **Package** — Create a zip with organized folders + PROMPT.md for AI design agents
+3. **Mobbin** — Search iOS + Web for apps with the best flows for each category
+4. **Galleries** — Search award sites (Awwwards, Godly, etc.) for visual inspiration
+5. **Download** — Get screenshots from both sources
+6. **Package** — Create a zip with organized folders + PROMPT.md for AI design agents
 
 ## Product Categories
 
@@ -61,12 +65,31 @@ The tool recognizes 20+ product types and knows what flows each needs:
 
 ### Main Research (recommended)
 ```bash
-# Full pipeline: URL → analyze → find apps → download → zip
+# Full pipeline: both Mobbin + Galleries (default)
 node skills/design-research/scripts/research.js "https://example.com"
 node skills/design-research/scripts/research.js "AI writing assistant SaaS"
+
+# Mobbin only (app UI flows)
+node skills/design-research/scripts/research.js "fintech app" --source=mobbin
+
+# Galleries only (award-winning sites)
+node skills/design-research/scripts/research.js "landing page" --source=galleries
+
+# Specific gallery sites
+node skills/design-research/scripts/research.js "SaaS" --source=galleries --sites=awwwards,godly
 ```
 
-### Individual Commands
+### Gallery Search (standalone)
+```bash
+# Search design galleries
+node skills/design-research/scripts/galleries.js search "SaaS dashboard"
+node skills/design-research/scripts/galleries.js search "AI chat" --sites=awwwards,godly
+
+# List available sites
+node skills/design-research/scripts/galleries.js site-list
+```
+
+### Mobbin Commands (individual)
 ```bash
 # Search for an app by name
 node scripts/mobbin-scraper.js search "Linear" --platform web
@@ -89,14 +112,34 @@ The tool auto-detects platform from keywords:
 
 Or specify explicitly: `--platform web` / `--platform ios`
 
+## Design Gallery Sites
+
+| Site | Type | Best For |
+|------|------|----------|
+| **Awwwards** | Awards | Premium, award-winning web design |
+| **Godly** | Gallery | Modern SaaS, startups, dark mode |
+| **Land-book** | Gallery | Landing pages by category |
+| **Lapa.ninja** | Gallery | Landing pages, sorted by industry |
+| **SaaS Landing Page** | Gallery | SaaS-specific inspiration |
+| **One Page Love** | Gallery | Single-page sites |
+| **Siteinspire** | Gallery | Curated web design |
+| **Page Flows** | Flows | User flow screenshots (like Mobbin for web) |
+| **Screenlane** | Flows | Mobile & web UI patterns |
+| **Dribbble** | Community | Design concepts (mixed quality) |
+| **Behance** | Community | Portfolios (mixed quality) |
+
 ## Output Format
 
 ```
 /product-design-research/
-├── 01-ui-reference-{app}/     # Best UI design language
-├── 02-{flow}-{app}/           # Best flow for each category
+├── 01-ui-reference-{app}/     # Best UI design language (Mobbin)
+├── 02-{flow}-{app}/           # Best flow for each category (Mobbin)
 ├── 03-{flow}-{app}/
-├── ...
+├── galleries/                 # Award-winning websites
+│   ├── awwwards/
+│   ├── godly/
+│   ├── landbook/
+│   └── lapa/
 └── PROMPT.md                  # Ready-to-paste prompt for v0/Cursor
 ```
 
@@ -121,13 +164,22 @@ Optional (for sentiment research):
 
 ```
 User: "Design research for https://myapp.com"
-→ Fetches landing page, categorizes as "SaaS + AI", finds Linear + Perplexity + Shopify flows, packages 50+ screens with PROMPT.md
+→ Mobbin: Linear + Perplexity + Shopify flows
+→ Galleries: Top Awwwards + Godly sites
+→ Output: 60+ screens with PROMPT.md
 
 User: "Best UX patterns for a two-sided marketplace"
-→ Searches Fiverr + Upwork + Airbnb, downloads onboarding + listing + search flows from each
+→ Mobbin: Fiverr + Upwork + Airbnb flows
+→ Galleries: Marketplace inspiration from Land-book
+→ Output: Listing creation, search, booking flows + landing pages
 
-User: "Find Mobbin flows for fintech onboarding"
-→ Searches Revolut + Wise + Coinbase, downloads KYC + onboarding flows
+User: "Award-winning SaaS landing pages" --source=galleries
+→ Galleries only: Awwwards + Godly + Lapa
+→ Output: 20+ landing page thumbnails for inspiration
+
+User: "Fintech mobile app" --source=mobbin
+→ Mobbin only: Revolut + Wise flows
+→ Output: KYC, dashboard, transfers screens
 ```
 
 ## Limitations

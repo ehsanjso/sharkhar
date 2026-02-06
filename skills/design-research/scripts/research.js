@@ -4,15 +4,29 @@
  * 
  * Full pipeline: URL/description → analyze → find apps → download → package
  * 
+ * Supports two sources:
+ *   1. Mobbin - real app UI flows (iOS/Web)
+ *   2. Design Galleries - award-winning websites (Awwwards, Godly, etc.)
+ * 
  * Usage:
  *   node research.js "https://example.com"
  *   node research.js "AI writing assistant SaaS"
- *   node research.js "two-sided marketplace for local services"
+ *   node research.js "two-sided marketplace" --source=all
+ *   node research.js "fintech app" --source=mobbin
+ *   node research.js "landing page" --source=galleries
  */
 
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
+
+// Import gallery scraper
+let galleries;
+try {
+  galleries = require('./galleries');
+} catch (e) {
+  // galleries.js not available, Mobbin-only mode
+}
 
 const BROWSER_API = 'http://127.0.0.1:18791';
 const PROFILE = 'clawd';
@@ -560,7 +574,13 @@ function findBestFlow(flows, purpose) {
 
 // --- Main Research Pipeline ---
 
-async function runResearch(input) {
+async function runResearch(input, options = {}) {
+  const {
+    source = 'all', // 'mobbin', 'galleries', 'all'
+    gallerySites = ['awwwards', 'godly', 'lapa', 'landbook'],
+    galleryLimit = 6,
+  } = options;
+
   const isUrl = input.startsWith('http://') || input.startsWith('https://');
   let productText = input;
   let productName = 'product';
@@ -578,28 +598,8 @@ async function runResearch(input) {
 
   // Categorize
   const categories = categorizeProduct(productText);
-  console.log(`\n📊 Categories: ${categories.join(' + ')}\n`);
-
-  // Collect apps to download
-  const appsToDownload = new Map(); // key: "appName-platform", value: { app config }
-  
-  for (const cat of categories) {
-    const config = PRODUCT_CATEGORIES[cat];
-    if (!config) continue;
-    
-    for (const [flowType, appConfig] of Object.entries(config.bestApps)) {
-      const key = `${appConfig.name}-${appConfig.platform}`;
-      if (!appsToDownload.has(key)) {
-        appsToDownload.set(key, {
-          ...appConfig,
-          flows: [flowType],
-          category: cat,
-        });
-      } else {
-        appsToDownload.get(key).flows.push(flowType);
-      }
-    }
-  }
+  console.log(`\n📊 Categories: ${categories.join(' + ')}`);
+  console.log(`📡 Source: ${source}\n`);
 
   // Setup output directory
   const ts = Date.now();
@@ -609,8 +609,35 @@ async function runResearch(input) {
   const downloadedApps = [];
   let folderIndex = 1;
 
-  // Download each app's flows
-  for (const [key, appConfig] of appsToDownload) {
+  // --- Mobbin Research (if enabled) ---
+  if (source === 'mobbin' || source === 'all') {
+    console.log('='.repeat(50));
+    console.log('📱 MOBBIN APP FLOWS');
+    console.log('='.repeat(50));
+
+    // Collect apps to download
+    const appsToDownload = new Map(); // key: "appName-platform", value: { app config }
+    
+    for (const cat of categories) {
+      const config = PRODUCT_CATEGORIES[cat];
+      if (!config) continue;
+      
+      for (const [flowType, appConfig] of Object.entries(config.bestApps)) {
+        const key = `${appConfig.name}-${appConfig.platform}`;
+        if (!appsToDownload.has(key)) {
+          appsToDownload.set(key, {
+            ...appConfig,
+            flows: [flowType],
+            category: cat,
+          });
+        } else {
+          appsToDownload.get(key).flows.push(flowType);
+        }
+      }
+    }
+
+    // Download each app's flows
+    for (const [key, appConfig] of appsToDownload) {
     console.log(`\n📦 ${appConfig.name} (${appConfig.platform})`);
     console.log(`   For: ${appConfig.flows.join(', ')}`);
 
@@ -668,11 +695,66 @@ async function runResearch(input) {
       folderIndex++;
     }
   }
+  } // End Mobbin section
 
-  // Generate PROMPT.md
-  const prompt = generatePrompt(productName, input, categories, downloadedApps);
-  fs.writeFileSync(path.join(baseDir, 'PROMPT.md'), prompt);
-  console.log('\n📝 PROMPT.md written');
+  // --- Gallery Research (if enabled) ---
+  let galleryResults = [];
+  
+  if ((source === 'galleries' || source === 'all') && galleries) {
+    console.log('\n' + '='.repeat(50));
+    console.log('🎨 DESIGN GALLERIES');
+    console.log('='.repeat(50));
+    
+    const galleryDir = path.join(baseDir, 'galleries');
+    fs.mkdirSync(galleryDir, { recursive: true });
+
+    try {
+      galleryResults = await galleries.searchGalleries(input, {
+        sites: gallerySites,
+        limit: galleryLimit,
+        outputDir: galleryDir,
+      });
+
+      // Organize gallery results by source
+      const bySource = {};
+      for (const r of galleryResults) {
+        if (!bySource[r.source]) bySource[r.source] = [];
+        bySource[r.source].push(r);
+      }
+
+      // Create subfolders per source
+      for (const [sourceName, results] of Object.entries(bySource)) {
+        const sourceDir = path.join(galleryDir, sourceName);
+        fs.mkdirSync(sourceDir, { recursive: true });
+        
+        for (let i = 0; i < results.length; i++) {
+          const r = results[i];
+          if (r.localPath && fs.existsSync(r.localPath)) {
+            const ext = path.extname(r.localPath) || '.jpg';
+            const newName = `${String(i + 1).padStart(2, '0')}-${r.title.slice(0, 40).replace(/[^a-zA-Z0-9]/g, '_')}${ext}`;
+            fs.renameSync(r.localPath, path.join(sourceDir, newName));
+          }
+        }
+      }
+
+      console.log(`\n   ✅ Gallery results organized into ${Object.keys(bySource).length} folders`);
+    } catch (e) {
+      console.log(`   ⚠ Gallery search failed: ${e.message}`);
+    }
+  }
+
+  // Skip Mobbin if galleries-only mode
+  if (source === 'galleries') {
+    // Just generate prompt for galleries
+    const prompt = generatePrompt(productName, input, categories, [], galleryResults);
+    fs.writeFileSync(path.join(baseDir, 'PROMPT.md'), prompt);
+    console.log('\n📝 PROMPT.md written');
+  } else {
+    // Generate PROMPT.md with both Mobbin and gallery results
+    const prompt = generatePrompt(productName, input, categories, downloadedApps, galleryResults);
+    fs.writeFileSync(path.join(baseDir, 'PROMPT.md'), prompt);
+    console.log('\n📝 PROMPT.md written');
+  }
 
   // Zip
   const zipPath = `/tmp/${productName}-design-research.zip`;
@@ -689,21 +771,60 @@ async function runResearch(input) {
   });
 
   const stat = fs.statSync(zipPath);
-  const totalScreens = downloadedApps.reduce((sum, a) => sum + a.screens, 0);
-  console.log(`\n📦 Done! ${totalScreens} screens from ${downloadedApps.length} apps`);
-  console.log(`   ${(stat.size/1024/1024).toFixed(1)}MB → ${zipPath}`);
+  const mobbinScreens = downloadedApps.reduce((sum, a) => sum + a.screens, 0);
+  const galleryCount = galleryResults.length;
   
-  return { zipPath, apps: downloadedApps, totalScreens };
+  console.log(`\n${'='.repeat(50)}`);
+  console.log('📦 RESEARCH COMPLETE');
+  console.log('='.repeat(50));
+  if (source !== 'galleries') console.log(`   Mobbin: ${mobbinScreens} screens from ${downloadedApps.length} apps`);
+  if (source !== 'mobbin') console.log(`   Galleries: ${galleryCount} design references`);
+  console.log(`   Size: ${(stat.size/1024/1024).toFixed(1)}MB`);
+  console.log(`   📁 ${zipPath}`);
+  
+  return { zipPath, apps: downloadedApps, galleryResults, totalScreens: mobbinScreens + galleryCount };
 }
 
-function generatePrompt(productName, input, categories, apps) {
-  const appList = apps.map(a => 
-    `### ${a.folder}/\n**${a.app}** (${a.platform}) — ${a.screens} screens\n→ ${a.why}\n→ Use for: ${a.purpose}`
-  ).join('\n\n');
+function generatePrompt(productName, input, categories, apps = [], galleryResults = []) {
+  // Mobbin apps section
+  const appList = apps.length > 0 
+    ? apps.map(a => 
+        `### ${a.folder}/\n**${a.app}** (${a.platform}) — ${a.screens} screens\n→ ${a.why}\n→ Use for: ${a.purpose}`
+      ).join('\n\n')
+    : '_No Mobbin flows collected_';
 
-  const mappingRows = apps.map(a => 
-    `| ${a.purpose} | ${a.app} | ${a.why} |`
-  ).join('\n');
+  const mappingRows = apps.length > 0
+    ? apps.map(a => `| ${a.purpose} | ${a.app} | ${a.why} |`).join('\n')
+    : '| _none_ | _none_ | _none_ |';
+
+  // Gallery section
+  const gallerySources = {};
+  for (const r of galleryResults) {
+    if (!gallerySources[r.sourceName]) gallerySources[r.sourceName] = [];
+    gallerySources[r.sourceName].push(r);
+  }
+
+  const gallerySection = Object.keys(gallerySources).length > 0
+    ? Object.entries(gallerySources).map(([source, results]) => 
+        `### galleries/${source.toLowerCase()}/\n**${source}** — ${results.length} references\n` +
+        results.slice(0, 5).map(r => `- ${r.title}`).join('\n')
+      ).join('\n\n')
+    : '';
+
+  const gallerySourceList = Object.keys(gallerySources).length > 0
+    ? '\n\n## Design Galleries\n\nAward-winning websites for visual inspiration:\n\n' + gallerySection
+    : '';
+
+  // Build prompt sections based on what we have
+  const mobbinPatterns = apps.length > 0
+    ? apps.map(a => `> - ${a.purpose}: Reference ${a.app}'s patterns from \`${a.folder}/\``).join('\n')
+    : '';
+
+  const galleryPatterns = Object.keys(gallerySources).length > 0
+    ? `> - **Visual polish**: Study the award-winning sites in \`galleries/\` for animation, typography, and micro-interactions`
+    : '';
+
+  const patternsSection = [mobbinPatterns, galleryPatterns].filter(Boolean).join('\n');
 
   return `# ${productName.charAt(0).toUpperCase() + productName.slice(1)} Design Research
 
@@ -713,7 +834,7 @@ ${input}
 ## Categories Detected
 ${categories.join(' + ')}
 
-## Reference Apps
+## Reference Apps (Mobbin)
 
 ${appList}
 
@@ -721,27 +842,39 @@ ${appList}
 
 | Feature | Reference App | Why |
 |---------|--------------|-----|
-${mappingRows}
+${mappingRows}${gallerySourceList}
 
 ## Prompt for AI Design Agent
 
 > Design a modern web application for "${productName}" based on the reference screenshots provided.
 >
 > **Visual style:** Follow the UI reference folder's design language — clean, minimal, modern.
+> Study the gallery references for award-winning visual polish.
 >
 > **Key patterns to implement:**
-${apps.map(a => `> - ${a.purpose}: Reference ${a.app}'s patterns from \`${a.folder}/\``).join('\n')}
+${patternsSection}
 >
 > **Tech stack:** Next.js 14 (App Router), shadcn/ui, Tailwind CSS, TypeScript.
 >
 > The screenshots are design references for patterns and layouts — don't copy exactly, but match the quality level and UX patterns.
+> The gallery sites show what "best in class" looks like for animations and visual design.
 `;
 }
 
 // --- CLI ---
 
 async function main() {
-  const input = process.argv.slice(2).join(' ');
+  const args = process.argv.slice(2);
+  
+  // Parse flags
+  const sourceArg = args.find(a => a.startsWith('--source='));
+  const sitesArg = args.find(a => a.startsWith('--sites='));
+  
+  const source = sourceArg ? sourceArg.split('=')[1] : 'all';
+  const sites = sitesArg ? sitesArg.split('=')[1].split(',') : undefined;
+  
+  // Get input (everything that's not a flag)
+  const input = args.filter(a => !a.startsWith('--')).join(' ');
   
   if (!input) {
     console.log(`
@@ -752,12 +885,29 @@ Usage:
   node research.js "AI writing assistant SaaS"
   node research.js "two-sided marketplace for local services"
 
-Analyzes the input, finds best-of-breed UX patterns from Mobbin, and packages screenshots with a design prompt.
+Options:
+  --source=all        Search both Mobbin and design galleries (default)
+  --source=mobbin     Only search Mobbin for app UI flows
+  --source=galleries  Only search design award sites
+  --sites=awwwards,godly,lapa  Specific gallery sites to search
+
+Sources:
+  📱 Mobbin      Real app UI flows (iOS + Web) - onboarding, dashboard, checkout, etc.
+  🏆 Galleries   Award-winning websites - Awwwards, Godly, Land-book, Lapa.ninja, etc.
+
+Examples:
+  node research.js "fintech dashboard" --source=all
+  node research.js "landing page" --source=galleries
+  node research.js "mobile app checkout" --source=mobbin
+  node research.js "SaaS" --source=galleries --sites=awwwards,godly
 `);
     process.exit(0);
   }
 
-  await runResearch(input);
+  const options = { source };
+  if (sites) options.gallerySites = sites;
+
+  await runResearch(input, options);
 }
 
 main().catch(e => { console.error('❌', e.message); process.exit(1); });
