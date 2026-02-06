@@ -1,6 +1,6 @@
 # 🧠 Long-term Memory
 
-*Last updated: 2026-02-05*
+*Last updated: 2026-02-06*
 
 ## About Ehsan
 
@@ -8,6 +8,27 @@
 - **Telegram:** @EhsanJso
 - **Timezone:** America/Toronto (EST)
 - **Platform:** Raspberry Pi 5
+
+## ⚠️ Active Issues
+
+### Pi 5 Thermal Throttling (Feb 6)
+**Status:** Pi running at 84.2°C with active throttling (flags 0xe0008)
+- Soft temperature limit active
+- ARM frequency capping occurring
+- Affects ALL services: ClawdBot, Uptime Kuma, Mission Control, bots
+
+**Immediate fix:** Order Official Active Cooler ($5 USD)
+- Drops temps 25-30°C
+- Dead-simple installation
+- Has PWM fan control via config.txt
+
+**Workaround until cooler arrives:**
+- Position Pi for better airflow
+- Monitor with `pi-health.sh` (now has throttle detection)
+
+**Research:** `memory/research/2026-02-06-raspberry-pi-5-thermal-management.md`
+
+---
 
 ## Our Projects
 
@@ -169,6 +190,16 @@ The Agent Dashboard helps me wake up each session knowing what happened.
 - **Benefits:** Quota relief, offline capability, privacy for sensitive queries
 - Research: `memory/research/2026-02-04-ollama-local-llms-raspberry-pi.md`
 
+### Caddy Reverse Proxy (Researched Feb 5)
+- **Best choice for Pi 5** — Single binary, ~40MB RAM, dead-simple config
+- **Install:** `apt install caddy`
+- **`tls internal`** auto-generates LAN certs (no Let's Encrypt needed)
+- **Pi-hole + Caddy combo:** DNS resolves `*.home` to Pi, Caddy routes to correct port
+- **Setup:** ~35 min from zero to clean URLs
+- **Blocked by:** Port 80 conflict with Pi-hole (move lighttpd to 8080 first)
+- **Goal:** `mission.home`, `uptime.home`, `pihole.home` instead of IP:port
+- Research: `memory/research/2026-02-05-reverse-proxy-homelab.md`
+
 ### Home Assistant + AI (Researched Feb 3)
 - HA supports Claude, GPT-4o, Gemini, and Ollama as conversation agents
 - Device control via AI — lights, climate, scenes
@@ -206,12 +237,23 @@ The spare capacity cron runs at noon daily. Priority order:
 **Recent code improvements:**
 - Polymarket scanner: added timeouts, retry logic, specific exception handling, logging (Feb 3)
 - Scripts: enhanced backup-clawdbot.sh (dry-run, --keep, --help) and prune-sessions.sh (Feb 4)
-- Pi-health.sh system health check script (Feb 4)
+- Pi-health.sh: added CPU throttle detection with bit decoding (Feb 5) — this revealed the 84°C throttling issue!
 
 **Research archive:** `memory/research/` — accumulating nicely:
 - Remotion on Pi, competitor scanning, LLM routing (Jan 30-31)
 - Pi-hole advanced, MCP ecosystem, HA + AI, Ollama, ArXiv papers (Feb 1-4)
 - AI news digest with industry trends (Feb 3)
+
+---
+
+## Design Research Tools
+
+### Mobbin Design Pipeline (Feb 5)
+- Built a workflow to fetch best-in-class UI flows from Mobbin
+- Takes URL/description → analyzes product → finds best flows from multiple apps → downloads
+- **Key insight:** Power is mixing flows from *different* apps (e.g., Linear for onboarding, Perplexity for chat UI)
+- First test: Bayclaw — 51 screens across Linear, Perplexity, Shopify
+- Scripts: `skills/frontend-design/design-research/`
 
 ---
 
