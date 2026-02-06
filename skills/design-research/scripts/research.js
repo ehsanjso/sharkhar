@@ -21,7 +21,7 @@ const PROFILE = 'clawd';
 
 const PRODUCT_CATEGORIES = {
   'saas-dashboard': {
-    keywords: ['saas', 'dashboard', 'productivity', 'project management', 'team', 'workspace', 'collaboration'],
+    keywords: ['saas', 'dashboard', 'productivity', 'project management', 'team', 'workspace', 'collaboration', 'crm', 'analytics', 'admin'],
     flows: ['onboarding', 'dashboard', 'settings', 'billing', 'team-invite'],
     bestApps: {
       'ui-reference': { name: 'Linear', platform: 'web', why: 'Gold standard for SaaS UI design' },
@@ -31,7 +31,7 @@ const PRODUCT_CATEGORIES = {
     }
   },
   'ai-tool': {
-    keywords: ['ai', 'chat', 'assistant', 'llm', 'gpt', 'claude', 'copilot', 'writing', 'generation'],
+    keywords: ['ai', 'chat', 'assistant', 'llm', 'gpt', 'claude', 'copilot', 'writing', 'generation', 'bot', 'agent', 'openai', 'anthropic', 'model', 'prompt'],
     flows: ['onboarding', 'chat-interface', 'model-selection', 'history', 'settings'],
     bestApps: {
       'ui-reference': { name: 'Linear', platform: 'web', why: 'Clean, minimal aesthetic' },
@@ -41,7 +41,7 @@ const PRODUCT_CATEGORIES = {
     }
   },
   'marketplace': {
-    keywords: ['marketplace', 'two-sided', 'gig', 'freelance', 'booking', 'service', 'local', 'creator', 'influencer'],
+    keywords: ['marketplace', 'two-sided', 'gig', 'freelance', 'booking', 'service', 'local', 'creator', 'influencer', 'hire', 'talent'],
     flows: ['onboarding', 'listing-creation', 'search-browse', 'booking', 'reviews', 'messaging'],
     bestApps: {
       'ui-reference': { name: 'Linear', platform: 'web', why: 'Modern SaaS aesthetic' },
@@ -52,7 +52,7 @@ const PRODUCT_CATEGORIES = {
     }
   },
   'fintech': {
-    keywords: ['fintech', 'banking', 'payments', 'money', 'transfer', 'crypto', 'wallet', 'finance'],
+    keywords: ['fintech', 'banking', 'payments', 'money', 'transfer', 'crypto', 'wallet', 'finance', 'invest', 'trading', 'stock'],
     flows: ['onboarding-kyc', 'dashboard', 'transfers', 'cards', 'transactions'],
     bestApps: {
       'ui-reference': { name: 'Revolut', platform: 'ios', why: 'Premium fintech design' },
@@ -62,7 +62,7 @@ const PRODUCT_CATEGORIES = {
     }
   },
   'ecommerce': {
-    keywords: ['ecommerce', 'shop', 'store', 'cart', 'checkout', 'products', 'orders'],
+    keywords: ['ecommerce', 'shop', 'store', 'cart', 'checkout', 'products', 'orders', 'retail', 'buy', 'sell'],
     flows: ['product-page', 'cart', 'checkout', 'order-tracking', 'dashboard'],
     bestApps: {
       'ui-reference': { name: 'Shopify', platform: 'web', why: 'E-commerce standard' },
@@ -72,13 +72,40 @@ const PRODUCT_CATEGORIES = {
     }
   },
   'social': {
-    keywords: ['social', 'feed', 'posts', 'followers', 'profile', 'content', 'creator'],
+    keywords: ['social', 'feed', 'posts', 'followers', 'profile', 'content', 'creator', 'community', 'share'],
     flows: ['feed', 'profile', 'create-post', 'notifications', 'settings'],
     bestApps: {
       'ui-reference': { name: 'Linear', platform: 'web', why: 'Clean, modern aesthetic' },
       'feed': { name: 'Instagram', platform: 'ios', why: 'Best content feed UX' },
       'create-post': { name: 'Instagram', platform: 'ios', why: 'Content creation flow' },
       'profile': { name: 'Instagram', platform: 'ios', why: 'Creator profile design' },
+    }
+  },
+  'devtool': {
+    keywords: ['developer', 'api', 'sdk', 'code', 'deploy', 'infrastructure', 'devops', 'hosting', 'ci', 'cd', 'git'],
+    flows: ['onboarding', 'dashboard', 'deploy', 'logs', 'settings'],
+    bestApps: {
+      'ui-reference': { name: 'Linear', platform: 'web', why: 'Developer-focused minimal design' },
+      'dashboard': { name: 'Shopify', platform: 'web', why: 'Clean overview dashboard' },
+      'onboarding': { name: 'Linear', platform: 'web', why: 'Developer onboarding' },
+    }
+  },
+  'health': {
+    keywords: ['health', 'fitness', 'wellness', 'meditation', 'sleep', 'workout', 'nutrition', 'mental', 'therapy'],
+    flows: ['onboarding', 'dashboard', 'tracking', 'programs', 'settings'],
+    bestApps: {
+      'ui-reference': { name: 'Headspace', platform: 'ios', why: 'Calming, wellness-focused design' },
+      'onboarding': { name: 'Headspace', platform: 'ios', why: 'Best wellness onboarding' },
+      'dashboard': { name: 'Headspace', platform: 'ios', why: 'Progress and tracking UI' },
+    }
+  },
+  'education': {
+    keywords: ['education', 'learning', 'course', 'lesson', 'tutorial', 'teach', 'study', 'quiz'],
+    flows: ['onboarding', 'dashboard', 'course-view', 'progress', 'settings'],
+    bestApps: {
+      'ui-reference': { name: 'Duolingo', platform: 'ios', why: 'Engaging, gamified education design' },
+      'onboarding': { name: 'Duolingo', platform: 'ios', why: 'Best education onboarding' },
+      'progress': { name: 'Duolingo', platform: 'ios', why: 'Gamified progress tracking' },
     }
   },
 };
@@ -248,32 +275,66 @@ async function getFlowImages(appFlowsUrl) {
     return Object.values(groups);
   }`);
 
-  // Get flow names from strip labels
+  // Get flow names from strip labels - improved extraction
   const labels = await evalJs(`() => {
     const labels = [];
+    
+    // Method 1: Look for "FlowName N screens" pattern
     const text = document.body.innerText;
-    const matches = [...text.matchAll(/^(.+?)\\s+(\\d+)\\s+screens?$/gm)];
+    const matches = [...text.matchAll(/^([A-Za-z][A-Za-z0-9 _-]+?)\\s+(\\d+)\\s+screens?$/gm)];
     for (const m of matches) {
-      const name = m[1].replace(/from$/, '').replace(/chevron.*icon/gi, '').trim();
-      if (name.length > 2 && name.length < 50) {
+      let name = m[1]
+        .replace(/from$/i, '')
+        .replace(/chevron.*icon/gi, '')
+        .replace(/arrow.*icon/gi, '')
+        .replace(/Latest$/i, '')
+        .trim();
+      if (name.length > 2 && name.length < 50 && !name.match(/^(Save|Copy|Clear|Filter)$/i)) {
         labels.push({ name, count: parseInt(m[2]) });
       }
     }
-    return labels;
+    
+    // Method 2: Get tree node names from sidebar
+    const treeNames = [];
+    document.querySelectorAll('li').forEach(li => {
+      const btn = li.querySelector(':scope > button');
+      if (!btn) return;
+      let text = '';
+      li.childNodes.forEach(n => {
+        if (n.nodeType === 3) text += n.textContent;
+      });
+      text = text.trim();
+      if (text && text.length > 2 && text.length < 50 && !text.match(/(chevron|icon|Save|Copy)/i)) {
+        treeNames.push(text);
+      }
+    });
+    
+    return { labels, treeNames };
   }`);
 
   const flows = r.result || [];
-  const flowLabels = labels.result || [];
+  const { labels: flowLabels, treeNames } = labels.result || { labels: [], treeNames: [] };
 
-  // Match names
+  // Match names - prefer strip labels, fallback to tree names
   flows.forEach((f, i) => {
+    // Try to match by screen count first
     const match = flowLabels.find(l => l.count === f.images.length);
     if (match) {
       f.name = match.name;
       flowLabels.splice(flowLabels.indexOf(match), 1);
+    } else if (treeNames[i]) {
+      f.name = treeNames[i];
     } else {
       f.name = `Flow ${i + 1}`;
     }
+    
+    // Clean up common artifacts
+    f.name = f.name
+      .replace(/chevron\s*down\s*icon/gi, '')
+      .replace(/arrow\s*\w+\s*icon/gi, '')
+      .replace(/^\s*Latest\s*/i, '')
+      .trim() || `Flow ${i + 1}`;
+    
     f.screenCount = f.images.length;
   });
 
