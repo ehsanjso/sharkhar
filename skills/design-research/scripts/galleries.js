@@ -262,18 +262,20 @@ async function scrapeAwwwards(category, limit = 5) {
 
   const results = await evalJs(`() => {
     const items = [];
-    document.querySelectorAll('li[data-id]').forEach((li, i) => {
-      if (i >= ${limit}) return;
-      const link = li.querySelector('a[href*="/sites/"]');
-      const img = li.querySelector('img[data-src], img[src*="assets.awwwards"]');
-      const title = li.querySelector('.bt-site, h2, .title');
-      if (link && (img || title)) {
-        items.push({
-          url: link.href,
-          title: title?.textContent?.trim() || 'Untitled',
-          thumb: img?.dataset?.src || img?.src || null,
-        });
-      }
+    // Find all site links in the list
+    document.querySelectorAll('a[href*="/sites/"]').forEach((link, i) => {
+      if (items.length >= ${limit}) return;
+      const img = link.querySelector('img');
+      const title = img?.alt || link.textContent?.trim() || 'Untitled';
+      // Skip if it's a duplicate or has no useful content
+      if (!img?.src || items.find(x => x.title === title)) return;
+      // Skip tiny images (icons)
+      if (img.src.includes('avatar') || img.src.includes('logo')) return;
+      items.push({
+        url: link.href,
+        title: title,
+        thumb: img.src,
+      });
     });
     return items;
   }`);
@@ -282,10 +284,8 @@ async function scrapeAwwwards(category, limit = 5) {
 }
 
 async function scrapeGodly(category, limit = 6) {
-  const catSlug = DESIGN_SITES.godly.categories[category] || '';
-  const url = catSlug 
-    ? `https://godly.website/category/${catSlug}`
-    : 'https://godly.website';
+  // Godly doesn't have category URLs anymore, just use main page
+  const url = 'https://godly.website';
   
   console.log(`  ✨ Godly: ${url}`);
   await nav(url);
@@ -293,20 +293,30 @@ async function scrapeGodly(category, limit = 6) {
 
   const results = await evalJs(`() => {
     const items = [];
-    document.querySelectorAll('a[href*="/website/"]').forEach((a, i) => {
-      if (i >= ${limit * 2}) return; // Get more, filter later
-      const img = a.querySelector('img');
-      const title = a.querySelector('h3, .title, p')?.textContent?.trim();
-      if (img?.src && !items.find(x => x.url === a.href)) {
+    document.querySelectorAll('article').forEach((article, i) => {
+      if (items.length >= ${limit}) return;
+      // Title is in first generic/div element
+      const titleEl = article.querySelector('div, span');
+      const title = titleEl?.textContent?.trim() || 'Untitled';
+      // External link has the thumbnail
+      const extLink = article.querySelector('a[href*="?ref=godly"]');
+      const thumb = extLink?.querySelector('img')?.src;
+      // Internal link to website page
+      const intLink = article.querySelector('a[href*="/website/"]');
+      const pageUrl = intLink?.href;
+      
+      if (thumb && pageUrl && !items.find(x => x.title === title)) {
+        // Extract actual site URL from external link
+        const siteUrl = extLink?.href?.replace('?ref=godly', '') || null;
         items.push({
-          url: a.href,
-          title: title || 'Untitled',
-          thumb: img.src,
-          siteUrl: a.href.split('/website/')[1]?.replace(/-/g, '.') || null,
+          url: pageUrl,
+          title: title,
+          thumb: thumb,
+          siteUrl: siteUrl,
         });
       }
     });
-    return items.slice(0, ${limit});
+    return items;
   }`);
 
   return results.result || [];
@@ -322,16 +332,26 @@ async function scrapeLapa(category, limit = 6) {
 
   const results = await evalJs(`() => {
     const items = [];
-    document.querySelectorAll('article a, .grid a[href*="/post/"]').forEach((a, i) => {
-      if (i >= ${limit}) return;
-      const img = a.querySelector('img');
-      const title = a.querySelector('h2, h3, .title')?.textContent?.trim() || 
-                    a.getAttribute('title') || 'Untitled';
-      if (img?.src) {
+    // Find all links to /post/ pages
+    document.querySelectorAll('a[href*="/post/"]').forEach((a, i) => {
+      if (items.length >= ${limit}) return;
+      // Get the title from link text or nearby heading
+      const title = a.textContent?.trim();
+      if (!title || title.length < 2 || title.length > 100) return;
+      // Skip duplicates
+      if (items.find(x => x.title === title)) return;
+      
+      // Find thumbnail - look for sibling or parent with external link that has an img
+      const container = a.closest('div[class]');
+      const extLink = container?.querySelector('a[href^="http"]:not([href*="lapa.ninja"])');
+      const thumb = extLink?.querySelector('img')?.src || container?.querySelector('img')?.src;
+      
+      if (thumb && !thumb.includes('logo')) {
         items.push({
-          url: a.href,
+          url: 'https://www.lapa.ninja' + a.getAttribute('href'),
           title: title,
-          thumb: img.src,
+          thumb: thumb,
+          siteUrl: extLink?.href || null,
         });
       }
     });
@@ -342,10 +362,8 @@ async function scrapeLapa(category, limit = 6) {
 }
 
 async function scrapeLandbook(category, limit = 6) {
-  const catSlug = DESIGN_SITES.landbook.categories[category] || '';
-  const url = catSlug 
-    ? `https://land-book.com/gallery?category=${catSlug}`
-    : 'https://land-book.com/gallery';
+  // Land-book main page shows recent designs
+  const url = 'https://land-book.com';
   
   console.log(`  📖 Land-book: ${url}`);
   await nav(url);
@@ -353,18 +371,26 @@ async function scrapeLandbook(category, limit = 6) {
 
   const results = await evalJs(`() => {
     const items = [];
-    document.querySelectorAll('.gallery-item, article, .site-card').forEach((el, i) => {
-      if (i >= ${limit}) return;
-      const link = el.querySelector('a');
-      const img = el.querySelector('img');
-      const title = el.querySelector('h2, h3, .title')?.textContent?.trim() || 'Untitled';
-      if (link && img?.src) {
-        items.push({
-          url: link.href,
-          title: title,
-          thumb: img.src,
-        });
-      }
+    // Find links to /websites/ pages with images
+    document.querySelectorAll('a[href*="/websites/"]').forEach((a, i) => {
+      if (items.length >= ${limit}) return;
+      const img = a.querySelector('img');
+      if (!img?.src) return;
+      // Skip logos and small images
+      if (img.src.includes('logo') || img.alt?.toLowerCase().includes('logo')) return;
+      
+      // Get title from img alt or link text
+      const title = img.alt?.replace(/ - .* design inspiration$/, '')?.trim() || 
+                    a.textContent?.trim() || 'Untitled';
+      if (title.length < 2 || title.length > 100) return;
+      // Skip duplicates
+      if (items.find(x => x.title === title || x.url === a.href)) return;
+      
+      items.push({
+        url: a.href,
+        title: title,
+        thumb: img.src,
+      });
     });
     return items;
   }`);
