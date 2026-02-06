@@ -80,11 +80,14 @@ const DESIGN_SITES = {
     quality: 4,
     categories: {
       'saas': 'saas',
-      'ai': 'ai-ml',
+      'ai': 'artificial-intelligence',
       'fintech': 'fintech',
-      'ecommerce': 'e-commerce',
-      'health': 'health-fitness',
-      'education': 'education',
+      'ecommerce': 'ecommerce',
+      'devtool': 'development-tools',
+      'startup': 'business',
+      'agency': 'agency',
+      'portfolio': 'portfolio',
+      'minimal': 'minimal',
     }
   },
   'saaslandingpage': {
@@ -295,21 +298,28 @@ async function scrapeGodly(category, limit = 6) {
     const items = [];
     document.querySelectorAll('article').forEach((article, i) => {
       if (items.length >= ${limit}) return;
-      // Title is in first generic/div element
-      const titleEl = article.querySelector('div, span');
+      // Title is in a div with opacity-0 class (shows on hover)
+      const titleEl = article.querySelector('div[class*="opacity"]');
       const title = titleEl?.textContent?.trim() || 'Untitled';
-      // External link has the thumbnail
-      const extLink = article.querySelector('a[href*="?ref=godly"]');
-      const thumb = extLink?.querySelector('img')?.src;
-      // Internal link to website page
-      const intLink = article.querySelector('a[href*="/website/"]');
-      const pageUrl = intLink?.href;
+      if (title.length < 2) return;
       
-      if (thumb && pageUrl && !items.find(x => x.title === title)) {
-        // Extract actual site URL from external link
-        const siteUrl = extLink?.href?.replace('?ref=godly', '') || null;
+      // Thumbnail is a background-image on a div inside the internal link
+      const intLink = article.querySelector('a[href*="/website/"]');
+      const bgDiv = intLink?.querySelector('div[style*="background-image"]');
+      let thumb = null;
+      if (bgDiv) {
+        const style = bgDiv.getAttribute('style') || '';
+        const match = style.match(/url\\(["']?([^"')]+)["']?\\)/);
+        if (match) thumb = match[1];
+      }
+      
+      // External link has the actual site URL
+      const extLink = article.querySelector('a[href*="?ref=godly"]');
+      const siteUrl = extLink?.href?.replace('?ref=godly', '') || null;
+      
+      if (thumb && intLink?.href && !items.find(x => x.title === title)) {
         items.push({
-          url: pageUrl,
+          url: intLink.href,
           title: title,
           thumb: thumb,
           siteUrl: siteUrl,
@@ -332,28 +342,40 @@ async function scrapeLapa(category, limit = 6) {
 
   const results = await evalJs(`() => {
     const items = [];
-    // Find all links to /post/ pages
-    document.querySelectorAll('a[href*="/post/"]').forEach((a, i) => {
+    const seen = new Set();
+    
+    // Find all links to /post/ pages and construct thumbnail URLs
+    document.querySelectorAll('a[href*="/post/"]').forEach((a) => {
       if (items.length >= ${limit}) return;
-      // Get the title from link text or nearby heading
+      
+      const href = a.getAttribute('href');
+      if (!href || seen.has(href)) return;
+      
+      // Extract slug from /post/slug/ or /post/slug
+      const match = href.match(/\\/post\\/([a-z0-9-]+)/i);
+      if (!match) return;
+      const slug = match[1];
+      
+      // Get title from link text
       const title = a.textContent?.trim();
-      if (!title || title.length < 2 || title.length > 100) return;
-      // Skip duplicates
-      if (items.find(x => x.title === title)) return;
+      if (!title || title.length < 2 || title.length > 50) return;
+      if (title.toLowerCase().includes('browse') || title.toLowerCase().includes('all')) return;
       
-      // Find thumbnail - look for sibling or parent with external link that has an img
-      const container = a.closest('div[class]');
+      seen.add(href);
+      
+      // Construct thumbnail URL from slug
+      const thumb = 'https://cdn.lapa.ninja/assets/images/1x/' + slug + '-thumb.jpg';
+      
+      // Find external link for the actual site URL
+      const container = a.closest('div');
       const extLink = container?.querySelector('a[href^="http"]:not([href*="lapa.ninja"])');
-      const thumb = extLink?.querySelector('img')?.src || container?.querySelector('img')?.src;
       
-      if (thumb && !thumb.includes('logo')) {
-        items.push({
-          url: 'https://www.lapa.ninja' + a.getAttribute('href'),
-          title: title,
-          thumb: thumb,
-          siteUrl: extLink?.href || null,
-        });
-      }
+      items.push({
+        url: 'https://www.lapa.ninja' + href,
+        title: title,
+        thumb: thumb,
+        siteUrl: extLink?.href || null,
+      });
     });
     return items;
   }`);
