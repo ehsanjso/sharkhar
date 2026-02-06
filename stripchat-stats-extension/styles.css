@@ -604,3 +604,13 @@
 .sc-tip-menu-items::-webkit-scrollbar-thumb:hover {
   background: hsl(0 0% 35%);
 }
+
+.sc-tip-more {
+  font-style: italic;
+  color: hsl(0 0% 50%) !important;
+  justify-content: center !important;
+}
+
+.sc-tip-more .sc-tip-action {
+  color: hsl(0 0% 50%);
+}

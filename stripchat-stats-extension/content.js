@@ -166,9 +166,8 @@
                 <span class="sc-scan-stat-secondary">📷 ${m.photos}</span>
                 <span class="sc-scan-stat-secondary">🎬 ${m.videos}</span>
                 <span class="sc-scan-stat-secondary">💎 ${m.privateRate}/min</span>
-                ${m.earnings > 0 ? `<span class="sc-scan-stat-secondary">💰 ${formatNumber(m.earnings)}</span>` : ''}
-                ${m.sessionEarnings > 0 ? `<span class="sc-scan-stat-secondary">📈 ${formatNumber(m.sessionEarnings)}</span>` : ''}
-                ${m.tipMenuCount > 0 ? `<span class="sc-scan-stat-secondary">📋 ${m.tipMenuCount} items</span>` : ''}
+                ${m.tipMenuCount > 0 ? `<span class="sc-scan-stat-secondary">📋 ${m.tipMenuCount} menu</span>` : ''}
+                ${m.hasLovense ? `<span class="sc-scan-stat-secondary">🎮 toy</span>` : ''}
                 ${tipperHtml}
                 ${goalHtml}
               </div>
@@ -208,9 +207,8 @@
             <span class="sc-scan-stat-secondary">📷 ${m.photos}</span>
             <span class="sc-scan-stat-secondary">🎬 ${m.videos}</span>
             <span class="sc-scan-stat-secondary">💎 ${m.privateRate}/min</span>
-            ${m.earnings > 0 ? `<span class="sc-scan-stat-secondary">💰 ${formatNumber(m.earnings)}</span>` : ''}
-            ${m.sessionEarnings > 0 ? `<span class="sc-scan-stat-secondary">📈 ${formatNumber(m.sessionEarnings)}</span>` : ''}
-            ${m.tipMenuCount > 0 ? `<span class="sc-scan-stat-secondary">📋 ${m.tipMenuCount} items</span>` : ''}
+            ${m.tipMenuCount > 0 ? `<span class="sc-scan-stat-secondary">📋 ${m.tipMenuCount} menu</span>` : ''}
+            ${m.hasLovense ? `<span class="sc-scan-stat-secondary">🎮 toy</span>` : ''}
             ${tipperHtml}
             ${goalHtml}
           </div>
@@ -287,10 +285,13 @@
           const sessionEarnings = cam.sessionEarnings || cam.broadcastEarnings || 
                                   cam.currentSessionEarned || 0;
           
-          // Get tip menu
-          const tipMenu = cam.tipMenu || cam.tipMenuItems || cam.broadcastSettings?.tipMenu ||
-                          user.tipMenu || details.user?.tipMenu || [];
-          const tipMenuCount = Array.isArray(tipMenu) ? tipMenu.length : 0;
+          // Get tip menu count
+          const tipMenuData = cam.tipMenu;
+          const tipMenuCount = (tipMenuData?.isEnabled && Array.isArray(tipMenuData?.settings)) 
+            ? tipMenuData.settings.length : 0;
+          
+          // Check for interactive toy
+          const hasLovense = cam.isLovenseEnabled || false;
           
           return {
             username,
@@ -303,11 +304,11 @@
             videos: details.user.videosCount || 0,
             privateRate: user.privateRate || 0,
             topTipper: topTipperInfo,
-            goal: cam.goalTip || cam.broadcastSettings?.goalTip || 0,
+            goal: cam.goal?.goal || 0,
+            goalDescription: cam.goal?.description || '',
             topic: cam.topic || '',
-            earnings: earnings,
-            sessionEarnings: sessionEarnings,
-            tipMenuCount: tipMenuCount
+            tipMenuCount: tipMenuCount,
+            hasLovense: hasLovense
           };
         }
       } catch (e) {}
@@ -406,40 +407,45 @@
         html += `<div class="sc-stat-item sc-stat-full"><div class="sc-stat-icon">👑</div><div class="sc-stat-data"><span class="sc-stat-value">${tipperName} (${formatNumber(tipperAmount)})</span><span class="sc-stat-label">Top Tipper</span></div></div>`;
       }
       
-      // Show goal/tip menu highest if available
-      const goalTip = cam.goalTip || cam.broadcastSettings?.goalTip;
-      if (goalTip && goalTip > 0) {
-        html += `<div class="sc-stat-item sc-stat-full"><div class="sc-stat-icon">🎯</div><div class="sc-stat-data"><span class="sc-stat-value">${formatNumber(goalTip)} tokens</span><span class="sc-stat-label">Goal Amount</span></div></div>`;
-      }
-      
-      // Earnings - check multiple possible locations
-      const earnings = user.totalEarned || user.earnings || user.tokensEarned || 
-                       details.user?.totalEarned || details.user?.earnings ||
-                       cam.totalEarned || cam.earnings || cam.sessionEarnings ||
-                       cam.broadcastSettings?.totalEarned;
-      if (earnings && earnings > 0) {
-        html += `<div class="sc-stat-item sc-stat-full"><div class="sc-stat-icon">💰</div><div class="sc-stat-data"><span class="sc-stat-value">${formatNumber(earnings)} tokens</span><span class="sc-stat-label">Total Earned</span></div></div>`;
-      }
-      
-      // Session earnings (current stream)
-      const sessionEarnings = cam.sessionEarnings || cam.broadcastEarnings || cam.currentSessionEarned;
-      if (sessionEarnings && sessionEarnings > 0) {
-        html += `<div class="sc-stat-item sc-stat-full"><div class="sc-stat-icon">📈</div><div class="sc-stat-data"><span class="sc-stat-value">${formatNumber(sessionEarnings)} tokens</span><span class="sc-stat-label">Session Earned</span></div></div>`;
+      // Goal progress (if active)
+      const goal = cam.goal;
+      if (goal?.isEnabled && goal.goal > 0) {
+        const progress = Math.round((goal.spent / goal.goal) * 100);
+        html += `<div class="sc-stat-item sc-stat-full"><div class="sc-stat-icon">🎯</div><div class="sc-stat-data"><span class="sc-stat-value">${formatNumber(goal.spent)}/${formatNumber(goal.goal)} (${progress}%)</span><span class="sc-stat-label">${goal.description || 'Goal'}</span></div></div>`;
       }
       
       html += '</div>';
       
-      // Tip Menu - check multiple possible locations
-      const tipMenu = cam.tipMenu || cam.tipMenuItems || cam.broadcastSettings?.tipMenu ||
-                      user.tipMenu || details.user?.tipMenu || details.tipMenu;
-      if (tipMenu && Array.isArray(tipMenu) && tipMenu.length > 0) {
+      // Tip Menu - at cam.tipMenu.settings
+      const tipMenuData = cam.tipMenu;
+      if (tipMenuData?.isEnabled && tipMenuData?.settings && Array.isArray(tipMenuData.settings) && tipMenuData.settings.length > 0) {
         html += `<div class="sc-tip-menu">`;
-        html += `<div class="sc-tip-menu-header">📋 Tip Menu</div>`;
+        html += `<div class="sc-tip-menu-header">📋 Tip Menu (${tipMenuData.settings.length} items)</div>`;
         html += `<div class="sc-tip-menu-items">`;
-        tipMenu.slice(0, 10).forEach(item => {
-          const action = item.action || item.name || item.label || item.text || 'Action';
-          const price = item.price || item.tokens || item.amount || item.cost || 0;
+        // Sort by price and show top 12
+        const sortedMenu = [...tipMenuData.settings].sort((a, b) => a.price - b.price);
+        sortedMenu.slice(0, 12).forEach(item => {
+          const action = item.activity || 'Action';
+          const price = item.price || 0;
           html += `<div class="sc-tip-menu-item"><span class="sc-tip-action">${action}</span><span class="sc-tip-price">${formatNumber(price)} 💎</span></div>`;
+        });
+        if (tipMenuData.settings.length > 12) {
+          html += `<div class="sc-tip-menu-item sc-tip-more">+${tipMenuData.settings.length - 12} more items...</div>`;
+        }
+        html += `</div></div>`;
+      }
+      
+      // Lovense toy levels (interactive toy pricing)
+      const lovense = cam.lovense;
+      if (cam.isLovenseEnabled && lovense?.levels) {
+        html += `<div class="sc-tip-menu">`;
+        html += `<div class="sc-tip-menu-header">🎮 Interactive Toy</div>`;
+        html += `<div class="sc-tip-menu-items">`;
+        Object.entries(lovense.levels).forEach(([level, config]) => {
+          if (config.min && config.max) {
+            const range = config.max === 'infinity' ? `${config.min}+` : `${config.min}-${config.max}`;
+            html += `<div class="sc-tip-menu-item"><span class="sc-tip-action">${level.replace('level', 'Level ')}: ${config.time}s</span><span class="sc-tip-price">${range} 💎</span></div>`;
+          }
         });
         html += `</div></div>`;
       }
