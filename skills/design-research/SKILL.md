@@ -28,16 +28,34 @@ Trigger on:
 
 ## Product Categories
 
-The tool recognizes these product types and knows what flows each needs:
+The tool recognizes 20+ product types and knows what flows each needs:
 
 | Category | Example Products | Key Flows |
 |----------|-----------------|-----------|
 | **SaaS Dashboard** | Linear, Notion, Figma | Onboarding, Dashboard, Settings, Billing |
-| **Marketplace** | Fiverr, Upwork, Airbnb | Listing creation, Search/browse, Booking, Reviews |
 | **AI Tool** | ChatGPT, Perplexity | Chat interface, Model selection, History |
+| **Marketplace** | Fiverr, Upwork, Airbnb | Listing creation, Search/browse, Booking, Reviews |
 | **E-commerce** | Shopify, Amazon | Product pages, Cart, Checkout, Order tracking |
 | **Fintech** | Revolut, Wise | Onboarding/KYC, Dashboard, Transfers, Cards |
 | **Social/Creator** | Instagram, TikTok | Feed, Profile, Create post, Notifications |
+| **Dev Tools** | Vercel, GitHub | Dashboard, Deploy, Logs, Settings |
+| **Health/Wellness** | Headspace, Calm | Onboarding, Dashboard, Tracking, Programs |
+| **Education** | Duolingo, Coursera | Onboarding, Course view, Progress, Quizzes |
+| **Travel** | Airbnb, Booking.com | Search, Listing detail, Booking, Trip management |
+| **Food Delivery** | DoorDash, Uber Eats | Browse, Menu, Cart, Order tracking |
+| **Real Estate** | Zillow, Redfin | Search, Property detail, Saved homes |
+| **Dating** | Hinge, Tinder, Bumble | Onboarding, Discovery, Profile, Messaging |
+| **Notes/PKM** | Notion, Obsidian | Editor, Navigation, Search, Templates |
+| **Music/Audio** | Spotify, SoundCloud | Player, Library, Search, Playlists |
+| **Video Streaming** | Netflix, YouTube | Browse, Player, Watchlist, Profiles |
+| **Communication** | Slack, Discord | Channels, Messaging, Threads, Calls |
+| **HR/Recruiting** | LinkedIn, Greenhouse | Job search, Application, Profile |
+| **IoT/Smart Home** | Google Home, Ring | Dashboard, Device control, Automation |
+| **Gaming** | Steam, Xbox | Store, Library, Profile, Achievements |
+| **Photography** | VSCO, Lightroom | Gallery, Editor, Filters, Albums |
+| **Scheduling** | Calendly, Cal.com | Calendar, Booking page, Availability |
+| **Legal** | DocuSign | Document view, Signing, Templates |
+| **Analytics** | Amplitude, Mixpanel | Dashboard, Reports, Charts |
 
 ## Scripts
 

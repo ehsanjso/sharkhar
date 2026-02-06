@@ -108,6 +108,158 @@ const PRODUCT_CATEGORIES = {
       'progress': { name: 'Duolingo', platform: 'ios', why: 'Gamified progress tracking' },
     }
   },
+  // --- NEW CATEGORIES ---
+  'travel': {
+    keywords: ['travel', 'hotel', 'flight', 'vacation', 'trip', 'airbnb', 'booking', 'accommodation', 'tourism', 'destination', 'itinerary'],
+    flows: ['search', 'listing-detail', 'booking', 'checkout', 'trip-management'],
+    bestApps: {
+      'ui-reference': { name: 'Airbnb', platform: 'web', why: 'Best-in-class travel UX' },
+      'search': { name: 'Airbnb', platform: 'web', why: 'Excellent search + map integration' },
+      'listing-detail': { name: 'Airbnb', platform: 'ios', why: 'Rich property pages with photos/reviews' },
+      'booking': { name: 'Airbnb', platform: 'ios', why: 'Smooth booking flow' },
+      'checkout': { name: 'Hopper', platform: 'ios', why: 'Price prediction + clear checkout' },
+    }
+  },
+  'food-delivery': {
+    keywords: ['food', 'delivery', 'restaurant', 'order', 'meal', 'takeout', 'uber eats', 'doordash', 'grubhub', 'grocery', 'instacart'],
+    flows: ['browse-restaurants', 'menu', 'cart', 'checkout', 'order-tracking'],
+    bestApps: {
+      'ui-reference': { name: 'DoorDash', platform: 'ios', why: 'Clean food delivery design' },
+      'browse': { name: 'DoorDash', platform: 'ios', why: 'Category browsing + filters' },
+      'menu': { name: 'Uber Eats', platform: 'ios', why: 'Best menu/item customization UX' },
+      'checkout': { name: 'DoorDash', platform: 'ios', why: 'Fast checkout flow' },
+      'tracking': { name: 'Uber Eats', platform: 'ios', why: 'Real-time order tracking' },
+    }
+  },
+  'real-estate': {
+    keywords: ['real estate', 'property', 'home', 'house', 'apartment', 'rent', 'buy', 'mortgage', 'zillow', 'redfin', 'listing'],
+    flows: ['search', 'property-detail', 'saved-homes', 'contact-agent', 'mortgage-calculator'],
+    bestApps: {
+      'ui-reference': { name: 'Zillow', platform: 'ios', why: 'Standard for real estate apps' },
+      'search': { name: 'Zillow', platform: 'ios', why: 'Map + list search with filters' },
+      'property-detail': { name: 'Redfin', platform: 'ios', why: 'Rich property pages' },
+      'saved-homes': { name: 'Zillow', platform: 'ios', why: 'Collections and saved searches' },
+    }
+  },
+  'dating': {
+    keywords: ['dating', 'match', 'swipe', 'tinder', 'hinge', 'bumble', 'relationship', 'single', 'profile', 'connection'],
+    flows: ['onboarding', 'profile-creation', 'discovery', 'matching', 'messaging'],
+    bestApps: {
+      'ui-reference': { name: 'Hinge', platform: 'ios', why: 'Thoughtful dating app design' },
+      'onboarding': { name: 'Hinge', platform: 'ios', why: 'Best profile-building onboarding' },
+      'discovery': { name: 'Tinder', platform: 'ios', why: 'Iconic card-swipe UX' },
+      'profile': { name: 'Hinge', platform: 'ios', why: 'Rich profile with prompts' },
+      'messaging': { name: 'Bumble', platform: 'ios', why: 'Clean chat interface' },
+    }
+  },
+  'notes-pkm': {
+    keywords: ['notes', 'notion', 'obsidian', 'roam', 'pkm', 'knowledge', 'wiki', 'docs', 'writing', 'journal', 'second brain', 'zettelkasten'],
+    flows: ['editor', 'navigation', 'search', 'templates', 'sharing'],
+    bestApps: {
+      'ui-reference': { name: 'Notion', platform: 'web', why: 'Best-in-class docs/notes design' },
+      'editor': { name: 'Notion', platform: 'web', why: 'Block-based editor excellence' },
+      'navigation': { name: 'Notion', platform: 'web', why: 'Sidebar + breadcrumb navigation' },
+      'templates': { name: 'Notion', platform: 'web', why: 'Template gallery UX' },
+    }
+  },
+  'music-audio': {
+    keywords: ['music', 'audio', 'spotify', 'podcast', 'playlist', 'streaming', 'song', 'album', 'artist', 'soundcloud'],
+    flows: ['home', 'player', 'library', 'search', 'playlist-creation'],
+    bestApps: {
+      'ui-reference': { name: 'Spotify', platform: 'ios', why: 'Gold standard for music apps' },
+      'player': { name: 'Spotify', platform: 'ios', why: 'Best now-playing experience' },
+      'library': { name: 'Spotify', platform: 'ios', why: 'Clean library organization' },
+      'search': { name: 'Spotify', platform: 'ios', why: 'Excellent search + browse' },
+    }
+  },
+  'video-streaming': {
+    keywords: ['video', 'streaming', 'netflix', 'youtube', 'watch', 'movie', 'show', 'series', 'tv', 'twitch', 'live'],
+    flows: ['browse', 'player', 'watchlist', 'profiles', 'search'],
+    bestApps: {
+      'ui-reference': { name: 'Netflix', platform: 'ios', why: 'Premium video streaming design' },
+      'browse': { name: 'Netflix', platform: 'ios', why: 'Content discovery + rows' },
+      'player': { name: 'Netflix', platform: 'ios', why: 'Immersive video player' },
+      'profiles': { name: 'Netflix', platform: 'ios', why: 'Multi-profile management' },
+    }
+  },
+  'communication': {
+    keywords: ['slack', 'discord', 'chat', 'messaging', 'team', 'channels', 'dm', 'voice', 'video call', 'meetings', 'zoom'],
+    flows: ['channels', 'messaging', 'threads', 'calls', 'settings'],
+    bestApps: {
+      'ui-reference': { name: 'Slack', platform: 'web', why: 'Standard for team communication' },
+      'channels': { name: 'Slack', platform: 'web', why: 'Channel organization + sidebar' },
+      'messaging': { name: 'Slack', platform: 'web', why: 'Rich messaging with threads' },
+      'threads': { name: 'Discord', platform: 'ios', why: 'Thread and forum UX' },
+    }
+  },
+  'hr-recruiting': {
+    keywords: ['hr', 'recruiting', 'hiring', 'jobs', 'career', 'resume', 'applicant', 'linkedin', 'ats', 'candidate', 'interview'],
+    flows: ['job-search', 'application', 'profile', 'messaging', 'dashboard'],
+    bestApps: {
+      'ui-reference': { name: 'LinkedIn', platform: 'web', why: 'Professional network standard' },
+      'job-search': { name: 'LinkedIn', platform: 'ios', why: 'Job search + filters' },
+      'profile': { name: 'LinkedIn', platform: 'web', why: 'Professional profile design' },
+      'application': { name: 'LinkedIn', platform: 'ios', why: 'Easy apply flow' },
+    }
+  },
+  'iot-smarthome': {
+    keywords: ['smart home', 'iot', 'home automation', 'ring', 'nest', 'alexa', 'google home', 'devices', 'thermostat', 'camera', 'security'],
+    flows: ['dashboard', 'device-control', 'automation', 'notifications', 'settings'],
+    bestApps: {
+      'ui-reference': { name: 'Google Home', platform: 'ios', why: 'Clean smart home design' },
+      'dashboard': { name: 'Google Home', platform: 'ios', why: 'Device overview grid' },
+      'device-control': { name: 'Philips Hue', platform: 'ios', why: 'Intuitive device controls' },
+      'automation': { name: 'Google Home', platform: 'ios', why: 'Routine/automation builder' },
+    }
+  },
+  'gaming': {
+    keywords: ['gaming', 'game', 'steam', 'epic', 'xbox', 'playstation', 'nintendo', 'esports', 'multiplayer', 'achievements'],
+    flows: ['store', 'library', 'profile', 'friends', 'achievements'],
+    bestApps: {
+      'ui-reference': { name: 'Steam', platform: 'web', why: 'Comprehensive gaming platform' },
+      'store': { name: 'Steam', platform: 'web', why: 'Game discovery + sales' },
+      'library': { name: 'Steam', platform: 'web', why: 'Game library management' },
+      'profile': { name: 'Xbox', platform: 'ios', why: 'Gaming profile + achievements' },
+    }
+  },
+  'photography': {
+    keywords: ['photo', 'photography', 'camera', 'editing', 'lightroom', 'vsco', 'gallery', 'album', 'filter', 'portrait'],
+    flows: ['gallery', 'editor', 'filters', 'export', 'albums'],
+    bestApps: {
+      'ui-reference': { name: 'VSCO', platform: 'ios', why: 'Beautiful photo app design' },
+      'editor': { name: 'Lightroom', platform: 'ios', why: 'Professional editing tools' },
+      'filters': { name: 'VSCO', platform: 'ios', why: 'Best preset/filter selection' },
+      'gallery': { name: 'VSCO', platform: 'ios', why: 'Clean photo grid' },
+    }
+  },
+  'scheduling': {
+    keywords: ['calendar', 'scheduling', 'appointment', 'booking', 'calendly', 'meeting', 'availability', 'time', 'slots'],
+    flows: ['calendar-view', 'booking-page', 'availability', 'confirmations', 'integrations'],
+    bestApps: {
+      'ui-reference': { name: 'Calendly', platform: 'web', why: 'Standard for scheduling tools' },
+      'booking-page': { name: 'Calendly', platform: 'web', why: 'Clean public booking page' },
+      'availability': { name: 'Calendly', platform: 'web', why: 'Availability management' },
+      'calendar': { name: 'Google Calendar', platform: 'web', why: 'Best calendar interface' },
+    }
+  },
+  'legal': {
+    keywords: ['legal', 'law', 'contract', 'agreement', 'signature', 'docusign', 'compliance', 'nda', 'terms'],
+    flows: ['document-view', 'signing', 'templates', 'dashboard', 'audit-trail'],
+    bestApps: {
+      'ui-reference': { name: 'DocuSign', platform: 'web', why: 'E-signature standard' },
+      'signing': { name: 'DocuSign', platform: 'web', why: 'Document signing flow' },
+      'templates': { name: 'DocuSign', platform: 'web', why: 'Template management' },
+    }
+  },
+  'analytics': {
+    keywords: ['analytics', 'metrics', 'data', 'charts', 'graphs', 'reporting', 'visualization', 'insights', 'kpi', 'dashboard'],
+    flows: ['dashboard', 'reports', 'data-exploration', 'charts', 'exports'],
+    bestApps: {
+      'ui-reference': { name: 'Amplitude', platform: 'web', why: 'Product analytics standard' },
+      'dashboard': { name: 'Amplitude', platform: 'web', why: 'Clean metrics dashboard' },
+      'charts': { name: 'Mixpanel', platform: 'web', why: 'Interactive chart exploration' },
+    }
+  },
 };
 
 // --- API Helpers ---
@@ -341,6 +493,71 @@ async function getFlowImages(appFlowsUrl) {
   return flows;
 }
 
+// --- Flow Matching ---
+
+// Keywords that indicate what a flow is about
+const FLOW_KEYWORDS = {
+  'onboarding': ['onboard', 'welcome', 'signup', 'sign up', 'sign-up', 'get started', 'intro', 'first', 'setup', 'set up', 'create account'],
+  'dashboard': ['dashboard', 'home', 'overview', 'main', 'landing'],
+  'settings': ['settings', 'preferences', 'config', 'account', 'profile settings'],
+  'billing': ['billing', 'payment', 'subscription', 'pricing', 'upgrade', 'plan', 'checkout'],
+  'chat-interface': ['chat', 'message', 'conversation', 'ask', 'query', 'prompt'],
+  'search': ['search', 'find', 'discover', 'explore', 'browse'],
+  'profile': ['profile', 'account', 'user', 'my '],
+  'listing': ['listing', 'create', 'new', 'add', 'post'],
+  'checkout': ['checkout', 'payment', 'cart', 'order', 'purchase', 'buy'],
+  'editor': ['editor', 'edit', 'compose', 'write', 'create'],
+  'player': ['player', 'playing', 'now playing', 'listen', 'watch'],
+  'library': ['library', 'collection', 'saved', 'favorites', 'my'],
+  'notifications': ['notification', 'alert', 'inbox', 'updates'],
+  'messaging': ['message', 'chat', 'dm', 'conversation', 'inbox'],
+  'booking': ['book', 'reserve', 'schedule', 'appointment'],
+  'tracking': ['track', 'progress', 'status', 'order status'],
+};
+
+/**
+ * Find the best matching flow for a given purpose
+ * @param {Array} flows - Array of flow objects with .name
+ * @param {string} purpose - What we're looking for (e.g., 'onboarding', 'billing')
+ * @returns {Object|null} Best matching flow or null
+ */
+function findBestFlow(flows, purpose) {
+  if (!flows || flows.length === 0) return null;
+  
+  const keywords = FLOW_KEYWORDS[purpose] || [purpose];
+  const purposeLower = purpose.toLowerCase();
+  
+  // Score each flow
+  const scored = flows.map(flow => {
+    const nameLower = flow.name.toLowerCase();
+    let score = 0;
+    
+    // Exact match is best
+    if (nameLower === purposeLower) {
+      score = 100;
+    }
+    // Check keywords
+    else {
+      for (const kw of keywords) {
+        if (nameLower.includes(kw)) {
+          score += 10;
+        }
+      }
+    }
+    
+    // Prefer flows with more screens (usually more complete)
+    score += Math.min(flow.screenCount || 0, 10) * 0.5;
+    
+    return { flow, score };
+  });
+  
+  // Sort by score descending
+  scored.sort((a, b) => b.score - a.score);
+  
+  // Return best match if it has any score, otherwise first flow
+  return scored[0].score > 0 ? scored[0].flow : flows[0];
+}
+
 // --- Main Research Pipeline ---
 
 async function runResearch(input) {
@@ -409,32 +626,47 @@ async function runResearch(input) {
       continue;
     }
 
-    // Download first flow (usually the main one)
-    const flow = flows[0];
-    const folderName = `${String(folderIndex).padStart(2, '0')}-${appConfig.flows[0]}-${appConfig.name.toLowerCase()}`;
-    const dir = path.join(baseDir, folderName);
-    fs.mkdirSync(dir, { recursive: true });
+    console.log(`   📋 Available: ${flows.map(f => f.name).join(', ')}`);
 
-    console.log(`   📥 ${flow.name} (${flow.screenCount} screens)`);
+    // Download best matching flow for each purpose
+    const downloadedFlowIds = new Set();
     
-    let ok = 0;
-    for (let i = 0; i < flow.images.length; i++) {
-      const sz = await downloadImage(upgradeUrl(flow.images[i]), path.join(dir, `${String(i+1).padStart(2,'0')}.png`));
-      if (sz > 0) ok++;
+    for (const purpose of appConfig.flows) {
+      const flow = findBestFlow(flows, purpose);
+      if (!flow) continue;
+      
+      // Skip if we already downloaded this flow for another purpose
+      if (downloadedFlowIds.has(flow.id)) {
+        console.log(`   ⏭ ${purpose}: reusing ${flow.name}`);
+        continue;
+      }
+      downloadedFlowIds.add(flow.id);
+
+      const folderName = `${String(folderIndex).padStart(2, '0')}-${purpose}-${appConfig.name.toLowerCase()}`;
+      const dir = path.join(baseDir, folderName);
+      fs.mkdirSync(dir, { recursive: true });
+
+      console.log(`   📥 ${purpose} → ${flow.name} (${flow.screenCount} screens)`);
+      
+      let ok = 0;
+      for (let i = 0; i < flow.images.length; i++) {
+        const sz = await downloadImage(upgradeUrl(flow.images[i]), path.join(dir, `${String(i+1).padStart(2,'0')}.png`));
+        if (sz > 0) ok++;
+      }
+      console.log(`   ✅ ${ok}/${flow.screenCount}`);
+
+      downloadedApps.push({
+        folder: folderName,
+        app: appConfig.name,
+        platform: appConfig.platform,
+        flow: flow.name,
+        screens: ok,
+        purpose: purpose,
+        why: appConfig.why,
+      });
+
+      folderIndex++;
     }
-    console.log(`   ✅ ${ok}/${flow.screenCount}`);
-
-    downloadedApps.push({
-      folder: folderName,
-      app: appConfig.name,
-      platform: appConfig.platform,
-      flow: flow.name,
-      screens: ok,
-      purpose: appConfig.flows.join(', '),
-      why: appConfig.why,
-    });
-
-    folderIndex++;
   }
 
   // Generate PROMPT.md
