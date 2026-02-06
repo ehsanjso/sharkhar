@@ -40,8 +40,8 @@ deletion and supports preview mode.
 Archives kept for 30 days in `~/backups/clawdbot/archived-sessions/`.
 
 ### pi-health.sh
-Quick system health check for Raspberry Pi. Shows CPU temp, memory, disk,
-ClawdBot status, and uptime with color-coded status indicators.
+Quick system health check for Raspberry Pi. Shows CPU temp, **CPU throttling**,
+memory, disk, ClawdBot status, and uptime with color-coded status indicators.
 
 ```bash
 ./pi-health.sh              # Human-readable health report
@@ -49,8 +49,18 @@ ClawdBot status, and uptime with color-coded status indicators.
 ./pi-health.sh --help       # Show full usage
 ```
 
-**Checks:** CPU temperature, load average, memory/swap usage, disk space,
-ClawdBot process status, Node.js memory, system uptime.
+**Checks:** CPU temperature, **CPU throttling** (via `vcgencmd get_throttled`),
+load average, memory/swap usage, disk space, ClawdBot process status, Node.js
+memory, system uptime.
+
+**Throttling detection:** Decodes hardware throttle flags to show:
+- Under-voltage detected
+- ARM frequency capped
+- Currently throttled
+- Soft temperature limit active
+
+Both "active now" and "occurred since boot" states are reported. Critical for
+diagnosing performance issues on Pi.
 
 ## Automation Scripts
 

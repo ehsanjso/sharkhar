@@ -20,7 +20,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -j, --json     Output as JSON (for scripts/cron)"
             echo "  -h, --help     Show this help message"
             echo ""
-            echo "Checks: CPU temp, load, memory, disk, uptime, ClawdBot status"
+            echo "Checks: CPU temp, throttling, load, memory, disk, uptime, ClawdBot status"
             exit 0
             ;;
         *)
@@ -73,6 +73,32 @@ NODE_COUNT=$(pgrep -c node 2>/dev/null || echo 0)
 NODE_MEM=$(ps -C node -o rss= 2>/dev/null | awk '{sum+=$1} END{printf "%.0f", sum/1024}')
 [ -z "$NODE_MEM" ] && NODE_MEM=0
 
+# CPU throttling check (vcgencmd get_throttled)
+# Bit meanings:
+# 0: Under-voltage detected (now)    16: Under-voltage has occurred
+# 1: Freq capped (now)               17: Freq capped has occurred
+# 2: Currently throttled             18: Throttling has occurred
+# 3: Soft temp limit (now)           19: Soft temp limit has occurred
+THROTTLE_RAW=$(vcgencmd get_throttled 2>/dev/null | cut -d= -f2)
+THROTTLE_HEX="${THROTTLE_RAW:-0x0}"
+THROTTLE_DEC=$((THROTTLE_HEX))
+
+# Current state (bits 0-3)
+THROTTLE_UNDERVOLT=$((THROTTLE_DEC & 1))
+THROTTLE_FREQCAP=$(((THROTTLE_DEC >> 1) & 1))
+THROTTLE_THROTTLED=$(((THROTTLE_DEC >> 2) & 1))
+THROTTLE_SOFTLIMIT=$(((THROTTLE_DEC >> 3) & 1))
+
+# Historical state (bits 16-19)
+THROTTLE_UNDERVOLT_HIST=$(((THROTTLE_DEC >> 16) & 1))
+THROTTLE_FREQCAP_HIST=$(((THROTTLE_DEC >> 17) & 1))
+THROTTLE_THROTTLED_HIST=$(((THROTTLE_DEC >> 18) & 1))
+THROTTLE_SOFTLIMIT_HIST=$(((THROTTLE_DEC >> 19) & 1))
+
+# Summary flags
+THROTTLE_NOW=$((THROTTLE_UNDERVOLT + THROTTLE_FREQCAP + THROTTLE_THROTTLED + THROTTLE_SOFTLIMIT))
+THROTTLE_HIST=$((THROTTLE_UNDERVOLT_HIST + THROTTLE_FREQCAP_HIST + THROTTLE_THROTTLED_HIST + THROTTLE_SOFTLIMIT_HIST))
+
 # Human-readable size
 human_size() {
     local bytes=$1
@@ -121,7 +147,24 @@ if $JSON_OUTPUT; then
     "memory_mb": $([ -n "$CLAWD_MEM" ] && echo "$CLAWD_MEM" || echo "null")
   },
   "node_processes": $NODE_COUNT,
-  "node_memory_mb": $NODE_MEM
+  "node_memory_mb": $NODE_MEM,
+  "throttling": {
+    "raw": "$THROTTLE_HEX",
+    "current": {
+      "under_voltage": $([[ $THROTTLE_UNDERVOLT -eq 1 ]] && echo "true" || echo "false"),
+      "freq_capped": $([[ $THROTTLE_FREQCAP -eq 1 ]] && echo "true" || echo "false"),
+      "throttled": $([[ $THROTTLE_THROTTLED -eq 1 ]] && echo "true" || echo "false"),
+      "soft_temp_limit": $([[ $THROTTLE_SOFTLIMIT -eq 1 ]] && echo "true" || echo "false")
+    },
+    "occurred": {
+      "under_voltage": $([[ $THROTTLE_UNDERVOLT_HIST -eq 1 ]] && echo "true" || echo "false"),
+      "freq_capped": $([[ $THROTTLE_FREQCAP_HIST -eq 1 ]] && echo "true" || echo "false"),
+      "throttled": $([[ $THROTTLE_THROTTLED_HIST -eq 1 ]] && echo "true" || echo "false"),
+      "soft_temp_limit": $([[ $THROTTLE_SOFTLIMIT_HIST -eq 1 ]] && echo "true" || echo "false")
+    },
+    "issues_now": $THROTTLE_NOW,
+    "issues_since_boot": $THROTTLE_HIST
+  }
 }
 EOF
     exit 0
@@ -182,6 +225,36 @@ fi
 echo "   Load (1/5/15m): $LOAD_1 / $LOAD_5 / $LOAD_15"
 echo ""
 
+# Throttling
+if [ "$THROTTLE_HEX" != "0x0" ]; then
+    echo -e "${YELLOW}⚡ Throttling${NC} ($THROTTLE_HEX)"
+    
+    # Current issues (happening right now)
+    if [ $THROTTLE_NOW -gt 0 ]; then
+        echo -e "   ${RED}Active now:${NC}"
+        [ $THROTTLE_UNDERVOLT -eq 1 ] && echo -e "   ${RED}⚠ Under-voltage detected${NC}"
+        [ $THROTTLE_FREQCAP -eq 1 ] && echo -e "   ${RED}⚠ ARM frequency capped${NC}"
+        [ $THROTTLE_THROTTLED -eq 1 ] && echo -e "   ${RED}⚠ Currently throttled${NC}"
+        [ $THROTTLE_SOFTLIMIT -eq 1 ] && echo -e "   ${RED}⚠ Soft temp limit active${NC}"
+    fi
+    
+    # Historical issues (since boot)
+    if [ $THROTTLE_HIST -gt 0 ] && [ $THROTTLE_NOW -eq 0 ]; then
+        echo -e "   ${YELLOW}Since boot:${NC}"
+    elif [ $THROTTLE_HIST -gt 0 ]; then
+        echo ""
+        echo -e "   ${YELLOW}Also occurred since boot:${NC}"
+    fi
+    
+    if [ $THROTTLE_HIST -gt 0 ]; then
+        [ $THROTTLE_UNDERVOLT_HIST -eq 1 ] && [ $THROTTLE_UNDERVOLT -eq 0 ] && echo "   • Under-voltage"
+        [ $THROTTLE_FREQCAP_HIST -eq 1 ] && [ $THROTTLE_FREQCAP -eq 0 ] && echo "   • ARM freq capping"
+        [ $THROTTLE_THROTTLED_HIST -eq 1 ] && [ $THROTTLE_THROTTLED -eq 0 ] && echo "   • Throttling"
+        [ $THROTTLE_SOFTLIMIT_HIST -eq 1 ] && [ $THROTTLE_SOFTLIMIT -eq 0 ] && echo "   • Soft temp limit"
+    fi
+    echo ""
+fi
+
 # Memory
 echo -e "${GREEN}🧠 Memory${NC}"
 echo -e "   Used: $(human_size $MEM_USED) / $(human_size $MEM_TOTAL) (${MEM_PCT}%) $(mem_status $MEM_PCT)"
@@ -219,6 +292,7 @@ ISSUES=0
 (( $(echo "$MEM_PCT >= 85" | bc -l) )) && ISSUES=$((ISSUES+1))
 [ "$DISK_PCT" -ge 85 ] && ISSUES=$((ISSUES+1))
 [ -z "$CLAWD_PID" ] && ISSUES=$((ISSUES+1))
+[ $THROTTLE_NOW -gt 0 ] && ISSUES=$((ISSUES+THROTTLE_NOW))
 
 echo -e "${BLUE}═══════════════════════════════════════${NC}"
 if [ $ISSUES -eq 0 ]; then
