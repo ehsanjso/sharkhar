@@ -67,6 +67,30 @@ ClawdBot process status, Node.js memory, system uptime.
 Both "active now" and "occurred since boot" states are reported. Critical for
 diagnosing performance issues on Pi.
 
+### memory-stats.sh
+Quick overview of memory folder health and maintenance status. Shows file counts,
+folder sizes, and tracks when MEMORY.md was last updated.
+
+```bash
+./memory-stats.sh              # Human-readable overview
+./memory-stats.sh --json       # JSON output (for scripts/cron)
+./memory-stats.sh --help       # Show full usage
+```
+
+**Checks:**
+- Total files and size in `memory/`
+- Daily journal count (oldest/newest dates)
+- Research archive stats
+- Build logs stats
+- Days since last MEMORY.md review
+
+**Review status indicators:**
+- ✓ Green (0-2 days) — Recently reviewed
+- ⚠ Yellow (3-4 days) — Review recommended
+- ⚠ Red (5+ days) — Overdue for review
+
+Useful for the "memory maintenance every 3+ days" guideline.
+
 ## Automation Scripts
 
 ### nft-price-monitor.js
