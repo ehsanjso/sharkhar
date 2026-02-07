@@ -97,26 +97,25 @@ def fetch_13f_summary(cik: str, fund_name: str) -> Dict:
             print(f"Error fetching 13F for {fund_name}: {e}")
             return None
     
-    # Find most recent 13F-HR filing
-        filings = data.get('filings', {}).get('recent', {})
-        forms = filings.get('form', [])
-        accessions = filings.get('accessionNumber', [])
-        dates = filings.get('filingDate', [])
-        
-        recent_13f = None
-        for i, form in enumerate(forms[:20]):
-            if form in ['13F-HR', '13F-HR/A']:
-                recent_13f = {
-                    'fund_name': fund_name,
-                    'cik': cik,
-                    'company_name': data.get('name', ''),
-                    'filing_date': dates[i],
-                    'accession': accessions[i],
-                    'form': form,
-                }
-                break
-        
-        return recent_13f
+    # Find most recent 13F-HR filing (runs for both rate_limiter and fallback paths)
+    if not data:
+        return None
+    
+    filings = data.get('filings', {}).get('recent', {})
+    forms = filings.get('form', [])
+    accessions = filings.get('accessionNumber', [])
+    dates = filings.get('filingDate', [])
+    
+    for i, form in enumerate(forms[:20]):
+        if form in ['13F-HR', '13F-HR/A']:
+            return {
+                'fund_name': fund_name,
+                'cik': cik,
+                'company_name': data.get('name', ''),
+                'filing_date': dates[i],
+                'accession': accessions[i],
+                'form': form,
+            }
     
     return None
 
