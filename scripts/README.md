@@ -2,6 +2,18 @@
 
 Utility scripts for ClawdBot maintenance, automation, and content creation.
 
+## Quick Start
+
+### status.sh
+**One command for everything.** Combines system health, memory stats, and ClawdBot info.
+
+```bash
+./status.sh              # Full status report
+./status.sh --json       # JSON for automation
+```
+
+---
+
 ## Maintenance Scripts
 
 ### backup-clawdbot.sh
