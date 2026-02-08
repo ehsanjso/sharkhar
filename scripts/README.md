@@ -81,11 +81,12 @@ diagnosing performance issues on Pi.
 
 ### memory-stats.sh
 Quick overview of memory folder health and maintenance status. Shows file counts,
-folder sizes, and tracks when MEMORY.md was last updated.
+folder sizes, archival recommendations, and tracks when MEMORY.md was last updated.
 
 ```bash
 ./memory-stats.sh              # Human-readable overview
 ./memory-stats.sh --json       # JSON output (for scripts/cron)
+./memory-stats.sh --cleanup    # Auto-archive files older than 30 days
 ./memory-stats.sh --help       # Show full usage
 ```
 
@@ -95,11 +96,19 @@ folder sizes, and tracks when MEMORY.md was last updated.
 - Research archive stats
 - Build logs stats
 - Days since last MEMORY.md review
+- **Archival recommendations** (files >30 days old)
+- **Large file warnings** (files >10KB)
 
 **Review status indicators:**
 - ✓ Green (0-2 days) — Recently reviewed
 - ⚠ Yellow (3-4 days) — Review recommended
 - ⚠ Red (5+ days) — Overdue for review
+
+**Archival recommendations:** Detects daily journal files older than 30 days and
+suggests moving them to `memory/archive/`. Use `--cleanup` to auto-archive.
+
+**Large file detection:** Warns about markdown files over 10KB (unusually large
+for notes). Consider splitting or summarizing these.
 
 Useful for the "memory maintenance every 3+ days" guideline.
 

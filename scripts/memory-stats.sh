@@ -5,7 +5,9 @@
 set -e
 
 JSON_OUTPUT=false
+CLEANUP_MODE=false
 MEMORY_DIR="${HOME}/clawd/memory"
+ARCHIVE_DIR="${MEMORY_DIR}/archive"
 
 # Colors
 RED='\033[0;31m'
@@ -22,6 +24,10 @@ while [[ $# -gt 0 ]]; do
             JSON_OUTPUT=true
             shift
             ;;
+        --cleanup|-c)
+            CLEANUP_MODE=true
+            shift
+            ;;
         --help|-h)
             echo "Usage: $(basename "$0") [OPTIONS]"
             echo ""
@@ -29,6 +35,7 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo "Options:"
             echo "  -j, --json     Output as JSON (for scripts/cron)"
+            echo "  -c, --cleanup  Auto-archive files older than 30 days"
             echo "  -h, --help     Show this help message"
             echo ""
             echo "Checks: file counts, folder sizes, daily journals, research archive,"
@@ -192,6 +199,40 @@ if $JSON_OUTPUT; then
   "review_status": "$REVIEW_STATUS"
 }
 EOF
+    exit 0
+fi
+
+# Cleanup mode - archive old files
+if $CLEANUP_MODE; then
+    if [ $ARCHIVAL_COUNT -eq 0 ]; then
+        echo -e "${GREEN}✓ No files to archive (nothing older than $ARCHIVAL_THRESHOLD days)${NC}"
+        exit 0
+    fi
+    
+    # Create archive directory
+    mkdir -p "$ARCHIVE_DIR"
+    
+    echo -e "${CYAN}📦 Archiving $ARCHIVAL_COUNT files older than $ARCHIVAL_THRESHOLD days...${NC}"
+    echo ""
+    
+    MOVED_COUNT=0
+    while IFS= read -r file; do
+        if [ -n "$file" ] && [ -f "$file" ]; then
+            FILENAME=$(basename "$file")
+            mv "$file" "$ARCHIVE_DIR/$FILENAME"
+            echo -e "   ${GREEN}✓${NC} $FILENAME → archive/"
+            MOVED_COUNT=$((MOVED_COUNT + 1))
+        fi
+    done < <(find "$MEMORY_DIR" -maxdepth 1 -name "202?-??-??.md" -type f -mtime +$ARCHIVAL_THRESHOLD 2>/dev/null)
+    
+    echo ""
+    if [ $MOVED_COUNT -gt 0 ]; then
+        SAVED_KB=$((ARCHIVAL_SIZE / 1024))
+        echo -e "${GREEN}✓ Archived $MOVED_COUNT files (~${SAVED_KB}KB saved in workspace)${NC}"
+        echo -e "   Location: $ARCHIVE_DIR/"
+    else
+        echo -e "${YELLOW}No files were moved${NC}"
+    fi
     exit 0
 fi
 
