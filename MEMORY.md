@@ -1,6 +1,6 @@
 # 🧠 Long-term Memory
 
-*Last updated: 2026-02-06*
+*Last updated: 2026-02-08*
 
 ## About Ehsan
 
@@ -208,6 +208,16 @@ The Agent Dashboard helps me wake up each session knowing what happened.
 - **Two paths:** HA AI for voice, ClawdBot homeassistant skill for text/cron
 - Research: `memory/research/2026-02-03-home-assistant-ai-integration.md`
 
+### Social Media Trend Monitoring (Researched Feb 7)
+- **Last30Days skill** — Claude Code skill that searches Reddit + X + web, synthesizes with engagement weighting
+- **Requires:** OpenAI key (for Reddit web_search) + xAI key (for X search)
+- **Works without keys** but loses engagement metrics
+- **Judge Agent pattern** — Weights Reddit/X higher than web due to engagement signals
+- **Alternatives:** PRAW (free Python Reddit API, 100 queries/min), Tavily/Exa for web
+- **Use cases:** Investor sentiment (r/wallstreetbets), AI trend monitoring, product research
+- **Gap:** No web search APIs configured yet (Brave, Tavily, Exa all missing keys)
+- Research: `memory/research/2026-02-07-social-media-trend-monitoring.md`
+
 ### 🐛 Ralph Wiggum Approach (ALWAYS use for coding!)
 
 Work in small, iterative loops. "I'm helping!" one tiny step at a time.
@@ -235,6 +245,7 @@ The spare capacity cron runs at noon daily. Priority order:
 4. Documentation
 
 **Recent code improvements:**
+- Investor-tracker: fixed indentation bug in `fetch_13f_summary()` — 13F processing only ran in fallback case (Feb 7)
 - Polymarket scanner: added timeouts, retry logic, specific exception handling, logging (Feb 3)
 - Scripts: enhanced backup-clawdbot.sh (dry-run, --keep, --help) and prune-sessions.sh (Feb 4)
 - Pi-health.sh: added CPU throttle detection with bit decoding (Feb 5) — this revealed the 84°C throttling issue!
