@@ -72,6 +72,31 @@ if [ -d "$BUILDS_DIR" ]; then
     BUILDS_SIZE=$(du -sh "$BUILDS_DIR" 2>/dev/null | cut -f1)
 fi
 
+# Archival recommendations (files > 30 days old)
+ARCHIVAL_THRESHOLD=30
+ARCHIVAL_CANDIDATES=()
+ARCHIVAL_SIZE=0
+if [ "$DAILY_FILES" -gt 0 ]; then
+    while IFS= read -r file; do
+        if [ -n "$file" ]; then
+            ARCHIVAL_CANDIDATES+=("$(basename "$file" .md)")
+            FILE_SIZE=$(stat -c%s "$file" 2>/dev/null || echo 0)
+            ARCHIVAL_SIZE=$((ARCHIVAL_SIZE + FILE_SIZE))
+        fi
+    done < <(find "$MEMORY_DIR" -maxdepth 1 -name "202?-??-??.md" -type f -mtime +$ARCHIVAL_THRESHOLD 2>/dev/null)
+fi
+ARCHIVAL_COUNT=${#ARCHIVAL_CANDIDATES[@]}
+
+# Large file detection (files > 10KB)
+LARGE_FILE_THRESHOLD=10240
+LARGE_FILES=()
+while IFS= read -r line; do
+    if [ -n "$line" ]; then
+        LARGE_FILES+=("$line")
+    fi
+done < <(find "$MEMORY_DIR" -type f -name "*.md" -size +${LARGE_FILE_THRESHOLD}c -exec sh -c 'size=$(stat -c%s "$1"); name=$(basename "$1"); echo "$name ($((size/1024))KB)"' _ {} \; 2>/dev/null)
+LARGE_FILE_COUNT=${#LARGE_FILES[@]}
+
 # Total stats
 TOTAL_FILES=$(find "$MEMORY_DIR" -type f 2>/dev/null | wc -l)
 TOTAL_SIZE=$(du -sh "$MEMORY_DIR" 2>/dev/null | cut -f1)
@@ -107,6 +132,32 @@ fi
 
 # JSON output
 if $JSON_OUTPUT; then
+    # Build archival candidates JSON array
+    ARCHIVAL_JSON="[]"
+    if [ $ARCHIVAL_COUNT -gt 0 ]; then
+        ARCHIVAL_JSON="["
+        for i in "${!ARCHIVAL_CANDIDATES[@]}"; do
+            ARCHIVAL_JSON+="\"${ARCHIVAL_CANDIDATES[$i]}\""
+            if [ $i -lt $((ARCHIVAL_COUNT - 1)) ]; then
+                ARCHIVAL_JSON+=","
+            fi
+        done
+        ARCHIVAL_JSON+="]"
+    fi
+    
+    # Build large files JSON array
+    LARGE_FILES_JSON="[]"
+    if [ $LARGE_FILE_COUNT -gt 0 ]; then
+        LARGE_FILES_JSON="["
+        for i in "${!LARGE_FILES[@]}"; do
+            LARGE_FILES_JSON+="\"${LARGE_FILES[$i]}\""
+            if [ $i -lt $((LARGE_FILE_COUNT - 1)) ]; then
+                LARGE_FILES_JSON+=","
+            fi
+        done
+        LARGE_FILES_JSON+="]"
+    fi
+    
     cat <<EOF
 {
   "memory_dir": "$MEMORY_DIR",
@@ -124,6 +175,17 @@ if $JSON_OUTPUT; then
   "builds": {
     "count": $BUILDS_COUNT,
     "size": "$BUILDS_SIZE"
+  },
+  "archival": {
+    "threshold_days": $ARCHIVAL_THRESHOLD,
+    "candidates_count": $ARCHIVAL_COUNT,
+    "reclaimable_bytes": $ARCHIVAL_SIZE,
+    "candidates": $ARCHIVAL_JSON
+  },
+  "large_files": {
+    "threshold_kb": $((LARGE_FILE_THRESHOLD / 1024)),
+    "count": $LARGE_FILE_COUNT,
+    "files": $LARGE_FILES_JSON
   },
   "last_review": "$LAST_REVIEW",
   "days_since_review": ${DAYS_SINCE_REVIEW:-null},
@@ -187,6 +249,40 @@ if [ -n "$LAST_REVIEW" ]; then
     fi
 else
     echo -e "   ${YELLOW}Could not detect last review date${NC}"
+fi
+echo ""
+
+# Archival recommendations
+echo -e "${BLUE}📦 Archival Recommendations${NC}"
+if [ $ARCHIVAL_COUNT -gt 0 ]; then
+    ARCHIVAL_SIZE_KB=$((ARCHIVAL_SIZE / 1024))
+    echo -e "   ${YELLOW}$ARCHIVAL_COUNT files${NC} older than $ARCHIVAL_THRESHOLD days"
+    echo -e "   Reclaimable: ~${ARCHIVAL_SIZE_KB}KB"
+    echo -e "   Oldest candidates:"
+    for i in "${!ARCHIVAL_CANDIDATES[@]}"; do
+        if [ $i -lt 3 ]; then
+            echo -e "     • ${ARCHIVAL_CANDIDATES[$i]}"
+        fi
+    done
+    if [ $ARCHIVAL_COUNT -gt 3 ]; then
+        echo -e "     • ... and $((ARCHIVAL_COUNT - 3)) more"
+    fi
+    echo -e "   ${CYAN}Tip: Move to memory/archive/ to keep workspace clean${NC}"
+else
+    echo -e "   ${GREEN}No files older than $ARCHIVAL_THRESHOLD days ✓${NC}"
+fi
+echo ""
+
+# Large file warnings
+echo -e "${BLUE}📏 Large Files${NC}"
+if [ $LARGE_FILE_COUNT -gt 0 ]; then
+    echo -e "   ${YELLOW}$LARGE_FILE_COUNT files${NC} over 10KB:"
+    for file in "${LARGE_FILES[@]}"; do
+        echo -e "     • $file"
+    done
+    echo -e "   ${CYAN}Tip: Consider splitting or summarizing large files${NC}"
+else
+    echo -e "   ${GREEN}No unusually large files ✓${NC}"
 fi
 echo ""
 echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"

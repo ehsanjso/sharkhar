@@ -68,10 +68,10 @@
     "probability": 0.013474415590932765,
     "shares": 26.355119837641215,
     "placed_at": "2026-02-02T05:08:44.733596+00:00",
-    "resolved": false,
-    "won": null,
-    "payout": 0.0,
-    "resolved_at": null,
+    "resolved": true,
+    "won": true,
+    "payout": 26.355119837641215,
+    "resolved_at": "2026-02-07T23:30:04.029054+00:00",
     "notes": "Auto: 99% consensus, M$2,673 volume. Ends 2h."
   },
   {
@@ -103,5 +103,20 @@
     "payout": 0.0,
     "resolved_at": null,
     "notes": "Auto: 82% consensus, M$5,934 volume. Ends 5h."
+  },
+  {
+    "id": "mf_20260207_233005_0IUCA5s8",
+    "market_id": "0IUCA5s8EN",
+    "market_question": "Will the US strike Iran by the end of February?",
+    "side": "NO",
+    "amount": 30.0,
+    "probability": 0.29000000000000004,
+    "shares": 42.25352112676057,
+    "placed_at": "2026-02-07T23:30:05.035335+00:00",
+    "resolved": false,
+    "won": null,
+    "payout": 0.0,
+    "resolved_at": null,
+    "notes": "Auto: High volume M$56,923, 388 bettors, 71% consensus."
   }
 ]

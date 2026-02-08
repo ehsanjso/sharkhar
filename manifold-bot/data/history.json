@@ -317,5 +317,77 @@
     "total_value": 506.1774828581698,
     "pnl": -121.82251714183019,
     "timestamp": "2026-02-06T11:30:05.542095+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 12,
+    "bets_placed": 0,
+    "mana": 378.1774828581698,
+    "total_value": 506.1774828581698,
+    "pnl": -121.82251714183019,
+    "timestamp": "2026-02-06T23:30:04.939248+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 12,
+    "bets_placed": 0,
+    "mana": 378.1774828581698,
+    "total_value": 506.1774828581698,
+    "pnl": -121.82251714183019,
+    "timestamp": "2026-02-07T05:30:05.074616+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 11,
+    "bets_placed": 0,
+    "mana": 378.1774828581698,
+    "total_value": 506.1774828581698,
+    "pnl": -121.82251714183019,
+    "timestamp": "2026-02-07T11:30:05.014143+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 10,
+    "bets_placed": 0,
+    "mana": 378.1774828581698,
+    "total_value": 506.1774828581698,
+    "pnl": -121.82251714183019,
+    "timestamp": "2026-02-07T17:30:06.232180+00:00"
+  },
+  {
+    "type": "BET_RESOLVED",
+    "bet_id": "mf_20260202_050844_s0pnc59g",
+    "market_id": "s0pnc59glc",
+    "won": true,
+    "amount": 26.0,
+    "payout": 26.355119837641215,
+    "profit": 0.35511983764121524,
+    "final_resolution": "NO",
+    "timestamp": "2026-02-07T23:30:04.031675+00:00"
+  },
+  {
+    "type": "BET_PLACED",
+    "bet_id": "mf_20260207_233005_0IUCA5s8",
+    "market_id": "0IUCA5s8EN",
+    "question": "Will the US strike Iran by the end of February?",
+    "side": "NO",
+    "amount": 30.0,
+    "probability": 0.29000000000000004,
+    "shares": 42.25352112676057,
+    "timestamp": "2026-02-07T23:30:05.037202+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 1,
+    "signals": 9,
+    "bets_placed": 1,
+    "mana": 374.532602695811,
+    "total_value": 506.532602695811,
+    "pnl": -125.46739730418898,
+    "timestamp": "2026-02-07T23:30:05.038203+00:00"
   }
 ]

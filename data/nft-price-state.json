@@ -3,33 +3,33 @@
     "ethereum:Parallel Planetfall": {
       "floor": 0.000174697,
       "nftCount": 23,
-      "updated": "2026-02-05T16:00:03.979Z"
+      "updated": "2026-02-07T16:00:04.333Z"
     },
     "ethereum:Parallel Cosmetics": {
       "floor": 0.00019,
       "nftCount": 3,
-      "updated": "2026-02-05T16:00:03.979Z"
+      "updated": "2026-02-07T16:00:04.333Z"
     },
     "ethereum:Parallel Alpha": {
       "floor": 0.000083,
       "nftCount": 44,
-      "updated": "2026-02-05T16:00:03.979Z"
+      "updated": "2026-02-07T16:00:04.333Z"
     },
     "base:Parallel Alpha [Base]": {
       "floor": 0.00003,
       "nftCount": 55,
-      "updated": "2026-02-05T16:00:03.979Z"
+      "updated": "2026-02-07T16:00:04.333Z"
     },
     "base:Parallel Mask": {
       "floor": 0,
       "nftCount": 2,
-      "updated": "2026-02-05T16:00:03.979Z"
+      "updated": "2026-02-07T16:00:04.333Z"
     },
     "base:Parallel Cosmetics [Base]": {
       "floor": 0.000023,
       "nftCount": 1,
-      "updated": "2026-02-05T16:00:03.979Z"
+      "updated": "2026-02-07T16:00:04.333Z"
     }
   },
-  "lastCheck": "2026-02-05T16:00:03.979Z"
+  "lastCheck": "2026-02-07T16:00:04.333Z"
 }
