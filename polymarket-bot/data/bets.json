@@ -9,10 +9,10 @@
     "price": 0.6825,
     "shares": 6.783882783882784,
     "placed_at": "2026-02-02T02:25:58.527192+00:00",
-    "resolved": false,
-    "won": null,
-    "payout": 0.0,
-    "resolved_at": null,
+    "resolved": true,
+    "won": false,
+    "payout": 0,
+    "resolved_at": "2026-02-09T11:00:04.392630+00:00",
     "notes": "Auto: High volume ($10,978,490), 68% consensus. Ends 6d."
   },
   {
@@ -25,10 +25,10 @@
     "price": 0.6835,
     "shares": 6.730065837600585,
     "placed_at": "2026-02-02T02:25:58.529235+00:00",
-    "resolved": false,
-    "won": null,
-    "payout": 0.0,
-    "resolved_at": null,
+    "resolved": true,
+    "won": false,
+    "payout": 0,
+    "resolved_at": "2026-02-09T11:00:04.512248+00:00",
     "notes": "Auto: High volume ($14,806,446), 68% consensus. Ends 6d."
   },
   {
@@ -57,10 +57,10 @@
     "price": 0.683,
     "shares": 5.183016105417276,
     "placed_at": "2026-02-02T05:00:05.435777+00:00",
-    "resolved": false,
-    "won": null,
-    "payout": 0.0,
-    "resolved_at": null,
+    "resolved": true,
+    "won": false,
+    "payout": 0,
+    "resolved_at": "2026-02-09T11:00:04.717626+00:00",
     "notes": "Auto: High volume ($10,979,217), 68% consensus. Ends 6d."
   },
   {
@@ -73,10 +73,10 @@
     "price": 0.6835,
     "shares": 5.164594001463057,
     "placed_at": "2026-02-02T05:00:05.438147+00:00",
-    "resolved": false,
-    "won": null,
-    "payout": 0.0,
-    "resolved_at": null,
+    "resolved": true,
+    "won": false,
+    "payout": 0,
+    "resolved_at": "2026-02-09T11:00:04.799376+00:00",
     "notes": "Auto: High volume ($14,807,744), 68% consensus. Ends 6d."
   }
 ]

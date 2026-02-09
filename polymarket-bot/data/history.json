@@ -338,5 +338,79 @@
     "total_value": 50.0,
     "pnl": -18.740000000000002,
     "timestamp": "2026-02-08T17:00:05.153506+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 50.0,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-08T23:00:05.463182+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 50.0,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-09T05:00:04.864049+00:00"
+  },
+  {
+    "type": "BET_RESOLVED",
+    "bet_id": "bet_20260202_022558_540234",
+    "market_id": "540234",
+    "won": false,
+    "amount": 4.63,
+    "payout": 0,
+    "profit": -4.63,
+    "market_outcome": "VOIDED",
+    "timestamp": "2026-02-09T11:00:04.394165+00:00"
+  },
+  {
+    "type": "BET_RESOLVED",
+    "bet_id": "bet_20260202_022558_540227",
+    "market_id": "540227",
+    "won": false,
+    "amount": 4.6,
+    "payout": 0,
+    "profit": -4.6,
+    "market_outcome": "VOIDED",
+    "timestamp": "2026-02-09T11:00:04.513935+00:00"
+  },
+  {
+    "type": "BET_RESOLVED",
+    "bet_id": "bet_20260202_050005_540234",
+    "market_id": "540234",
+    "won": false,
+    "amount": 3.54,
+    "payout": 0,
+    "profit": -3.54,
+    "market_outcome": "VOIDED",
+    "timestamp": "2026-02-09T11:00:04.719267+00:00"
+  },
+  {
+    "type": "BET_RESOLVED",
+    "bet_id": "bet_20260202_050005_540227",
+    "market_id": "540227",
+    "won": false,
+    "amount": 3.53,
+    "payout": 0,
+    "profit": -3.53,
+    "market_outcome": "VOIDED",
+    "timestamp": "2026-02-09T11:00:04.800804+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 4,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 33.699999999999996,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-09T11:00:04.895375+00:00"
   }
 ]
