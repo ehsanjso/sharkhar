@@ -20,6 +20,7 @@ CONTEXT_LINES=2
 FILES_ONLY=false
 JSON_OUTPUT=false
 WORD_BOUNDARY=false
+RECENT_DAYS=0
 QUERY=""
 
 # Parse arguments
@@ -41,6 +42,10 @@ while [[ $# -gt 0 ]]; do
             WORD_BOUNDARY=true
             shift
             ;;
+        --recent|-r)
+            RECENT_DAYS="$2"
+            shift 2
+            ;;
         --help|-h)
             echo "Usage: $(basename "$0") \"query\" [OPTIONS]"
             echo ""
@@ -50,6 +55,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -c, --context N   Lines of context around match (default: 2)"
             echo "  -f, --files-only  Only show matching filenames"
             echo "  -w, --word        Match whole words only (no partial matches)"
+            echo "  -r, --recent N    Only search files from last N days"
             echo "  -j, --json        Output as JSON"
             echo "  -h, --help        Show this help message"
             echo ""
@@ -57,6 +63,7 @@ while [[ $# -gt 0 ]]; do
             echo "  $(basename "$0") \"quota\"                 # Find quota mentions"
             echo "  $(basename "$0") \"ollama\" --context 5    # More context"
             echo "  $(basename "$0") \"rag\" --files-only      # Just filenames"
+            echo "  $(basename "$0") \"api\" --recent 7        # Last 7 days only"
             echo ""
             echo "Searches: memory/*.md, memory/**/*.md, MEMORY.md"
             exit 0
@@ -86,10 +93,21 @@ else
     PATTERN="$QUERY"
 fi
 
-# Find all markdown files
+# Find all markdown files (optionally filtered by recency)
 find_files() {
-    find "$MEMORY_DIR" -name "*.md" -type f 2>/dev/null
-    [[ -f "${HOME}/clawd/MEMORY.md" ]] && echo "${HOME}/clawd/MEMORY.md"
+    if [[ "$RECENT_DAYS" -gt 0 ]]; then
+        # Filter by modification time
+        find "$MEMORY_DIR" -name "*.md" -type f -mtime -"$RECENT_DAYS" 2>/dev/null
+        if [[ -f "${HOME}/clawd/MEMORY.md" ]]; then
+            # Check if MEMORY.md was modified within recent days
+            if find "${HOME}/clawd/MEMORY.md" -mtime -"$RECENT_DAYS" 2>/dev/null | grep -q .; then
+                echo "${HOME}/clawd/MEMORY.md"
+            fi
+        fi
+    else
+        find "$MEMORY_DIR" -name "*.md" -type f 2>/dev/null
+        [[ -f "${HOME}/clawd/MEMORY.md" ]] && echo "${HOME}/clawd/MEMORY.md"
+    fi
 }
 
 if $FILES_ONLY; then
