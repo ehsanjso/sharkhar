@@ -79,6 +79,20 @@ ClawdBot process status, Node.js memory, system uptime.
 Both "active now" and "occurred since boot" states are reported. Critical for
 diagnosing performance issues on Pi.
 
+### memory-search.sh
+Simple grep-based search for memory files. Stopgap until RAG/semantic search 
+is set up. Searches all memory/*.md files plus MEMORY.md.
+
+```bash
+./memory-search.sh "quota"                 # Search with context
+./memory-search.sh "rag" --word            # Whole words only (no partials)
+./memory-search.sh "ollama" --files-only   # Just filenames
+./memory-search.sh "api" --context 5       # More context lines
+./memory-search.sh "bug" --json            # JSON output for scripts
+```
+
+**Options:** `--word` (whole words), `--context N`, `--files-only`, `--json`
+
 ### memory-stats.sh
 Quick overview of memory folder health and maintenance status. Shows file counts,
 folder sizes, archival recommendations, and tracks when MEMORY.md was last updated.
