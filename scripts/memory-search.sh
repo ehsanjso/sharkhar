@@ -21,6 +21,7 @@ FILES_ONLY=false
 JSON_OUTPUT=false
 WORD_BOUNDARY=false
 RECENT_DAYS=0
+FILE_TYPE=""
 QUERY=""
 
 # Parse arguments
@@ -46,24 +47,30 @@ while [[ $# -gt 0 ]]; do
             RECENT_DAYS="$2"
             shift 2
             ;;
+        --type|-t)
+            FILE_TYPE="$2"
+            shift 2
+            ;;
         --help|-h)
             echo "Usage: $(basename "$0") \"query\" [OPTIONS]"
             echo ""
             echo "Search memory files with context. Case-insensitive by default."
             echo ""
             echo "Options:"
-            echo "  -c, --context N   Lines of context around match (default: 2)"
-            echo "  -f, --files-only  Only show matching filenames"
-            echo "  -w, --word        Match whole words only (no partial matches)"
-            echo "  -r, --recent N    Only search files from last N days"
-            echo "  -j, --json        Output as JSON"
-            echo "  -h, --help        Show this help message"
+            echo "  -c, --context N    Lines of context around match (default: 2)"
+            echo "  -f, --files-only   Only show matching filenames"
+            echo "  -w, --word         Match whole words only (no partial matches)"
+            echo "  -r, --recent N     Only search files from last N days"
+            echo "  -t, --type TYPE    Filter by file type: daily|research|builds"
+            echo "  -j, --json         Output as JSON"
+            echo "  -h, --help         Show this help message"
             echo ""
             echo "Examples:"
             echo "  $(basename "$0") \"quota\"                 # Find quota mentions"
             echo "  $(basename "$0") \"ollama\" --context 5    # More context"
             echo "  $(basename "$0") \"rag\" --files-only      # Just filenames"
             echo "  $(basename "$0") \"api\" --recent 7        # Last 7 days only"
+            echo "  $(basename "$0") \"script\" --type builds  # Only build sessions"
             echo ""
             echo "Searches: memory/*.md, memory/**/*.md, MEMORY.md"
             exit 0
@@ -93,20 +100,58 @@ else
     PATTERN="$QUERY"
 fi
 
-# Find all markdown files (optionally filtered by recency)
+# Find all markdown files (optionally filtered by recency and type)
 find_files() {
+    local find_args=()
+    local base_path="$MEMORY_DIR"
+    
+    # Determine search path based on type
+    case "$FILE_TYPE" in
+        daily)
+            # Only root-level YYYY-MM-DD.md files
+            find_args+=("-maxdepth" "1" "-regex" ".*/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\.md")
+            ;;
+        research)
+            base_path="$MEMORY_DIR/research"
+            ;;
+        builds)
+            base_path="$MEMORY_DIR/builds"
+            ;;
+        "")
+            # No filter - search all
+            ;;
+        *)
+            echo "Unknown type: $FILE_TYPE (use: daily|research|builds)" >&2
+            exit 1
+            ;;
+    esac
+    
+    # Add recency filter if specified
     if [[ "$RECENT_DAYS" -gt 0 ]]; then
-        # Filter by modification time
-        find "$MEMORY_DIR" -name "*.md" -type f -mtime -"$RECENT_DAYS" 2>/dev/null
+        find_args+=("-mtime" "-$RECENT_DAYS")
+    fi
+    
+    # Type-specific searches
+    if [[ "$FILE_TYPE" == "daily" ]]; then
+        find "$MEMORY_DIR" "${find_args[@]}" -type f 2>/dev/null
+    elif [[ -n "$FILE_TYPE" ]]; then
+        # Subdir type (research/builds)
+        if [[ -d "$base_path" ]]; then
+            find "$base_path" -name "*.md" -type f "${find_args[@]}" 2>/dev/null
+        fi
+    else
+        # All files
+        find "$MEMORY_DIR" -name "*.md" -type f "${find_args[@]}" 2>/dev/null
+        # Include MEMORY.md if no type filter
         if [[ -f "${HOME}/clawd/MEMORY.md" ]]; then
-            # Check if MEMORY.md was modified within recent days
-            if find "${HOME}/clawd/MEMORY.md" -mtime -"$RECENT_DAYS" 2>/dev/null | grep -q .; then
+            if [[ "$RECENT_DAYS" -gt 0 ]]; then
+                if find "${HOME}/clawd/MEMORY.md" -mtime -"$RECENT_DAYS" 2>/dev/null | grep -q .; then
+                    echo "${HOME}/clawd/MEMORY.md"
+                fi
+            else
                 echo "${HOME}/clawd/MEMORY.md"
             fi
         fi
-    else
-        find "$MEMORY_DIR" -name "*.md" -type f 2>/dev/null
-        [[ -f "${HOME}/clawd/MEMORY.md" ]] && echo "${HOME}/clawd/MEMORY.md"
     fi
 }
 
