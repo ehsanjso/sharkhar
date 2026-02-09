@@ -88,10 +88,18 @@ is set up. Searches all memory/*.md files plus MEMORY.md.
 ./memory-search.sh "rag" --word            # Whole words only (no partials)
 ./memory-search.sh "ollama" --files-only   # Just filenames
 ./memory-search.sh "api" --context 5       # More context lines
+./memory-search.sh "api" --recent 7        # Last 7 days only
+./memory-search.sh "script" --type builds  # Only build session files
 ./memory-search.sh "bug" --json            # JSON output for scripts
 ```
 
-**Options:** `--word` (whole words), `--context N`, `--files-only`, `--json`
+**Options:** 
+- `--word` — Whole words only (avoid partial matches)
+- `--context N` — Lines of context around match (default: 2)
+- `--recent N` — Only search files modified in last N days
+- `--type TYPE` — Filter by type: `daily` | `research` | `builds`
+- `--files-only` — Only show matching filenames
+- `--json` — JSON output for scripts
 
 ### memory-stats.sh
 Quick overview of memory folder health and maintenance status. Shows file counts,
