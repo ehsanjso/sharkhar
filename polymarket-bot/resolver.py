@@ -4,18 +4,32 @@ Polymarket Resolution Checker
 Checks if markets have resolved and updates bets accordingly.
 """
 
+import logging
 import requests
+from requests.exceptions import RequestException, Timeout
 from portfolio import get_pending_bets, resolve_bet, Bet, add_to_history
 
 GAMMA_API = "https://gamma-api.polymarket.com"
+REQUEST_TIMEOUT = 15  # seconds
+
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
 
 def fetch_market_by_id(market_id: str) -> dict:
     """Fetch a single market by ID."""
-    resp = requests.get(f"{GAMMA_API}/markets/{market_id}")
-    if resp.status_code == 404:
+    try:
+        resp = requests.get(f"{GAMMA_API}/markets/{market_id}", timeout=REQUEST_TIMEOUT)
+        if resp.status_code == 404:
+            logger.debug(f"Market {market_id} not found (404)")
+            return {}
+        resp.raise_for_status()
+        return resp.json()
+    except Timeout:
+        logger.warning(f"Timeout fetching market {market_id}")
         return {}
-    resp.raise_for_status()
-    return resp.json()
+    except RequestException as e:
+        logger.warning(f"Failed to fetch market {market_id}: {e}")
+        return {}
 
 def check_market_resolution(market_id: str) -> tuple[bool, str, str]:
     """
@@ -51,19 +65,28 @@ def check_and_resolve_pending_bets() -> list[dict]:
     pending = get_pending_bets()
     results = []
     
-    print(f"🔍 Checking {len(pending)} pending bets...")
+    logger.info(f"🔍 Checking {len(pending)} pending bets...")
     
     for bet in pending:
-        is_resolved, winning_outcome, details = check_market_resolution(bet.market_id)
+        try:
+            is_resolved, winning_outcome, details = check_market_resolution(bet.market_id)
+        except Exception as e:
+            logger.error(f"Error checking bet {bet.id}: {e}")
+            results.append({
+                "bet_id": bet.id,
+                "status": "error",
+                "message": str(e),
+            })
+            continue
         
         if not is_resolved:
-            print(f"  ⏳ {bet.id}: Still open")
+            logger.info(f"  ⏳ {bet.id}: Still open")
             continue
         
         # Determine if bet won
         if not winning_outcome:
             # Market voided - return stake
-            print(f"  🚫 {bet.id}: Market voided, returning stake")
+            logger.info(f"  🚫 {bet.id}: Market voided, returning stake")
             # For now, treat as loss but we could handle this differently
             success, msg = resolve_bet(bet.id, won=False, market_outcome="VOIDED")
             results.append({
@@ -86,7 +109,7 @@ def check_and_resolve_pending_bets() -> list[dict]:
         success, msg = resolve_bet(bet.id, won=won, market_outcome=winning_outcome)
         
         status_emoji = "✅" if won else "❌"
-        print(f"  {status_emoji} {bet.id}: {msg}")
+        logger.info(f"  {status_emoji} {bet.id}: {msg}")
         
         results.append({
             "bet_id": bet.id,
@@ -114,4 +137,4 @@ def get_resolution_summary(results: list[dict]) -> str:
 
 if __name__ == "__main__":
     results = check_and_resolve_pending_bets()
-    print(f"\n{get_resolution_summary(results)}")
+    logger.info(f"\n{get_resolution_summary(results)}")
