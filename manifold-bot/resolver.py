@@ -4,18 +4,32 @@ Manifold Markets Resolution Checker
 Checks if markets have resolved and updates bets accordingly.
 """
 
+import logging
 import requests
+from requests.exceptions import RequestException, Timeout
 from portfolio import get_pending_bets, resolve_bet, add_to_history
 
 MANIFOLD_API = "https://api.manifold.markets/v0"
+REQUEST_TIMEOUT = 15  # seconds
+
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
 
 def fetch_market_by_id(market_id: str) -> dict:
     """Fetch a single market by ID."""
-    resp = requests.get(f"{MANIFOLD_API}/market/{market_id}")
-    if resp.status_code == 404:
+    try:
+        resp = requests.get(f"{MANIFOLD_API}/market/{market_id}", timeout=REQUEST_TIMEOUT)
+        if resp.status_code == 404:
+            logger.debug(f"Market {market_id} not found (404)")
+            return {}
+        resp.raise_for_status()
+        return resp.json()
+    except Timeout:
+        logger.warning(f"Timeout fetching market {market_id}")
         return {}
-    resp.raise_for_status()
-    return resp.json()
+    except RequestException as e:
+        logger.warning(f"Failed to fetch market {market_id}: {e}")
+        return {}
 
 def check_market_resolution(market_id: str) -> tuple[bool, str, str]:
     """
