@@ -26,9 +26,15 @@ logging thoughts, progress, or debugging notes without opening an editor.
 echo "Long note" | ./devlog.sh                     # From stdin/pipe
 ./devlog.sh --dry-run "Test entry"                 # Preview only
 ./devlog.sh --list                                 # Show today's entries
+./devlog.sh --yesterday "Forgot to log this"       # Add to yesterday's file
+./devlog.sh --edit                                 # Open in $EDITOR
+./devlog.sh -y --list                              # View yesterday's entries
 ```
 
 Notes are appended to `memory/YYYY-MM-DD.md` with timestamps.
+
+**Bash alias:** After sourcing `~/.bashrc`, use `devlog` instead of `./devlog.sh`.
+Tab completion available for options and common section names.
 
 ---
 

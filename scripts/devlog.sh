@@ -19,7 +19,11 @@ set -euo pipefail
 # Config
 MEMORY_DIR="${HOME}/clawd/memory"
 TODAY=$(date '+%Y-%m-%d')
+YESTERDAY=$(date -d 'yesterday' '+%Y-%m-%d' 2>/dev/null || date -v-1d '+%Y-%m-%d')
 TODAY_FILE="${MEMORY_DIR}/${TODAY}.md"
+YESTERDAY_FILE="${MEMORY_DIR}/${YESTERDAY}.md"
+TARGET_FILE="$TODAY_FILE"
+TARGET_DATE="$TODAY"
 
 # Colors
 RED='\033[0;31m'
@@ -34,6 +38,8 @@ NC='\033[0m'
 SECTION=""
 DRY_RUN=false
 LIST_MODE=false
+EDIT_MODE=false
+USE_YESTERDAY=false
 MESSAGE=""
 
 usage() {
@@ -46,6 +52,8 @@ Options:
   -s, --section NAME   Add section header (e.g., "Debug", "Work Log")
   -d, --dry-run        Preview without writing
   -l, --list           Show today's entries
+  -y, --yesterday      Target yesterday's file instead of today
+  -e, --edit           Open target file in \$EDITOR
   -h, --help           Show this help
 
 Examples:
@@ -53,6 +61,9 @@ Examples:
   $(basename "$0") --section "Debug" "Traced bug to line 42"
   echo "Long note from pipe" | $(basename "$0")
   $(basename "$0") --dry-run "Test entry"
+  $(basename "$0") --yesterday "Late night fix I forgot to log"
+  $(basename "$0") --edit           # Open today's file in editor
+  $(basename "$0") -y --edit        # Open yesterday's file in editor
 
 Notes are appended to: ${MEMORY_DIR}/YYYY-MM-DD.md
 EOF
@@ -73,6 +84,16 @@ while [[ $# -gt 0 ]]; do
             LIST_MODE=true
             shift
             ;;
+        -y|--yesterday)
+            USE_YESTERDAY=true
+            TARGET_FILE="$YESTERDAY_FILE"
+            TARGET_DATE="$YESTERDAY"
+            shift
+            ;;
+        -e|--edit)
+            EDIT_MODE=true
+            shift
+            ;;
         -h|--help)
             usage
             exit 0
@@ -89,14 +110,33 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# List mode - show today's entries
+# Edit mode - open in $EDITOR
+if $EDIT_MODE; then
+    EDITOR="${EDITOR:-nano}"
+    if [[ ! -f "$TARGET_FILE" ]]; then
+        # Create file with header first
+        cat > "$TARGET_FILE" <<EOF
+# Daily Log - ${TARGET_DATE}
+
+EOF
+        echo -e "${GREEN}✓ Created ${TARGET_FILE}${NC}"
+    fi
+    echo -e "${CYAN}Opening ${TARGET_FILE} in ${EDITOR}...${NC}"
+    exec "$EDITOR" "$TARGET_FILE"
+fi
+
+# List mode - show entries for target date
 if $LIST_MODE; then
-    if [[ -f "$TODAY_FILE" ]]; then
-        echo -e "${CYAN}📝 Today's entries (${TODAY}):${NC}"
+    if [[ -f "$TARGET_FILE" ]]; then
+        if $USE_YESTERDAY; then
+            echo -e "${CYAN}📝 Yesterday's entries (${TARGET_DATE}):${NC}"
+        else
+            echo -e "${CYAN}📝 Today's entries (${TARGET_DATE}):${NC}"
+        fi
         echo ""
-        cat "$TODAY_FILE"
+        cat "$TARGET_FILE"
     else
-        echo -e "${YELLOW}No entries for today (${TODAY})${NC}"
+        echo -e "${YELLOW}No entries for ${TARGET_DATE}${NC}"
     fi
     exit 0
 fi
@@ -134,24 +174,24 @@ fi
 
 # Dry run - just show what would be written
 if $DRY_RUN; then
-    echo -e "${CYAN}📝 Would append to: ${TODAY_FILE}${NC}"
+    echo -e "${CYAN}📝 Would append to: ${TARGET_FILE}${NC}"
     echo ""
     echo -e "${YELLOW}${ENTRY}${NC}"
     exit 0
 fi
 
 # Create file with header if it doesn't exist
-if [[ ! -f "$TODAY_FILE" ]]; then
-    cat > "$TODAY_FILE" <<EOF
-# Daily Log - ${TODAY}
+if [[ ! -f "$TARGET_FILE" ]]; then
+    cat > "$TARGET_FILE" <<EOF
+# Daily Log - ${TARGET_DATE}
 
 EOF
-    echo -e "${GREEN}✓ Created ${TODAY_FILE}${NC}"
+    echo -e "${GREEN}✓ Created ${TARGET_FILE}${NC}"
 fi
 
 # Append the entry
-echo "" >> "$TODAY_FILE"
-echo -n "$ENTRY" >> "$TODAY_FILE"
+echo "" >> "$TARGET_FILE"
+echo -n "$ENTRY" >> "$TARGET_FILE"
 
-echo -e "${GREEN}✓ Logged to ${TODAY}${NC}"
+echo -e "${GREEN}✓ Logged to ${TARGET_DATE}${NC}"
 echo -e "  ${ENTRY}"
