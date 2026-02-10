@@ -1,6 +1,6 @@
 # 🧠 Long-term Memory
 
-*Last updated: 2026-02-08*
+*Last updated: 2026-02-10*
 
 ## About Ehsan
 
@@ -169,6 +169,7 @@ The Agent Dashboard helps me wake up each session knowing what happened.
 - MCP = "USB-C for AI" — standardized tool access protocol
 - **Quick wins:** Home Assistant MCP, SQLite queries via chat, enhanced Git ops
 - **Pipedream MCP** gives access to 2,500+ APIs at once
+- **Ecosystem maturing:** SDKs now available for 10 languages (Feb 9 scan)
 - Research: `memory/research/2026-02-02-mcp-servers-ecosystem.md`
 
 ### Pi-hole Advanced Features
@@ -218,6 +219,26 @@ The Agent Dashboard helps me wake up each session knowing what happened.
 - **Gap:** No web search APIs configured yet (Brave, Tavily, Exa all missing keys)
 - Research: `memory/research/2026-02-07-social-media-trend-monitoring.md`
 
+### RAG for Personal Knowledge Base (Researched Feb 8)
+- **Local semantic search** over memory files — the missing piece for Mission Control
+- **nomic-embed-text** (274MB) — Best embedding model for Pi 5, 768 dims, ~50 docs/min
+- **LanceDB** — Serverless vector DB, no daemon, ~50MB RAM, pip install
+- **Tech stack:** Ollama (embeddings) → LanceDB (vectors) → Optional llama3.2:1b (generation)
+- **Implementation:** Chunk by H2 headers, keep file metadata, 1-2 hour build
+- **Enables:** "What did I work on last week?" queries, Mission Control search bar
+- **Cost savings:** ~$30-50/month vs cloud embeddings + vector DB
+- Research: `memory/research/2026-02-08-rag-personal-knowledge-base.md`
+
+### Tailscale for Remote Access (Researched Feb 9)
+- **Zero-config VPN** — WireGuard-based, no open ports, NAT traversal
+- **Free tier:** 3 users, 100 devices, all features including exit nodes
+- **Install:** 4 commands to get Pi on tailnet (see research)
+- **Tailscale Serve** — Auto-HTTPS for Pi services from anywhere
+- **Subnet router** — Pi becomes gateway to entire 192.168.0.x network
+- **Pi-hole + Tailscale** — DNS filtering works on cellular too
+- **Enables:** Mission Control on phone, Uptime Kuma on-the-go, SSH without port forwarding
+- Research: `memory/research/2026-02-09-tailscale-secure-remote-access.md`
+
 ### 🐛 Ralph Wiggum Approach (ALWAYS use for coding!)
 
 Work in small, iterative loops. "I'm helping!" one tiny step at a time.
@@ -245,6 +266,7 @@ The spare capacity cron runs at noon daily. Priority order:
 4. Documentation
 
 **Recent code improvements:**
+- devlog.sh: created quick daily logging tool with --yesterday, --edit flags, bash completion (Feb 9)
 - Investor-tracker: fixed indentation bug in `fetch_13f_summary()` — 13F processing only ran in fallback case (Feb 7)
 - Polymarket scanner: added timeouts, retry logic, specific exception handling, logging (Feb 3)
 - Scripts: enhanced backup-clawdbot.sh (dry-run, --keep, --help) and prune-sessions.sh (Feb 4)
