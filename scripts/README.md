@@ -14,6 +14,24 @@ Utility scripts for ClawdBot maintenance, automation, and content creation.
 
 ---
 
+## Logging & Memory
+
+### devlog.sh
+Quick CLI for appending timestamped notes to daily memory files. Useful for
+logging thoughts, progress, or debugging notes without opening an editor.
+
+```bash
+./devlog.sh "Fixed the API timeout issue"          # Simple note
+./devlog.sh --section "Debug" "Bug on line 42"     # With section header
+echo "Long note" | ./devlog.sh                     # From stdin/pipe
+./devlog.sh --dry-run "Test entry"                 # Preview only
+./devlog.sh --list                                 # Show today's entries
+```
+
+Notes are appended to `memory/YYYY-MM-DD.md` with timestamps.
+
+---
+
 ## Maintenance Scripts
 
 ### backup-clawdbot.sh
