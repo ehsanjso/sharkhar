@@ -42,6 +42,7 @@ EDIT_MODE=false
 SEARCH_MODE=false
 SEARCH_TERM=""
 APPEND_MODE=false
+TAIL_COUNT=""
 USE_YESTERDAY=false
 CUSTOM_DATE=""
 MESSAGE=""
@@ -57,6 +58,7 @@ Options:
   -a, --append         Append to existing section (use with --section)
   -d, --dry-run        Preview without writing
   -l, --list           Show target date's entries
+  -t, --tail N         Show last N lines of target file
   -S, --search TERM    Search entries in target file (case-insensitive)
   -y, --yesterday      Target yesterday's file instead of today
   -D, --date DATE      Target specific date (YYYY-MM-DD format)
@@ -76,6 +78,7 @@ Examples:
   $(basename "$0") --search "API"          # Search today's file
   $(basename "$0") -y --search "bug"       # Search yesterday's file
   $(basename "$0") -a -s "Debug" "More info"  # Append to existing Debug section
+  $(basename "$0") --tail 10                   # Show last 10 lines
 
 Notes are appended to: ${MEMORY_DIR}/YYYY-MM-DD.md
 EOF
@@ -99,6 +102,10 @@ while [[ $# -gt 0 ]]; do
         -l|--list)
             LIST_MODE=true
             shift
+            ;;
+        -t|--tail)
+            TAIL_COUNT="$2"
+            shift 2
             ;;
         -S|--search)
             SEARCH_MODE=true
@@ -178,6 +185,22 @@ if $LIST_MODE; then
         fi
         echo ""
         cat "$TARGET_FILE"
+    else
+        echo -e "${YELLOW}No entries for ${TARGET_DATE}${NC}"
+    fi
+    exit 0
+fi
+
+# Tail mode - show last N lines
+if [[ -n "$TAIL_COUNT" ]]; then
+    if [[ ! "$TAIL_COUNT" =~ ^[0-9]+$ ]]; then
+        echo -e "${RED}Error: --tail requires a number${NC}" >&2
+        exit 1
+    fi
+    if [[ -f "$TARGET_FILE" ]]; then
+        echo -e "${CYAN}📝 Last ${TAIL_COUNT} lines of ${TARGET_DATE}:${NC}"
+        echo ""
+        tail -n "$TAIL_COUNT" "$TARGET_FILE"
     else
         echo -e "${YELLOW}No entries for ${TARGET_DATE}${NC}"
     fi

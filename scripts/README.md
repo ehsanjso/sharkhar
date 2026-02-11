@@ -27,8 +27,10 @@ echo "Long note" | ./devlog.sh                     # From stdin/pipe
 ./devlog.sh --dry-run "Test entry"                 # Preview only
 ./devlog.sh --list                                 # Show today's entries
 ./devlog.sh --search "API"                         # Search today's file
+./devlog.sh --tail 10                              # Show last 10 lines
 ./devlog.sh --yesterday "Forgot to log this"       # Add to yesterday's file
 ./devlog.sh -y --search "bug"                      # Search yesterday's file
+./devlog.sh -y --tail 5                            # Last 5 lines of yesterday
 ./devlog.sh --date 2026-02-08 "Historical note"    # Target specific date
 ./devlog.sh -D 2026-02-08 --list                   # View any date's entries
 ./devlog.sh --edit                                 # Open in $EDITOR
