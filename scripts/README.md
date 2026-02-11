@@ -43,6 +43,10 @@ Overrides `--yesterday` if both are specified.
 **Search:** Use `-S`/`--search TERM` for case-insensitive grep within the target
 file. Combines with `-y`/`--date` to search any date's entries.
 
+**Append to section:** Use `-a`/`--append` with `--section` to add entries to an
+existing section instead of creating a new one. If the section doesn't exist, it
+creates a new section normally.
+
 **Bash alias:** After sourcing `~/.bashrc`, use `devlog` instead of `./devlog.sh`.
 Tab completion available for options and common section names.
 

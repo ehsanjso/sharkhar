@@ -41,6 +41,7 @@ LIST_MODE=false
 EDIT_MODE=false
 SEARCH_MODE=false
 SEARCH_TERM=""
+APPEND_MODE=false
 USE_YESTERDAY=false
 CUSTOM_DATE=""
 MESSAGE=""
@@ -53,6 +54,7 @@ Quick CLI for appending timestamped notes to daily memory files.
 
 Options:
   -s, --section NAME   Add section header (e.g., "Debug", "Work Log")
+  -a, --append         Append to existing section (use with --section)
   -d, --dry-run        Preview without writing
   -l, --list           Show target date's entries
   -S, --search TERM    Search entries in target file (case-insensitive)
@@ -73,6 +75,7 @@ Examples:
   $(basename "$0") -D 2026-02-08 --list   # View entries from specific date
   $(basename "$0") --search "API"          # Search today's file
   $(basename "$0") -y --search "bug"       # Search yesterday's file
+  $(basename "$0") -a -s "Debug" "More info"  # Append to existing Debug section
 
 Notes are appended to: ${MEMORY_DIR}/YYYY-MM-DD.md
 EOF
@@ -84,6 +87,10 @@ while [[ $# -gt 0 ]]; do
         -s|--section)
             SECTION="$2"
             shift 2
+            ;;
+        -a|--append)
+            APPEND_MODE=true
+            shift
             ;;
         -d|--dry-run)
             DRY_RUN=true
@@ -219,9 +226,54 @@ fi
 
 # Format the entry
 TIMESTAMP=$(date '+%I:%M %p')
-ENTRY=""
+NEW_LINE="- ${MESSAGE}"
 
-# Add section header if provided
+# Handle append mode (append to existing section)
+if $APPEND_MODE && [[ -n "$SECTION" ]] && [[ -f "$TARGET_FILE" ]]; then
+    # Find the last line matching "## SECTION" (with any timestamp)
+    SECTION_LINE=$(grep -n "^## ${SECTION}" "$TARGET_FILE" 2>/dev/null | tail -1 | cut -d: -f1 || true)
+    
+    if [[ -n "$SECTION_LINE" ]]; then
+        # Found existing section - insert after all its entries
+        # Find the next section header or EOF
+        TOTAL_LINES=$(wc -l < "$TARGET_FILE")
+        NEXT_SECTION=$(tail -n +$((SECTION_LINE + 1)) "$TARGET_FILE" | grep -n "^## " | head -1 | cut -d: -f1 || true)
+        
+        if [[ -n "$NEXT_SECTION" ]]; then
+            # Insert before next section (at line SECTION_LINE + NEXT_SECTION - 1)
+            INSERT_AT=$((SECTION_LINE + NEXT_SECTION - 1))
+        else
+            # No next section, append at end
+            INSERT_AT=$((TOTAL_LINES + 1))
+        fi
+        
+        if $DRY_RUN; then
+            echo -e "${CYAN}📝 Would append to section '${SECTION}' in: ${TARGET_FILE}${NC}"
+            echo ""
+            echo -e "${YELLOW}${NEW_LINE}${NC}"
+            exit 0
+        fi
+        
+        # Insert the line using sed
+        if [[ "$INSERT_AT" -gt "$TOTAL_LINES" ]]; then
+            # Append at end
+            echo "$NEW_LINE" >> "$TARGET_FILE"
+        else
+            # Insert before the line
+            sed -i "${INSERT_AT}i\\${NEW_LINE}" "$TARGET_FILE"
+        fi
+        
+        echo -e "${GREEN}✓ Appended to '${SECTION}' in ${TARGET_DATE}${NC}"
+        echo -e "  ${NEW_LINE}"
+        exit 0
+    else
+        echo -e "${YELLOW}Section '${SECTION}' not found, creating new section${NC}"
+        # Fall through to create new section
+    fi
+fi
+
+# Format entry (new section or simple note)
+ENTRY=""
 if [[ -n "$SECTION" ]]; then
     ENTRY+="## ${SECTION} (${TIMESTAMP})"$'\n'
     ENTRY+="- ${MESSAGE}"$'\n'
