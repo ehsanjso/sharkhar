@@ -26,7 +26,9 @@ logging thoughts, progress, or debugging notes without opening an editor.
 echo "Long note" | ./devlog.sh                     # From stdin/pipe
 ./devlog.sh --dry-run "Test entry"                 # Preview only
 ./devlog.sh --list                                 # Show today's entries
+./devlog.sh --search "API"                         # Search today's file
 ./devlog.sh --yesterday "Forgot to log this"       # Add to yesterday's file
+./devlog.sh -y --search "bug"                      # Search yesterday's file
 ./devlog.sh --date 2026-02-08 "Historical note"    # Target specific date
 ./devlog.sh -D 2026-02-08 --list                   # View any date's entries
 ./devlog.sh --edit                                 # Open in $EDITOR
@@ -37,6 +39,9 @@ Notes are appended to `memory/YYYY-MM-DD.md` with timestamps.
 
 **Date targeting:** Use `-D`/`--date YYYY-MM-DD` to target any specific date.
 Overrides `--yesterday` if both are specified.
+
+**Search:** Use `-S`/`--search TERM` for case-insensitive grep within the target
+file. Combines with `-y`/`--date` to search any date's entries.
 
 **Bash alias:** After sourcing `~/.bashrc`, use `devlog` instead of `./devlog.sh`.
 Tab completion available for options and common section names.

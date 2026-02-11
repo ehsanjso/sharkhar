@@ -39,6 +39,8 @@ SECTION=""
 DRY_RUN=false
 LIST_MODE=false
 EDIT_MODE=false
+SEARCH_MODE=false
+SEARCH_TERM=""
 USE_YESTERDAY=false
 CUSTOM_DATE=""
 MESSAGE=""
@@ -53,6 +55,7 @@ Options:
   -s, --section NAME   Add section header (e.g., "Debug", "Work Log")
   -d, --dry-run        Preview without writing
   -l, --list           Show target date's entries
+  -S, --search TERM    Search entries in target file (case-insensitive)
   -y, --yesterday      Target yesterday's file instead of today
   -D, --date DATE      Target specific date (YYYY-MM-DD format)
   -e, --edit           Open target file in \$EDITOR
@@ -68,6 +71,8 @@ Examples:
   $(basename "$0") -y --edit           # Open yesterday's file in editor
   $(basename "$0") --date 2026-02-08 "Added to specific date"
   $(basename "$0") -D 2026-02-08 --list   # View entries from specific date
+  $(basename "$0") --search "API"          # Search today's file
+  $(basename "$0") -y --search "bug"       # Search yesterday's file
 
 Notes are appended to: ${MEMORY_DIR}/YYYY-MM-DD.md
 EOF
@@ -87,6 +92,11 @@ while [[ $# -gt 0 ]]; do
         -l|--list)
             LIST_MODE=true
             shift
+            ;;
+        -S|--search)
+            SEARCH_MODE=true
+            SEARCH_TERM="$2"
+            shift 2
             ;;
         -y|--yesterday)
             USE_YESTERDAY=true
@@ -161,6 +171,27 @@ if $LIST_MODE; then
         fi
         echo ""
         cat "$TARGET_FILE"
+    else
+        echo -e "${YELLOW}No entries for ${TARGET_DATE}${NC}"
+    fi
+    exit 0
+fi
+
+# Search mode - grep within target file
+if $SEARCH_MODE; then
+    if [[ -z "$SEARCH_TERM" ]]; then
+        echo -e "${RED}Error: Search term required${NC}" >&2
+        exit 1
+    fi
+    if [[ -f "$TARGET_FILE" ]]; then
+        echo -e "${CYAN}🔍 Searching '${SEARCH_TERM}' in ${TARGET_DATE}:${NC}"
+        echo ""
+        # Case-insensitive search with color highlighting
+        if grep -i --color=always "$SEARCH_TERM" "$TARGET_FILE"; then
+            :
+        else
+            echo -e "${YELLOW}No matches found for '${SEARCH_TERM}'${NC}"
+        fi
     else
         echo -e "${YELLOW}No entries for ${TARGET_DATE}${NC}"
     fi

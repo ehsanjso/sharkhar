@@ -7,7 +7,7 @@ _devlog_completions() {
     local prev="${COMP_WORDS[COMP_CWORD-1]}"
     
     # Options
-    local opts="-s --section -d --dry-run -l --list -y --yesterday -D --date -e --edit -h --help"
+    local opts="-s --section -d --dry-run -l --list -S --search -y --yesterday -D --date -e --edit -h --help"
     
     # Section suggestions after --section
     if [[ "$prev" == "-s" || "$prev" == "--section" ]]; then
