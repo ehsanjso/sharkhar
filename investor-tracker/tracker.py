@@ -3,9 +3,10 @@
 Investor Tracker - Track Congress and Hedge Fund Trades
 
 Usage:
-    python tracker.py fetch      # Fetch latest data
+    python tracker.py fetch      # Fetch Congress trades
     python tracker.py digest     # Generate daily digest
-    python tracker.py backtest   # Run backtests (TODO)
+    python tracker.py recommend  # Generate buy/sell recommendations
+    python tracker.py fund       # Fetch 13F summaries for hedge funds
 """
 
 import sys
@@ -14,8 +15,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 from database import init_db, insert_congress_trade, get_recent_trades, get_recent_fund_changes
-from fetchers import fetch_congress_trades_capitol, filter_notable_trades, fetch_13f_filings
-from config import CONGRESS_WATCHLIST, HEDGE_FUND_WATCHLIST
+from fetchers import fetch_congress_trades_capitol, filter_notable_trades, fetch_all_13f_summaries
+from config import CONGRESS_WATCHLIST
 
 
 def fetch_all_data():
@@ -203,28 +204,47 @@ def get_recommendations() -> dict:
 def main():
     if len(sys.argv) < 2:
         print(__doc__)
-        return
+        return 0
     
     command = sys.argv[1].lower()
     
-    if command == 'fetch':
-        fetch_all_data()
-    elif command == 'digest':
-        digest = generate_digest()
-        print()
-        print(digest)
-    elif command == 'recommend':
-        recs = get_recommendations()
-        print("\n🎯 BUY SIGNALS:")
-        for r in recs['buy'][:10]:
-            print(f"  {r['ticker']}: score={r['score']} (buys={r['buys']}, watchlist={r['watchlist_buys']})")
-        print("\n⚠️ SELL SIGNALS:")
-        for r in recs['sell'][:10]:
-            print(f"  {r['ticker']}: score={r['score']} (sells={r['sells']})")
-    else:
-        print(f"Unknown command: {command}")
-        print(__doc__)
+    try:
+        if command == 'fetch':
+            new_count = fetch_all_data()
+            return 0
+        elif command == 'digest':
+            digest = generate_digest()
+            print()
+            print(digest)
+            return 0
+        elif command == 'recommend':
+            recs = get_recommendations()
+            print("\n🎯 BUY SIGNALS:")
+            for r in recs['buy'][:10]:
+                print(f"  {r['ticker']}: score={r['score']} (buys={r['buys']}, watchlist={r['watchlist_buys']})")
+            print("\n⚠️ SELL SIGNALS:")
+            for r in recs['sell'][:10]:
+                print(f"  {r['ticker']}: score={r['score']} (sells={r['sells']})")
+            return 0
+        elif command == 'fund':
+            # Fetch 13F summaries for all watched hedge funds
+            print("Fetching 13F summaries...")
+            summaries = fetch_all_13f_summaries()
+            print(f"\nFetched {len(summaries)} fund summaries:")
+            for s in summaries:
+                print(f"  • {s['fund_name']}: {s['filing_date']} ({s['form']})")
+            return 0
+        else:
+            print(f"Unknown command: {command}")
+            print(__doc__)
+            return 1
+    except KeyboardInterrupt:
+        print("\n\nInterrupted by user")
+        return 130
+    except Exception as e:
+        print(f"\n❌ Error: {e}", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
