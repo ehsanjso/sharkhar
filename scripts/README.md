@@ -27,11 +27,16 @@ echo "Long note" | ./devlog.sh                     # From stdin/pipe
 ./devlog.sh --dry-run "Test entry"                 # Preview only
 ./devlog.sh --list                                 # Show today's entries
 ./devlog.sh --yesterday "Forgot to log this"       # Add to yesterday's file
+./devlog.sh --date 2026-02-08 "Historical note"    # Target specific date
+./devlog.sh -D 2026-02-08 --list                   # View any date's entries
 ./devlog.sh --edit                                 # Open in $EDITOR
 ./devlog.sh -y --list                              # View yesterday's entries
 ```
 
 Notes are appended to `memory/YYYY-MM-DD.md` with timestamps.
+
+**Date targeting:** Use `-D`/`--date YYYY-MM-DD` to target any specific date.
+Overrides `--yesterday` if both are specified.
 
 **Bash alias:** After sourcing `~/.bashrc`, use `devlog` instead of `./devlog.sh`.
 Tab completion available for options and common section names.
