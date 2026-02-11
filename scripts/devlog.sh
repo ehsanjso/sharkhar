@@ -44,6 +44,7 @@ SEARCH_TERM=""
 APPEND_MODE=false
 TAIL_COUNT=""
 COUNT_MODE=false
+WEEK_MODE=false
 USE_YESTERDAY=false
 CUSTOM_DATE=""
 MESSAGE=""
@@ -61,6 +62,7 @@ Options:
   -l, --list           Show target date's entries
   -t, --tail N         Show last N lines of target file
   -c, --count          Count entries (lines starting with -)
+  -w, --week           Show weekly summary (last 7 days)
   -S, --search TERM    Search entries in target file (case-insensitive)
   -y, --yesterday      Target yesterday's file instead of today
   -D, --date DATE      Target specific date (YYYY-MM-DD format)
@@ -82,6 +84,7 @@ Examples:
   $(basename "$0") -a -s "Debug" "More info"  # Append to existing Debug section
   $(basename "$0") --tail 10                   # Show last 10 lines
   $(basename "$0") --count                     # Count today's entries
+  $(basename "$0") --week                      # Weekly summary (last 7 days)
 
 Notes are appended to: ${MEMORY_DIR}/YYYY-MM-DD.md
 EOF
@@ -112,6 +115,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -c|--count)
             COUNT_MODE=true
+            shift
+            ;;
+        -w|--week)
+            WEEK_MODE=true
             shift
             ;;
         -S|--search)
@@ -224,6 +231,47 @@ if $COUNT_MODE; then
         echo -e "  ${GREEN}Sections:${NC} ${SECTION_COUNT}"
     else
         echo -e "${YELLOW}No entries for ${TARGET_DATE}${NC}"
+    fi
+    exit 0
+fi
+
+# Week mode - summarize last 7 days
+if $WEEK_MODE; then
+    echo -e "${CYAN}📊 Weekly Summary (last 7 days):${NC}"
+    echo ""
+    TOTAL_ENTRIES=0
+    TOTAL_SECTIONS=0
+    DAYS_WITH_ENTRIES=0
+    
+    for i in $(seq 0 6); do
+        DAY_DATE=$(date -d "$TODAY - $i days" '+%Y-%m-%d' 2>/dev/null || date -v-${i}d '+%Y-%m-%d')
+        DAY_FILE="${MEMORY_DIR}/${DAY_DATE}.md"
+        if [[ -f "$DAY_FILE" ]]; then
+            DAY_ENTRIES=$(grep -c "^- " "$DAY_FILE" 2>/dev/null || echo "0")
+            DAY_SECTIONS=$(grep -c "^## " "$DAY_FILE" 2>/dev/null || echo "0")
+            TOTAL_ENTRIES=$((TOTAL_ENTRIES + DAY_ENTRIES))
+            TOTAL_SECTIONS=$((TOTAL_SECTIONS + DAY_SECTIONS))
+            DAYS_WITH_ENTRIES=$((DAYS_WITH_ENTRIES + 1))
+            
+            # Format: date | entries | sections (or day name for recent)
+            if [[ $i -eq 0 ]]; then
+                DAY_LABEL="Today    "
+            elif [[ $i -eq 1 ]]; then
+                DAY_LABEL="Yesterday"
+            else
+                DAY_LABEL=$(date -d "$DAY_DATE" '+%a %m/%d' 2>/dev/null || date -j -f '%Y-%m-%d' "$DAY_DATE" '+%a %m/%d')
+            fi
+            echo -e "  ${DAY_LABEL}: ${GREEN}${DAY_ENTRIES}${NC} entries, ${DAY_SECTIONS} sections"
+        fi
+    done
+    
+    echo ""
+    echo -e "  ${BOLD}────────────────────────────${NC}"
+    echo -e "  ${BOLD}Total:${NC}    ${GREEN}${TOTAL_ENTRIES}${NC} entries, ${TOTAL_SECTIONS} sections"
+    echo -e "  ${BOLD}Active:${NC}   ${DAYS_WITH_ENTRIES}/7 days"
+    if [[ $DAYS_WITH_ENTRIES -gt 0 ]]; then
+        AVG_ENTRIES=$((TOTAL_ENTRIES / DAYS_WITH_ENTRIES))
+        echo -e "  ${BOLD}Average:${NC}  ${AVG_ENTRIES} entries/day"
     fi
     exit 0
 fi
