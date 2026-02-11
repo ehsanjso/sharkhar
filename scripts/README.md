@@ -30,6 +30,7 @@ echo "Long note" | ./devlog.sh                     # From stdin/pipe
 ./devlog.sh --tail 10                              # Show last 10 lines
 ./devlog.sh --count                                # Count entries/sections
 ./devlog.sh --week                                 # Weekly summary (last 7 days)
+./devlog.sh --month                                # Monthly summary (last 30 days)
 ./devlog.sh --yesterday "Forgot to log this"       # Add to yesterday's file
 ./devlog.sh -y --search "bug"                      # Search yesterday's file
 ./devlog.sh -y --tail 5                            # Last 5 lines of yesterday

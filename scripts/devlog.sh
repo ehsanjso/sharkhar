@@ -45,6 +45,7 @@ APPEND_MODE=false
 TAIL_COUNT=""
 COUNT_MODE=false
 WEEK_MODE=false
+MONTH_MODE=false
 USE_YESTERDAY=false
 CUSTOM_DATE=""
 MESSAGE=""
@@ -63,6 +64,7 @@ Options:
   -t, --tail N         Show last N lines of target file
   -c, --count          Count entries (lines starting with -)
   -w, --week           Show weekly summary (last 7 days)
+  -m, --month          Show monthly summary (last 30 days)
   -S, --search TERM    Search entries in target file (case-insensitive)
   -y, --yesterday      Target yesterday's file instead of today
   -D, --date DATE      Target specific date (YYYY-MM-DD format)
@@ -85,6 +87,7 @@ Examples:
   $(basename "$0") --tail 10                   # Show last 10 lines
   $(basename "$0") --count                     # Count today's entries
   $(basename "$0") --week                      # Weekly summary (last 7 days)
+  $(basename "$0") --month                     # Monthly summary (last 30 days)
 
 Notes are appended to: ${MEMORY_DIR}/YYYY-MM-DD.md
 EOF
@@ -119,6 +122,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -w|--week)
             WEEK_MODE=true
+            shift
+            ;;
+        -m|--month)
+            MONTH_MODE=true
             shift
             ;;
         -S|--search)
@@ -269,6 +276,63 @@ if $WEEK_MODE; then
     echo -e "  ${BOLD}────────────────────────────${NC}"
     echo -e "  ${BOLD}Total:${NC}    ${GREEN}${TOTAL_ENTRIES}${NC} entries, ${TOTAL_SECTIONS} sections"
     echo -e "  ${BOLD}Active:${NC}   ${DAYS_WITH_ENTRIES}/7 days"
+    if [[ $DAYS_WITH_ENTRIES -gt 0 ]]; then
+        AVG_ENTRIES=$((TOTAL_ENTRIES / DAYS_WITH_ENTRIES))
+        echo -e "  ${BOLD}Average:${NC}  ${AVG_ENTRIES} entries/day"
+    fi
+    exit 0
+fi
+
+# Month mode - summarize last 30 days (by week)
+if $MONTH_MODE; then
+    echo -e "${CYAN}📊 Monthly Summary (last 30 days):${NC}"
+    echo ""
+    
+    TOTAL_ENTRIES=0
+    TOTAL_SECTIONS=0
+    DAYS_WITH_ENTRIES=0
+    
+    # Group by week
+    for week in 0 1 2 3; do
+        WEEK_START=$((week * 7))
+        WEEK_END=$((WEEK_START + 6))
+        WEEK_ENTRIES=0
+        WEEK_SECTIONS=0
+        WEEK_DAYS=0
+        
+        for i in $(seq $WEEK_START $WEEK_END); do
+            [[ $i -ge 30 ]] && break
+            DAY_DATE=$(date -d "$TODAY - $i days" '+%Y-%m-%d' 2>/dev/null || date -v-${i}d '+%Y-%m-%d')
+            DAY_FILE="${MEMORY_DIR}/${DAY_DATE}.md"
+            if [[ -f "$DAY_FILE" ]]; then
+                DAY_ENTRIES=$(grep -c "^- " "$DAY_FILE" 2>/dev/null || echo "0")
+                DAY_SECTIONS=$(grep -c "^## " "$DAY_FILE" 2>/dev/null || echo "0")
+                WEEK_ENTRIES=$((WEEK_ENTRIES + DAY_ENTRIES))
+                WEEK_SECTIONS=$((WEEK_SECTIONS + DAY_SECTIONS))
+                WEEK_DAYS=$((WEEK_DAYS + 1))
+                TOTAL_ENTRIES=$((TOTAL_ENTRIES + DAY_ENTRIES))
+                TOTAL_SECTIONS=$((TOTAL_SECTIONS + DAY_SECTIONS))
+                DAYS_WITH_ENTRIES=$((DAYS_WITH_ENTRIES + 1))
+            fi
+        done
+        
+        if [[ $week -eq 0 ]]; then
+            WEEK_LABEL="This week    "
+        elif [[ $week -eq 1 ]]; then
+            WEEK_LABEL="Last week    "
+        else
+            WEEK_LABEL="$((week+1)) weeks ago "
+        fi
+        
+        if [[ $WEEK_DAYS -gt 0 ]]; then
+            echo -e "  ${WEEK_LABEL}: ${GREEN}${WEEK_ENTRIES}${NC} entries (${WEEK_DAYS} days)"
+        fi
+    done
+    
+    echo ""
+    echo -e "  ${BOLD}────────────────────────────${NC}"
+    echo -e "  ${BOLD}Total:${NC}    ${GREEN}${TOTAL_ENTRIES}${NC} entries, ${TOTAL_SECTIONS} sections"
+    echo -e "  ${BOLD}Active:${NC}   ${DAYS_WITH_ENTRIES}/30 days"
     if [[ $DAYS_WITH_ENTRIES -gt 0 ]]; then
         AVG_ENTRIES=$((TOTAL_ENTRIES / DAYS_WITH_ENTRIES))
         echo -e "  ${BOLD}Average:${NC}  ${AVG_ENTRIES} entries/day"
