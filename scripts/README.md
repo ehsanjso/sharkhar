@@ -28,6 +28,7 @@ echo "Long note" | ./devlog.sh                     # From stdin/pipe
 ./devlog.sh --list                                 # Show today's entries
 ./devlog.sh --search "API"                         # Search today's file
 ./devlog.sh --tail 10                              # Show last 10 lines
+./devlog.sh --count                                # Count entries/sections
 ./devlog.sh --yesterday "Forgot to log this"       # Add to yesterday's file
 ./devlog.sh -y --search "bug"                      # Search yesterday's file
 ./devlog.sh -y --tail 5                            # Last 5 lines of yesterday
@@ -48,6 +49,9 @@ file. Combines with `-y`/`--date` to search any date's entries.
 **Append to section:** Use `-a`/`--append` with `--section` to add entries to an
 existing section instead of creating a new one. If the section doesn't exist, it
 creates a new section normally.
+
+**Stats:** Use `-c`/`--count` to get a quick summary of entries and sections for
+a given date.
 
 **Bash alias:** After sourcing `~/.bashrc`, use `devlog` instead of `./devlog.sh`.
 Tab completion available for options and common section names.

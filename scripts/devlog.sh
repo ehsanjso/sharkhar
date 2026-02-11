@@ -43,6 +43,7 @@ SEARCH_MODE=false
 SEARCH_TERM=""
 APPEND_MODE=false
 TAIL_COUNT=""
+COUNT_MODE=false
 USE_YESTERDAY=false
 CUSTOM_DATE=""
 MESSAGE=""
@@ -59,6 +60,7 @@ Options:
   -d, --dry-run        Preview without writing
   -l, --list           Show target date's entries
   -t, --tail N         Show last N lines of target file
+  -c, --count          Count entries (lines starting with -)
   -S, --search TERM    Search entries in target file (case-insensitive)
   -y, --yesterday      Target yesterday's file instead of today
   -D, --date DATE      Target specific date (YYYY-MM-DD format)
@@ -79,6 +81,7 @@ Examples:
   $(basename "$0") -y --search "bug"       # Search yesterday's file
   $(basename "$0") -a -s "Debug" "More info"  # Append to existing Debug section
   $(basename "$0") --tail 10                   # Show last 10 lines
+  $(basename "$0") --count                     # Count today's entries
 
 Notes are appended to: ${MEMORY_DIR}/YYYY-MM-DD.md
 EOF
@@ -106,6 +109,10 @@ while [[ $# -gt 0 ]]; do
         -t|--tail)
             TAIL_COUNT="$2"
             shift 2
+            ;;
+        -c|--count)
+            COUNT_MODE=true
+            shift
             ;;
         -S|--search)
             SEARCH_MODE=true
@@ -201,6 +208,20 @@ if [[ -n "$TAIL_COUNT" ]]; then
         echo -e "${CYAN}📝 Last ${TAIL_COUNT} lines of ${TARGET_DATE}:${NC}"
         echo ""
         tail -n "$TAIL_COUNT" "$TARGET_FILE"
+    else
+        echo -e "${YELLOW}No entries for ${TARGET_DATE}${NC}"
+    fi
+    exit 0
+fi
+
+# Count mode - count entries (lines starting with -)
+if $COUNT_MODE; then
+    if [[ -f "$TARGET_FILE" ]]; then
+        ENTRY_COUNT=$(grep -c "^- " "$TARGET_FILE" 2>/dev/null || echo "0")
+        SECTION_COUNT=$(grep -c "^## " "$TARGET_FILE" 2>/dev/null || echo "0")
+        echo -e "${CYAN}📊 ${TARGET_DATE} stats:${NC}"
+        echo -e "  ${GREEN}Entries:${NC}  ${ENTRY_COUNT}"
+        echo -e "  ${GREEN}Sections:${NC} ${SECTION_COUNT}"
     else
         echo -e "${YELLOW}No entries for ${TARGET_DATE}${NC}"
     fi
