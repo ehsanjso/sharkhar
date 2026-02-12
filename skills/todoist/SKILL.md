@@ -12,6 +12,23 @@ metadata:
 
 # Todoist CLI
 
+## When to Use
+- **Todoist app users** (syncs with Todoist cloud)
+- **Cross-device task sync** (phone, desktop, web)
+- **Project-based organization** with labels
+- **Natural language due dates** ("tomorrow 10am", "every monday")
+- User explicitly mentions "Todoist" or wants cloud-synced tasks
+
+## When NOT to Use
+- **Daily standups/weekly reviews** → Use `task-tracker` (has standup format)
+- **Local-only tasks** (no sync needed) → Use `task-tracker`
+- **Meeting notes extraction** → Use `task-tracker`
+- **Team issues** (Linear, GitHub) → Use `linear` or `github`
+- **Calendar events** → Use `google-calendar`
+- **No TODOIST_API_TOKEN configured** → Use `task-tracker` instead
+
+---
+
 CLI for Todoist task management, built on the official TypeScript SDK.
 
 ## Installation

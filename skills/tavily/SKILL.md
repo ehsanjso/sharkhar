@@ -5,6 +5,23 @@ description: AI-optimized web search using Tavily Search API. Use when you need 
 
 # Tavily AI Search
 
+## When to Use
+- General research queries ("What is X?", "Explain Y", "How does Z work?")
+- Fact-checking and verification
+- Current events and news lookup
+- Need an **AI-generated summary** synthesized from multiple sources
+- Domain-filtered research (only search specific sites)
+- Quick factual answers with source citations
+
+## When NOT to Use
+- **Searching for people/LinkedIn profiles** → Use `exa-plus` (has `CATEGORY=people`)
+- **Finding companies or startups** → Use `exa-plus` (has `CATEGORY=company`)
+- **Academic research papers** → Use `exa-plus` (has `CATEGORY=research paper`) or `arxiv-watcher`
+- **GitHub repos or code** → Use `exa-plus` (has `CATEGORY=github`)
+- **Financial reports** → Use `exa-plus` (has `CATEGORY=financial report`)
+- **Stock prices/fundamentals** → Use `yahoo-finance` skill
+- **ArXiv-specific papers** → Use `arxiv-watcher` skill
+
 ## Overview
 
 Tavily is a search engine specifically optimized for Large Language Models and AI applications. Unlike traditional search APIs, Tavily provides AI-ready results with optional answer generation, clean content extraction, and domain filtering capabilities.

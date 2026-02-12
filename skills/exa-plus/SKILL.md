@@ -9,6 +9,25 @@ metadata: {"clawdbot":{"emoji":"🧠","requires":{"bins":["curl","jq"]}}}
 
 Powerful AI-powered search with LinkedIn, news, research papers, and more.
 
+## When to Use
+- **Finding people** (LinkedIn profiles, bios, contact info) → `CATEGORY=people`
+- **Finding companies/startups** → `CATEGORY=company`
+- **Research papers** (not ArXiv-specific) → `CATEGORY=research paper`
+- **GitHub repos/code** → `CATEGORY=github`
+- **Tweets/social media** → `CATEGORY=tweet`
+- **Financial reports** → `CATEGORY=financial report`
+- **PDF documents** → `CATEGORY=pdf`
+- **Semantic/neural search** (finds conceptually similar results, not just keyword matches)
+- **Date-range filtered searches** (e.g., "news from last month")
+
+## When NOT to Use
+- **General fact-finding with AI summary** → Use `tavily` (has AI answer generation)
+- **Quick factual questions** ("What is X?") → Use `tavily`
+- **ArXiv papers specifically** → Use `arxiv-watcher` skill
+- **Stock prices, fundamentals, options** → Use `yahoo-finance` skill
+- **Current weather** → Use `weather` skill
+- **Movie/TV info** → Use `tmdb` skill
+
 ## Setup
 
 Create `~/.clawdbot/credentials/exa/config.json`:

@@ -5,6 +5,22 @@ homepage: https://github.com/kesslerio/task-tracker-clawdbot-skill
 metadata: {"clawdbot":{"emoji":"📋","requires":{"files":["~/clawd/memory/work/TASKS.md"]},"install":[{"id":"init","kind":"script","script":"python3 scripts/init.py","label":"Initialize TASKS.md from template"}]}}
 ---
 
+## When to Use
+- **Daily standup** summaries ("what's on my plate?", "standup")
+- **Weekly reviews** ("what did I do last week?")
+- **Blocker tracking** and priority management
+- **Extract tasks from meeting notes**
+- **Local/offline task management** (no external service)
+- User prefers tasks in **markdown files** (TASKS.md)
+
+## When NOT to Use
+- **Syncing tasks across devices** → Use `todoist` (cloud sync)
+- **Todoist app users** → Use `todoist` skill
+- **Team/project issues** (Linear, GitHub) → Use `linear` or `github`
+- **Calendar events/meetings** → Use `google-calendar`
+
+---
+
 <div align="center">
 
 ![Task Tracker](https://img.shields.io/badge/Task_Tracker-Clawdbot_skill-blue?style=for-the-badge&logo=checklist)

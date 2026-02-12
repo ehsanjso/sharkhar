@@ -9,6 +9,21 @@ metadata: {"clawdis":{"emoji":"📊","requires":{"env":["LINEAR_API_KEY"]}}}
 
 Manage issues, check project status, and stay on top of your team's work.
 
+## When to Use
+- **Linear app issues** (create, update, comment, change status)
+- **Team project management** in Linear
+- **Standup summaries** from Linear data
+- **Issue priorities** (urgent/high/medium/low)
+- **Workflow status** (todo/progress/review/done/blocked)
+- User mentions "Linear", "my issues", "standup", or Linear issue IDs (e.g., "TEAM-123")
+
+## When NOT to Use
+- **GitHub issues or PRs** → Use `github` skill
+- **CI/CD, workflow runs, GitHub Actions** → Use `github` skill
+- **Code reviews, PR checks** → Use `github` skill
+- **Personal to-do lists** (not team/project) → Use `task-tracker` or `todoist`
+- **Finding companies or people** → Use `exa-plus`
+
 ## Setup
 
 ```bash

@@ -5,6 +5,24 @@ description: Get stock prices, quotes, fundamentals, earnings, options, dividend
 
 # Yahoo Finance CLI
 
+## When to Use
+- **Quick price checks** ("What's AAPL trading at?")
+- **Fundamental data** (PE ratio, EPS, market cap, margins)
+- **Earnings info** (next earnings date, EPS estimates, history)
+- **Options chains** (strike, bid/ask, volume, IV)
+- **Dividends** (yield, ex-date, payout ratio)
+- **Analyst ratings** (buy/hold/sell distribution)
+- **Historical data** (price history for charting)
+- **Comparing multiple tickers** side-by-side
+- **Any ticker type:** US stocks, Indian NSE/BSE, crypto, forex, ETFs
+
+## When NOT to Use
+- **AI-synthesized analysis with news sentiment** → Use `financial-market-analysis` (has intelligent news synthesis)
+- **Investment ratings with reasoning** → Use `financial-market-analysis` (provides Buy/Hold/Sell with context)
+- **Company research/discovery** → Use `exa-plus` with `CATEGORY=company`
+- **Financial reports (10-K, earnings calls)** → Use `exa-plus` with `CATEGORY=financial report`
+- **General market news** → Use `tavily` with `--topic news`
+
 A Python CLI for fetching comprehensive stock data from Yahoo Finance using yfinance.
 
 ## Requirements

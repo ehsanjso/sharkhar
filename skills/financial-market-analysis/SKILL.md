@@ -5,6 +5,23 @@ description: "Precision Financial Insights - Analyze stocks, companies, and mark
 
 # Financial Market Analysis Agent
 
+## When to Use
+- **AI-synthesized market analysis** (combines price data + news + sentiment)
+- **Investment recommendations** (Buy/Hold/Sell with reasoning)
+- **News sentiment analysis** for a stock or company
+- **Comprehensive research reports** that synthesize multiple data sources
+- **Tracking analysis over time** (Firebase persistence)
+- **When you need "why" not just "what"** (interpretation, not raw data)
+
+## When NOT to Use
+- **Quick price checks** → Use `yahoo-finance` (free, instant)
+- **Raw fundamentals** (PE, EPS, margins) → Use `yahoo-finance`
+- **Options chains** → Use `yahoo-finance`
+- **Dividend data** → Use `yahoo-finance`
+- **Historical price data** → Use `yahoo-finance`
+- **Comparing multiple tickers** → Use `yahoo-finance`
+- **No CRAFTED_API_KEY configured** → Use `yahoo-finance` instead
+
 > "In the world of finance, data isn't just information; it's the substrate of precision execution."
 
 Stop relying on fragmented reports and manual research. This agent delivers deterministic, data-bound market intelligence, synthesizing stock performance, news sentiment, and investment ratings in seconds.
