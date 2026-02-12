@@ -1,6 +1,6 @@
 # 🧠 Long-term Memory
 
-*Last updated: 2026-02-10*
+*Last updated: 2026-02-12*
 
 ## About Ehsan
 
@@ -28,9 +28,35 @@
 
 **Research:** `memory/research/2026-02-06-raspberry-pi-5-thermal-management.md`
 
+### No Web Search APIs Configured
+**Status:** Brave, Tavily, and Exa search APIs all missing keys
+- Limits research capabilities to what's cached/known
+- Can't proactively scan AI news, check prices, or verify current info
+- **Fix:** Run `clawdbot configure --section web` or set BRAVE_API_KEY / TAVILY_API_KEY / EXA_API_KEY
+
 ---
 
 ## Our Projects
+
+### Komod AI (Wardrobe App) — Active Feb 2026
+
+Mobile wardrobe management app with AI features.
+
+**Stack:** React Native (Expo), TypeScript
+**Location:** `/projects/komod-ai`
+**Dev server:** Port 3002 (`npx expo start --web --port 3002 --host lan`)
+
+**Recent work (Feb 12):**
+- Wardrobe cards with favorite hearts + quick actions (long-press menu)
+- Item detail with sticky CTA bar + gradient blur
+- 3-screen onboarding flow (value-first)
+- Completion animations (worn checkmark, washed droplets, heart pulse + particles)
+- PWA support (manifest.json, service worker)
+- UI audit: removed duplicate headers, fixed spacing
+
+**Design research:** Airbnb UX patterns, Whering app (competitor) via Mobbin
+
+**⚠️ Pi limitation:** `npx expo export -p web` OOMs at ~88% — use external machine for web builds
 
 ### Uptime Kuma (Service Monitoring)
 
@@ -238,6 +264,19 @@ The Agent Dashboard helps me wake up each session knowing what happened.
 - **Pi-hole + Tailscale** — DNS filtering works on cellular too
 - **Enables:** Mission Control on phone, Uptime Kuma on-the-go, SSH without port forwarding
 - Research: `memory/research/2026-02-09-tailscale-secure-remote-access.md`
+
+### Prometheus + Grafana Observability (Researched Feb 11)
+- **Completes observability triad:** Uptime Kuma (availability) + Prometheus (performance trends)
+- **Low footprint:** ~200-400MB RAM total for full stack
+- **Architecture:** node_exporter (9100) → Prometheus (9090) → Grafana (3000)
+- **hwmon collector** exposes Pi thermal sensor for temp monitoring
+- **Dashboard 1860** — "Node Exporter Full" for instant comprehensive view
+- **PromQL** — Correlate temp vs CPU freq vs time (when does throttling happen?)
+- **Setup time:** ~30 minutes from zero to dashboards
+- **Integration:** Add `grafana.home` to Caddy, embed panels in Mission Control
+- Research: `memory/research/2026-02-11-prometheus-grafana-pi-monitoring.md`
+
+---
 
 ### 🐛 Ralph Wiggum Approach (ALWAYS use for coding!)
 
