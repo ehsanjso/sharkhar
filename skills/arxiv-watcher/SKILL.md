@@ -7,6 +7,19 @@ description: Search and summarize papers from ArXiv. Use when the user asks for 
 
 This skill interacts with the ArXiv API to find and summarize the latest research papers.
 
+## When to Use
+- **ArXiv-specific searches** (user mentions "ArXiv" or wants preprints)
+- **Latest AI/ML research papers** (daily summaries, recent papers)
+- **Finding papers by ArXiv ID** (e.g., "2512.08769")
+- **Summarizing paper abstracts**
+- **Tracking research** (auto-logs to RESEARCH_LOG.md)
+
+## When NOT to Use
+- **General research papers** (not ArXiv-specific) → Use `exa-plus` with `CATEGORY=research paper`
+- **Published journal articles** → Use `exa-plus`
+- **General research questions** → Use `tavily`
+- **Finding researchers/people** → Use `exa-plus` with `CATEGORY=people`
+
 ## Capabilities
 
 - **Search**: Find papers by keyword, author, or category.

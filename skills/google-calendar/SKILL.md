@@ -7,6 +7,19 @@ description: Manage Google Calendar events - create, list, update, and delete ev
 
 Manage calendar events via Google Calendar API.
 
+## When to Use
+- **Check schedule** ("what's on my calendar?", "am I free tomorrow?")
+- **Create calendar events** (meetings, appointments, reminders)
+- **Update or delete events**
+- **Find free time slots**
+- User mentions "calendar", "meeting", "schedule", or specific dates/times
+
+## When NOT to Use
+- **Task/to-do management** → Use `task-tracker` or `todoist`
+- **Project issues/tickets** → Use `linear` or `github`
+- **Reminders without calendar entry** → Use Clawdbot's `cron` tool
+- **Time zone conversions** → Just ask (no skill needed)
+
 ## Setup (OAuth2)
 
 1. Create project: https://console.cloud.google.com

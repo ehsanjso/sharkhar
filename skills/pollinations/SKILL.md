@@ -7,6 +7,22 @@ description: Pollinations.ai API for AI generation - text, images, videos, audio
 
 Unified AI platform for text, images, videos, and audio generation with 25+ models.
 
+## When to Use
+- **Image generation** ("create an image of...", "generate a picture")
+- **Video generation** (AI-generated video clips)
+- **Audio generation** (music, sound effects)
+- **Vision/image analysis** (describe what's in an image)
+- **Transcription** (audio to text)
+- **Multi-model text generation** (access to 25+ LLMs)
+- User mentions "Pollinations" or wants **free API** generation
+
+## When NOT to Use
+- **Web search** → Use `tavily` or `exa-plus`
+- **Stock images/photos** → Use web search for stock photo sites
+- **YouTube transcripts** → Use `youtube-summarizer`
+- **Text-to-speech** (voice output) → Use Clawdbot's built-in `tts` tool
+- **Local speech-to-text** → Use `openai-whisper` skill
+
 ## API Key
 
 Get free or paid keys at https://enter.pollinations.ai

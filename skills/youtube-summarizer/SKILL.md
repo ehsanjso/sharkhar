@@ -17,6 +17,13 @@ Activate this skill when:
 - User asks to summarize or transcribe a YouTube video
 - User requests information about a YouTube video's content
 
+## When NOT to Use
+- **Local audio/video files** → Use `openai-whisper` for transcription
+- **Non-YouTube videos** (Vimeo, etc.) → Use `web_fetch` or browser
+- **Searching for YouTube videos** → Use `tavily` or `exa-plus`
+- **Movie/TV info** → Use `tmdb` skill
+- **Creating videos** → Use `remotion-best-practices` or `pollinations`
+
 ## Dependencies
 
 **Required:** MCP YouTube Transcript server must be installed at:
