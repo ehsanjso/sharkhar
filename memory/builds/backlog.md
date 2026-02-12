@@ -11,10 +11,15 @@ Priority queue of tasks for automated sessions. Pick from top.
 **Goal:** Improve skill routing by adding "When to use / When NOT to use" blocks
 
 **Skills to audit:**
-- [ ] tavily vs exa-plus (both are "search" - need differentiation)
-- [ ] github vs linear (both are "project management")
-- [ ] yahoo-finance vs financial-market-analysis
-- [ ] All other skills in ~/clawd/skills/
+- [x] tavily vs exa-plus (both are "search" - need differentiation) ✅
+- [x] github vs linear (both are "project management") ✅
+- [x] yahoo-finance vs financial-market-analysis ✅
+- [x] task-tracker vs todoist ✅
+- [x] arxiv-watcher (vs exa-plus research paper) ✅
+- [x] pollinations (image generation) ✅
+- [x] youtube-summarizer ✅
+- [x] google-calendar ✅
+- [ ] Remaining skills in ~/clawd/skills/ (lower priority)
 
 **Template to add to each SKILL.md:**
 ```markdown
