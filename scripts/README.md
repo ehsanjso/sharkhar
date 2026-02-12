@@ -49,6 +49,26 @@ date headers. Great for weekly reviews and project tracking.
 
 Notes are appended to `memory/YYYY-MM-DD.md` with timestamps.
 
+### weekly-report.sh
+Wrapper around devlog.sh for generating formatted weekly summaries. Perfect for
+standups, retrospectives, or exporting reports.
+
+```bash
+./weekly-report.sh              # This week's report
+./weekly-report.sh --last       # Last week's report
+./weekly-report.sh --offset 2   # 2 weeks ago
+./weekly-report.sh --summary    # Stats only (no entries)
+./weekly-report.sh -s "API"     # Filter entries by keyword
+./weekly-report.sh -m > report.md  # Export as markdown
+```
+
+**Options:**
+- `-l, --last` - Last week (shortcut for --offset 1)
+- `-o, --offset N` - Go back N weeks
+- `-s, --search TERM` - Filter entries by term
+- `--summary` - Stats only, skip full entries
+- `-m, --markdown` - Markdown output for sharing
+
 **Date targeting:** Use `-D`/`--date YYYY-MM-DD` to target any specific date.
 Overrides `--yesterday` if both are specified.
 
