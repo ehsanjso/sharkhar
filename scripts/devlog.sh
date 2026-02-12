@@ -48,6 +48,8 @@ WEEK_MODE=false
 MONTH_MODE=false
 USE_YESTERDAY=false
 CUSTOM_DATE=""
+RANGE_START=""
+RANGE_END=""
 MESSAGE=""
 
 usage() {
@@ -65,6 +67,7 @@ Options:
   -c, --count          Count entries (lines starting with -)
   -w, --week           Show weekly summary (last 7 days)
   -m, --month          Show monthly summary (last 30 days)
+  -R, --range START END  Process date range (use with --list, --search, --count)
   -S, --search TERM    Search entries in target file (case-insensitive)
   -y, --yesterday      Target yesterday's file instead of today
   -D, --date DATE      Target specific date (YYYY-MM-DD format)
@@ -88,6 +91,9 @@ Examples:
   $(basename "$0") --count                     # Count today's entries
   $(basename "$0") --week                      # Weekly summary (last 7 days)
   $(basename "$0") --month                     # Monthly summary (last 30 days)
+  $(basename "$0") --range 2026-02-08 2026-02-11 --list    # Entries across range
+  $(basename "$0") -R 2026-02-08 2026-02-11 --search "API" # Search across range
+  $(basename "$0") --range 2026-02-08 2026-02-11 --count   # Stats across range
 
 Notes are appended to: ${MEMORY_DIR}/YYYY-MM-DD.md
 EOF
@@ -127,6 +133,11 @@ while [[ $# -gt 0 ]]; do
         -m|--month)
             MONTH_MODE=true
             shift
+            ;;
+        -R|--range)
+            RANGE_START="$2"
+            RANGE_END="$3"
+            shift 3
             ;;
         -S|--search)
             SEARCH_MODE=true
@@ -179,6 +190,40 @@ if [[ -n "$CUSTOM_DATE" ]]; then
     TARGET_FILE="${MEMORY_DIR}/${CUSTOM_DATE}.md"
 fi
 
+# Validate --range arguments
+if [[ -n "$RANGE_START" || -n "$RANGE_END" ]]; then
+    # Both must be provided
+    if [[ -z "$RANGE_START" || -z "$RANGE_END" ]]; then
+        echo -e "${RED}Error: --range requires both START and END dates${NC}" >&2
+        exit 1
+    fi
+    # Validate format
+    if [[ ! "$RANGE_START" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+        echo -e "${RED}Error: Invalid start date format. Use YYYY-MM-DD${NC}" >&2
+        exit 1
+    fi
+    if [[ ! "$RANGE_END" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+        echo -e "${RED}Error: Invalid end date format. Use YYYY-MM-DD${NC}" >&2
+        exit 1
+    fi
+    # Validate dates are real
+    if ! date -d "$RANGE_START" >/dev/null 2>&1; then
+        echo -e "${RED}Error: Invalid start date: ${RANGE_START}${NC}" >&2
+        exit 1
+    fi
+    if ! date -d "$RANGE_END" >/dev/null 2>&1; then
+        echo -e "${RED}Error: Invalid end date: ${RANGE_END}${NC}" >&2
+        exit 1
+    fi
+    # Check START <= END
+    START_EPOCH=$(date -d "$RANGE_START" +%s)
+    END_EPOCH=$(date -d "$RANGE_END" +%s)
+    if [[ $START_EPOCH -gt $END_EPOCH ]]; then
+        echo -e "${RED}Error: Start date must be before or equal to end date${NC}" >&2
+        exit 1
+    fi
+fi
+
 # Edit mode - open in $EDITOR
 if $EDIT_MODE; then
     EDITOR="${EDITOR:-nano}"
@@ -194,8 +239,34 @@ EOF
     exec "$EDITOR" "$TARGET_FILE"
 fi
 
-# List mode - show entries for target date
+# List mode - show entries for target date (or range)
 if $LIST_MODE; then
+    # Range mode - iterate through dates
+    if [[ -n "$RANGE_START" ]]; then
+        echo -e "${CYAN}📝 Entries from ${RANGE_START} to ${RANGE_END}:${NC}"
+        echo ""
+        FOUND_ANY=false
+        CURRENT_DATE="$RANGE_START"
+        END_EPOCH=$(date -d "$RANGE_END" +%s)
+        while true; do
+            CURRENT_EPOCH=$(date -d "$CURRENT_DATE" +%s)
+            [[ $CURRENT_EPOCH -gt $END_EPOCH ]] && break
+            CURRENT_FILE="${MEMORY_DIR}/${CURRENT_DATE}.md"
+            if [[ -f "$CURRENT_FILE" ]]; then
+                FOUND_ANY=true
+                echo -e "${BOLD}${BLUE}═══ ${CURRENT_DATE} ═══${NC}"
+                cat "$CURRENT_FILE"
+                echo ""
+            fi
+            # Increment date by 1 day
+            CURRENT_DATE=$(date -d "$CURRENT_DATE + 1 day" '+%Y-%m-%d' 2>/dev/null || date -j -v+1d -f '%Y-%m-%d' "$CURRENT_DATE" '+%Y-%m-%d')
+        done
+        if ! $FOUND_ANY; then
+            echo -e "${YELLOW}No entries found in range${NC}"
+        fi
+        exit 0
+    fi
+    # Single date mode
     if [[ -f "$TARGET_FILE" ]]; then
         if [[ -n "$CUSTOM_DATE" ]]; then
             echo -e "${CYAN}📝 Entries for ${TARGET_DATE}:${NC}"
@@ -230,6 +301,40 @@ fi
 
 # Count mode - count entries (lines starting with -)
 if $COUNT_MODE; then
+    # Range mode - count across multiple dates
+    if [[ -n "$RANGE_START" ]]; then
+        echo -e "${CYAN}📊 Stats from ${RANGE_START} to ${RANGE_END}:${NC}"
+        echo ""
+        TOTAL_ENTRIES=0
+        TOTAL_SECTIONS=0
+        DAYS_WITH_ENTRIES=0
+        CURRENT_DATE="$RANGE_START"
+        END_EPOCH=$(date -d "$RANGE_END" +%s)
+        while true; do
+            CURRENT_EPOCH=$(date -d "$CURRENT_DATE" +%s)
+            [[ $CURRENT_EPOCH -gt $END_EPOCH ]] && break
+            CURRENT_FILE="${MEMORY_DIR}/${CURRENT_DATE}.md"
+            if [[ -f "$CURRENT_FILE" ]]; then
+                DAY_ENTRIES=$(grep -c "^- " "$CURRENT_FILE" 2>/dev/null || echo "0")
+                DAY_SECTIONS=$(grep -c "^## " "$CURRENT_FILE" 2>/dev/null || echo "0")
+                TOTAL_ENTRIES=$((TOTAL_ENTRIES + DAY_ENTRIES))
+                TOTAL_SECTIONS=$((TOTAL_SECTIONS + DAY_SECTIONS))
+                DAYS_WITH_ENTRIES=$((DAYS_WITH_ENTRIES + 1))
+                echo -e "  ${CURRENT_DATE}: ${GREEN}${DAY_ENTRIES}${NC} entries, ${DAY_SECTIONS} sections"
+            fi
+            CURRENT_DATE=$(date -d "$CURRENT_DATE + 1 day" '+%Y-%m-%d' 2>/dev/null || date -j -v+1d -f '%Y-%m-%d' "$CURRENT_DATE" '+%Y-%m-%d')
+        done
+        echo ""
+        echo -e "  ${BOLD}────────────────────────────${NC}"
+        echo -e "  ${BOLD}Total:${NC}    ${GREEN}${TOTAL_ENTRIES}${NC} entries, ${TOTAL_SECTIONS} sections"
+        echo -e "  ${BOLD}Active:${NC}   ${DAYS_WITH_ENTRIES} days"
+        if [[ $DAYS_WITH_ENTRIES -gt 0 ]]; then
+            AVG_ENTRIES=$((TOTAL_ENTRIES / DAYS_WITH_ENTRIES))
+            echo -e "  ${BOLD}Average:${NC}  ${AVG_ENTRIES} entries/day"
+        fi
+        exit 0
+    fi
+    # Single date mode
     if [[ -f "$TARGET_FILE" ]]; then
         ENTRY_COUNT=$(grep -c "^- " "$TARGET_FILE" 2>/dev/null || echo "0")
         SECTION_COUNT=$(grep -c "^## " "$TARGET_FILE" 2>/dev/null || echo "0")
@@ -340,12 +445,40 @@ if $MONTH_MODE; then
     exit 0
 fi
 
-# Search mode - grep within target file
+# Search mode - grep within target file (or range)
 if $SEARCH_MODE; then
     if [[ -z "$SEARCH_TERM" ]]; then
         echo -e "${RED}Error: Search term required${NC}" >&2
         exit 1
     fi
+    # Range mode - search across multiple dates
+    if [[ -n "$RANGE_START" ]]; then
+        echo -e "${CYAN}🔍 Searching '${SEARCH_TERM}' from ${RANGE_START} to ${RANGE_END}:${NC}"
+        echo ""
+        FOUND_ANY=false
+        CURRENT_DATE="$RANGE_START"
+        END_EPOCH=$(date -d "$RANGE_END" +%s)
+        while true; do
+            CURRENT_EPOCH=$(date -d "$CURRENT_DATE" +%s)
+            [[ $CURRENT_EPOCH -gt $END_EPOCH ]] && break
+            CURRENT_FILE="${MEMORY_DIR}/${CURRENT_DATE}.md"
+            if [[ -f "$CURRENT_FILE" ]]; then
+                # Check if file has matches first
+                if grep -qi "$SEARCH_TERM" "$CURRENT_FILE" 2>/dev/null; then
+                    FOUND_ANY=true
+                    echo -e "${BOLD}${BLUE}═══ ${CURRENT_DATE} ═══${NC}"
+                    grep -i --color=always "$SEARCH_TERM" "$CURRENT_FILE"
+                    echo ""
+                fi
+            fi
+            CURRENT_DATE=$(date -d "$CURRENT_DATE + 1 day" '+%Y-%m-%d' 2>/dev/null || date -j -v+1d -f '%Y-%m-%d' "$CURRENT_DATE" '+%Y-%m-%d')
+        done
+        if ! $FOUND_ANY; then
+            echo -e "${YELLOW}No matches found for '${SEARCH_TERM}' in range${NC}"
+        fi
+        exit 0
+    fi
+    # Single date mode
     if [[ -f "$TARGET_FILE" ]]; then
         echo -e "${CYAN}🔍 Searching '${SEARCH_TERM}' in ${TARGET_DATE}:${NC}"
         echo ""

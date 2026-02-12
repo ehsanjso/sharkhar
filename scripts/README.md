@@ -38,7 +38,14 @@ echo "Long note" | ./devlog.sh                     # From stdin/pipe
 ./devlog.sh -D 2026-02-08 --list                   # View any date's entries
 ./devlog.sh --edit                                 # Open in $EDITOR
 ./devlog.sh -y --list                              # View yesterday's entries
+./devlog.sh --range 2026-02-08 2026-02-11 --list   # Entries across date range
+./devlog.sh -R 2026-02-08 2026-02-11 --search "API" # Search across range
+./devlog.sh --range 2026-02-08 2026-02-11 --count  # Stats across range
 ```
+
+**Range queries:** Use `-R`/`--range START END` with `--list`, `--search`, or
+`--count` to process multiple dates. Shows entries from all dates in range with
+date headers. Great for weekly reviews and project tracking.
 
 Notes are appended to `memory/YYYY-MM-DD.md` with timestamps.
 
