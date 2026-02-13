@@ -161,6 +161,8 @@ connectivity issues. Checks gateway process, websocket, cron jobs, sessions, and
 ./gateway-health.sh --json       # JSON output (for scripts/cron)
 ./gateway-health.sh --quick      # Skip slow checks (websocket ping)
 ./gateway-health.sh --verbose    # Show more detail
+./gateway-health.sh --watch      # Live monitoring (5s refresh)
+./gateway-health.sh --watch 10   # Live monitoring (custom interval)
 ./gateway-health.sh --help       # Show full usage
 ```
 
