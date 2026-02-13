@@ -532,5 +532,45 @@
     "total_value": 33.699999999999996,
     "pnl": -18.740000000000002,
     "timestamp": "2026-02-12T11:00:04.883152+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 33.699999999999996,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-12T17:00:04.452613+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 33.699999999999996,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-12T23:00:06.281107+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 33.699999999999996,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-13T05:00:09.436681+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 33.699999999999996,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-13T11:00:04.851550+00:00"
   }
 ]

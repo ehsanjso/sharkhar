@@ -559,5 +559,67 @@
     "total_value": 506.532602695811,
     "pnl": -125.46739730418898,
     "timestamp": "2026-02-12T05:30:06.565838+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 12,
+    "bets_placed": 0,
+    "mana": 374.532602695811,
+    "total_value": 506.532602695811,
+    "pnl": -125.46739730418898,
+    "timestamp": "2026-02-12T17:30:05.420139+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 9,
+    "bets_placed": 0,
+    "mana": 374.532602695811,
+    "total_value": 506.532602695811,
+    "pnl": -125.46739730418898,
+    "timestamp": "2026-02-12T23:30:05.592502+00:00"
+  },
+  {
+    "type": "BET_RESOLVED",
+    "bet_id": "mf_20260203_233005_EnTvGW1d",
+    "market_id": "EnTvGW1d736JUXMMvFN3",
+    "won": true,
+    "amount": 15.0,
+    "payout": 18.29268292682927,
+    "profit": 3.2926829268292686,
+    "final_resolution": "NO",
+    "timestamp": "2026-02-13T05:30:06.959048+00:00"
+  },
+  {
+    "type": "BET_PLACED",
+    "bet_id": "mf_20260213_053007_uZpnqOOL",
+    "market_id": "uZpnqOOLps",
+    "question": "Will a famous person bet on this market?",
+    "side": "NO",
+    "amount": 17.0,
+    "probability": 0.1809134566351205,
+    "shares": 20.754827603640642,
+    "timestamp": "2026-02-13T05:30:07.748306+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 1,
+    "signals": 11,
+    "bets_placed": 1,
+    "mana": 375.8252856226403,
+    "total_value": 509.8252856226403,
+    "pnl": -124.17471437735969,
+    "timestamp": "2026-02-13T05:30:07.750407+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 11,
+    "bets_placed": 0,
+    "mana": 375.8252856226403,
+    "total_value": 509.8252856226403,
+    "pnl": -124.17471437735969,
+    "timestamp": "2026-02-13T11:30:05.895375+00:00"
   }
 ]

@@ -98,10 +98,10 @@
     "probability": 0.17999999999999994,
     "shares": 18.29268292682927,
     "placed_at": "2026-02-03T23:30:05.744693+00:00",
-    "resolved": false,
-    "won": null,
-    "payout": 0.0,
-    "resolved_at": null,
+    "resolved": true,
+    "won": true,
+    "payout": 18.29268292682927,
+    "resolved_at": "2026-02-13T05:30:06.954636+00:00",
     "notes": "Auto: 82% consensus, M$5,934 volume. Ends 5h."
   },
   {
@@ -118,5 +118,20 @@
     "payout": 0.0,
     "resolved_at": null,
     "notes": "Auto: High volume M$56,923, 388 bettors, 71% consensus."
+  },
+  {
+    "id": "mf_20260213_053007_uZpnqOOL",
+    "market_id": "uZpnqOOLps",
+    "market_question": "Will a famous person bet on this market?",
+    "side": "NO",
+    "amount": 17.0,
+    "probability": 0.1809134566351205,
+    "shares": 20.754827603640642,
+    "placed_at": "2026-02-13T05:30:07.746115+00:00",
+    "resolved": false,
+    "won": null,
+    "payout": 0.0,
+    "resolved_at": null,
+    "notes": "Auto: 82% consensus, M$11,454 volume. Ends 16d."
   }
 ]
