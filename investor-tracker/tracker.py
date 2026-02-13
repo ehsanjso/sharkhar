@@ -3,6 +3,7 @@
 Investor Tracker - Track Congress and Hedge Fund Trades
 
 Usage:
+    python tracker.py status     # Show cache/database status
     python tracker.py fetch      # Fetch Congress trades
     python tracker.py digest     # Generate daily digest
     python tracker.py recommend  # Generate buy/sell recommendations
@@ -201,6 +202,81 @@ def get_recommendations() -> dict:
     return recommendations
 
 
+def show_status():
+    """Show current cache and database status"""
+    import sys
+    import io
+    
+    # Force UTF-8 output
+    if sys.stdout.encoding != 'utf-8':
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    
+    print("=" * 50)
+    print("INVESTOR TRACKER - Status")
+    print("=" * 50)
+    print(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print()
+    
+    # Check congress trades cache
+    cache_path = Path(__file__).parent / "congress_trades_cache.json"
+    if cache_path.exists():
+        try:
+            with open(cache_path, 'r') as f:
+                trades = json.load(f)
+            mtime = datetime.fromtimestamp(cache_path.stat().st_mtime)
+            age = datetime.now() - mtime
+            age_str = f"{age.days}d {age.seconds // 3600}h" if age.days else f"{age.seconds // 3600}h {(age.seconds % 3600) // 60}m"
+            print(f"[CACHE] Congress Trades: {len(trades)} trades")
+            print(f"        Last updated: {mtime.strftime('%Y-%m-%d %H:%M')} ({age_str} ago)")
+            
+            # Date range
+            if trades:
+                dates = [t.get('disclosure_date') or t.get('transaction_date') for t in trades if t.get('disclosure_date') or t.get('transaction_date')]
+                if dates:
+                    dates.sort()
+                    print(f"        Date range: {dates[0][:10]} to {dates[-1][:10]}")
+        except Exception as e:
+            print(f"[CACHE] Congress Trades: Error reading - {e}")
+    else:
+        print("[CACHE] Congress Trades: Not found")
+    
+    print()
+    
+    # Check processed trades
+    processed_path = Path(__file__).parent / "processed_trades.json"
+    if processed_path.exists():
+        try:
+            with open(processed_path, 'r') as f:
+                processed = json.load(f)
+            count = len(processed) if isinstance(processed, list) else len(processed.get('trades', []))
+            print(f"[PROCESSED] Tracked entries: {count}")
+        except Exception as e:
+            print(f"[PROCESSED] Error reading - {e}")
+    else:
+        print("[PROCESSED] Not initialized")
+    
+    print()
+    
+    # Check database
+    db_path = Path(__file__).parent / "trades.db"
+    if db_path.exists():
+        try:
+            import sqlite3
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM congress_trades")
+            count = cursor.fetchone()[0]
+            conn.close()
+            print(f"[DATABASE] Congress trades stored: {count}")
+        except Exception as e:
+            print(f"[DATABASE] Error - {e}")
+    else:
+        print("[DATABASE] Not initialized (run 'fetch' first)")
+    
+    print()
+    print("Commands: status | fetch | digest | recommend | fund")
+
+
 def main():
     if len(sys.argv) < 2:
         print(__doc__)
@@ -209,7 +285,10 @@ def main():
     command = sys.argv[1].lower()
     
     try:
-        if command == 'fetch':
+        if command == 'status':
+            show_status()
+            return 0
+        elif command == 'fetch':
             new_count = fetch_all_data()
             return 0
         elif command == 'digest':
