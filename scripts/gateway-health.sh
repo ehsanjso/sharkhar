@@ -28,6 +28,8 @@ LOG_FILE="${CLAWDBOT_DIR}/gateway.log"
 JSON_MODE=false
 QUICK_MODE=false
 VERBOSE_MODE=false
+WATCH_MODE=false
+WATCH_INTERVAL=5
 
 # Colors
 RED='\033[0;31m'
@@ -48,15 +50,18 @@ usage() {
     echo "Use when experiencing timeouts, slowness, or connectivity issues."
     echo ""
     echo "Options:"
-    echo "  --json       Output as JSON (for scripts/automation)"
-    echo "  --quick      Skip slow checks (websocket ping)"
-    echo "  --verbose    Show more detail (recent logs, session list)"
-    echo "  --help       Show this help message"
+    echo "  --json         Output as JSON (for scripts/automation)"
+    echo "  --quick        Skip slow checks (websocket ping)"
+    echo "  --verbose      Show more detail (recent logs, session list)"
+    echo "  --watch [N]    Continuous monitoring (refresh every N seconds, default: 5)"
+    echo "  --help         Show this help message"
     echo ""
     echo "Examples:"
     echo "  $(basename "$0")              # Quick health check"
     echo "  $(basename "$0") --json       # JSON for monitoring"
     echo "  $(basename "$0") --verbose    # Full diagnostic"
+    echo "  $(basename "$0") --watch      # Live monitoring (5s refresh)"
+    echo "  $(basename "$0") --watch 10   # Live monitoring (10s refresh)"
 }
 
 # Parse arguments
@@ -72,6 +77,15 @@ while [[ $# -gt 0 ]]; do
             ;;
         --verbose|-v)
             VERBOSE_MODE=true
+            shift
+            ;;
+        --watch|-w)
+            WATCH_MODE=true
+            # Check if next arg is a number (interval)
+            if [[ ${2:-} =~ ^[0-9]+$ ]]; then
+                WATCH_INTERVAL=$2
+                shift
+            fi
             shift
             ;;
         --help|-h)
@@ -466,7 +480,10 @@ EOF
 # MAIN
 #==============================================================================
 
-main() {
+run_checks() {
+    # Reset status data for fresh run
+    STATUS_DATA=()
+    
     if ! $JSON_MODE; then
         echo ""
         echo -e "${BOLD}🔌 GATEWAY HEALTH${NC}"
@@ -484,6 +501,32 @@ main() {
         output_json
     else
         echo ""
+    fi
+}
+
+watch_loop() {
+    # Trap Ctrl+C to exit gracefully
+    trap 'echo -e "\n${CYAN}Watch stopped.${NC}"; exit 0' INT
+    
+    while true; do
+        # Clear screen if in a terminal, otherwise just print separator
+        if [[ -t 1 ]]; then
+            clear 2>/dev/null || printf '\033[2J\033[H'
+        else
+            echo "════════════════════════════════════════════════════════════════"
+        fi
+        echo -e "${CYAN}⟳ Watching (every ${WATCH_INTERVAL}s) | Press Ctrl+C to stop${NC}"
+        echo -e "${CYAN}$(date '+%Y-%m-%d %H:%M:%S')${NC}"
+        run_checks
+        sleep "$WATCH_INTERVAL"
+    done
+}
+
+main() {
+    if $WATCH_MODE; then
+        watch_loop
+    else
+        run_checks
     fi
 }
 
