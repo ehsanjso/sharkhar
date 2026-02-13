@@ -152,6 +152,33 @@ ClawdBot process status, Node.js memory, system uptime.
 Both "active now" and "occurred since boot" states are reported. Critical for
 diagnosing performance issues on Pi.
 
+### gateway-health.sh
+ClawdBot Gateway diagnostics. Use when experiencing timeouts, slowness, or
+connectivity issues. Checks gateway process, websocket, cron jobs, sessions, and errors.
+
+```bash
+./gateway-health.sh              # Human-readable health report
+./gateway-health.sh --json       # JSON output (for scripts/cron)
+./gateway-health.sh --quick      # Skip slow checks (websocket ping)
+./gateway-health.sh --verbose    # Show more detail
+./gateway-health.sh --help       # Show full usage
+```
+
+**Checks:**
+- **Process status** — Gateway running, PID, uptime, memory (warns >500MB), CPU
+- **Websocket** — Port 18789 reachability and latency
+- **Cron jobs** — Job counts, enabled vs disabled, last run time
+- **Sessions** — Active sessions in last 24h, total session count
+- **Errors** — Scans recent logs for errors/exceptions
+
+**Status levels:**
+- 🟢 HEALTHY — All checks pass
+- 🟡 WARNING — High memory or many recent errors
+- 🔴 CRITICAL — Gateway not running or websocket unreachable
+
+**Recommendations:** Automatically suggests actions based on detected issues
+(restart gateway, check logs, etc.).
+
 ### memory-search.sh
 Simple grep-based search for memory files. Stopgap until RAG/semantic search 
 is set up. Searches all memory/*.md files plus MEMORY.md.
