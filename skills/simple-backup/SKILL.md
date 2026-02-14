@@ -6,6 +6,18 @@ metadata: {"clawdbot":{"emoji":"💾","requires":{"bins":["rclone","gpg","tar"]}
 
 # Simple Backup
 
+## When to Use
+- Creating encrypted backups of the clawd workspace and state
+- Scheduling periodic automated backups via cron
+- Syncing backups to cloud storage (Google Drive, S3, etc.) via rclone
+- Disaster recovery preparation for Pi or agent data
+
+## When NOT to Use
+- **Git-based version control** → Use `git commit/push` for code changes
+- **Database backups** → Use database-specific tools (pg_dump, mongodump)
+- **Partial/selective backups** → This backs up entire workspace and state
+- **Real-time sync** → Use syncthing or rclone mount for continuous sync
+
 A robust backup script that:
 1.  **Stages:** Copies `~/clawd` (workspace), `~/.clawdbot` (state), and `skills/`.
 2.  **Compresses:** Creates a `.tgz` archive.

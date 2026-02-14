@@ -9,6 +9,18 @@ metadata: {"clawdbot":{"emoji":"📊","requires":{"bins":["node"]}}}
 
 Monitor your Claude Max 5x plan quota usage in real-time.
 
+## When to Use
+- Checking Claude API rate limit status before long tasks
+- Monitoring session quota (5-hour window) percentage
+- Tracking weekly usage across Sonnet and all models
+- Setting up quota alerts when approaching limits
+- Deciding whether to continue with expensive operations
+
+## When NOT to Use
+- **Antigravity/proxy quotas** → Use `antigravity-quota` skill
+- **General API usage metrics** → Check Anthropic console directly
+- **Billing inquiries** → Check Anthropic billing dashboard
+
 ## Features
 
 - **Session quota tracking** - 5-hour window usage percentage

@@ -5,9 +5,18 @@ metadata:
   tags: remotion, video, react, animation, composition
 ---
 
-## When to use
+## When to Use
+- Working with Remotion code for programmatic video generation
+- Creating React-based video compositions and animations
+- Embedding 3D content, audio, captions, or charts in videos
+- Rendering videos server-side or in cloud environments
+- Need domain-specific patterns for timing, sequencing, assets
 
-Use this skills whenever you are dealing with Remotion code to obtain the domain-specific knowledge.
+## When NOT to Use
+- **Simple video editing** → Use traditional video editors (Premiere, DaVinci)
+- **Static image generation** → Use Satori or Puppeteer screenshots
+- **Video file manipulation only** → Use FFmpeg directly
+- **Non-React projects** → Remotion requires React
 
 ## How to use
 
