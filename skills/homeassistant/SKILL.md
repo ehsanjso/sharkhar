@@ -79,6 +79,23 @@ curl -s "$HA_URL/api/states/{entity_id}" -H "Authorization: Bearer $HA_TOKEN"
 - `media_player.*` — TVs, speakers
 - `sensor.*` — Temperature, humidity, etc.
 
+## When to Use
+
+- User wants to control smart home devices (lights, switches, thermostats, covers)
+- Turning on/off or dimming lights
+- Triggering scenes ("movie mode", "bedtime")
+- Checking device states ("is the garage door closed?")
+- Running automations or scripts in Home Assistant
+- Any request mentioning specific HA entity domains (switch.*, light.*, climate.*)
+
+## When NOT to Use
+
+- **System administration tasks** → Use `pi-admin` instead (CPU, memory, services, updates)
+- **Process monitoring** → Use `process-watch` instead (what's using resources)
+- **Network debugging** → Use `sysadmin-toolbox` instead
+- **IoT setup/configuration** → This skill is for control, not HA installation/config
+- **Non-HA devices** → If user mentions Phillips Hue app directly (not through HA)
+
 ## Notes
 
 - API returns JSON by default

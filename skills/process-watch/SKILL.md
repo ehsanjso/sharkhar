@@ -95,3 +95,23 @@ process-watch watch --alert-cpu 90 --alert-mem 85
 - **macOS**: Full support
 - **Linux**: Full support  
 - **Windows**: Partial (basic process list, no lsof equivalent)
+
+## When to Use
+
+- Finding which process is consuming CPU/memory/disk
+- Investigating what's listening on a specific port
+- Killing runaway or stuck processes
+- Monitoring system resource usage in real-time
+- Debugging why a system is slow or unresponsive
+- Listing network connections for a process
+- Finding open files or handles for a process
+
+## When NOT to Use
+
+- **Smart home control** → Use `homeassistant` instead
+- **Service management** (start/stop/restart services) → Use `pi-admin` or `systemctl`
+- **Package updates** → Use `pi-admin` for apt/system updates
+- **Tool recommendations** ("what CLI should I use?") → Use `sysadmin-toolbox` for tool discovery
+- **Shell scripting help** → Use `sysadmin-toolbox` for one-liner references
+- **Docker/container inspection** → Use Docker CLI or `sysadmin-toolbox` container tools
+- **General system info** (hostname, kernel, uptime) → Use `pi-admin` for system overview
