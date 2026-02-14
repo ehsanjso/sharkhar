@@ -4,6 +4,19 @@ description: Create distinctive, production-grade frontend interfaces with high 
 license: Complete terms in LICENSE.txt
 ---
 
+## When to Use
+- Building web components, pages, or applications
+- User asks to "design" or "build" a UI/frontend
+- Creating landing pages, dashboards, or interfaces
+- Needs distinctive, production-grade visual design
+- Avoiding generic "AI slop" aesthetics
+
+## When NOT to Use
+- **Flowcharts/diagrams** → Use `excalidraw-flowchart`
+- **Backend/API work** → Not a frontend task
+- **Quick mockups** (no code) → Use design tools directly
+- **Remotion video projects** → Use `remotion-best-practices`
+
 This skill guides creation of distinctive, production-grade frontend interfaces that avoid generic "AI slop" aesthetics. Implement real working code with exceptional attention to aesthetic details and creative choices.
 
 The user provides frontend requirements: a component, page, application, or interface to build. They may include context about the purpose, audience, or technical constraints.

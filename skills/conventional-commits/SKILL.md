@@ -9,6 +9,18 @@ metadata:
 
 # Conventional Commits
 
+## When to Use
+- Creating git commits
+- Writing commit messages
+- User mentions "commit", "git commit", or "commit message"
+- Automated changelog generation
+- Projects using semantic versioning
+
+## When NOT to Use
+- **GitHub issues/PRs** → Use `github` skill
+- **Linear issues** → Use `linear` skill
+- **General git operations** (branch, merge, rebase) → Not commit-message specific
+
 Format all commit messages according to the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification. This enables automated changelog generation, semantic versioning, and better commit history.
 
 ## Format Structure

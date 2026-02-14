@@ -9,6 +9,18 @@ metadata: {"clawdbot":{"emoji":"📊","requires":{"bins":["node"]}}}
 
 Check quota status across all Antigravity accounts configured in Clawdbot.
 
+## When to Use
+- Checking Antigravity account quotas
+- "How much quota do I have left?"
+- Monitoring Claude/Gemini usage limits
+- Detecting account bans
+- Planning model usage around resets
+
+## When NOT to Use
+- **Claude API quota** (Anthropic console) → Use `claude-quota-monitor`
+- **Session usage** (this session's token count) → Use `session_status` tool
+- **Non-Antigravity providers** → Different quota systems
+
 ## Prerequisites
 
 - Clawdbot with Antigravity accounts configured
