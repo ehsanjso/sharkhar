@@ -19,7 +19,10 @@ Priority queue of tasks for automated sessions. Pick from top.
 - [x] pollinations (image generation) ✅
 - [x] youtube-summarizer ✅
 - [x] google-calendar ✅
-- [ ] Remaining skills in ~/clawd/skills/ (lower priority)
+- [x] homeassistant ✅ (Feb 13)
+- [x] jq ✅ (Feb 13)
+- [x] process-watch ✅ (Feb 13)
+- [ ] Remaining skills in ~/clawd/skills/ (lower priority): pi-admin, pm2, tldr, tmdb, plan-my-day, bambu-cli, gifgrep, playwright-cli, simple-backup
 
 **Template to add to each SKILL.md:**
 ```markdown
