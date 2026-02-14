@@ -5,6 +5,20 @@ description: Operate and troubleshoot BambuLab printers with the bambu-cli (stat
 
 # Bambu CLI
 
+## When to Use
+- Monitoring BambuLab printer status (temps, progress, AMS)
+- Starting/pausing/stopping prints
+- Camera snapshots from the printer
+- Managing files on the printer (upload, list, delete)
+- Sending G-code commands
+- Running calibrations
+- Troubleshooting printer connectivity (`doctor`)
+
+## When NOT to Use
+- **homeassistant** → Smart home control (lights, plugs) even if printer is on a smart outlet
+- **process-watch** → System processes on the host, not printer firmware
+- **web_search** → Researching printer issues, filament compatibility, slicer settings
+
 ## Overview
 Use bambu-cli to configure, monitor, and control BambuLab printers over MQTT/FTPS/camera, producing exact commands and safe defaults.
 
