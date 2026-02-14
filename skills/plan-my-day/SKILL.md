@@ -10,6 +10,18 @@ tags: [productivity, planning, time-blocking, energy-management]
 
 Generate a clean, actionable hour-by-hour plan for the day based on current priorities and energy windows.
 
+## When to Use
+- Morning planning ("plan my day", "what should I do today?")
+- Creating time-blocked schedules
+- Identifying top 3 priorities
+- Energy-based task scheduling
+- Day structure when overwhelmed with tasks
+
+## When NOT to Use
+- **task-tracker** → Managing task lists, adding/completing tasks, weekly reviews
+- **google-calendar** → Checking existing calendar events, scheduling meetings
+- **cron** → Setting up automated reminders at specific times
+
 ## Usage
 
 ```

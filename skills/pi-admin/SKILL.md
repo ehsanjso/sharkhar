@@ -16,6 +16,12 @@ Complete system monitoring and introspection for the Raspberry Pi host. Access n
 - Troubleshooting system issues
 - Getting system overview for debugging
 
+## When NOT to Use
+- **process-watch** → Finding CPU/memory hog processes, killing runaway processes, watching /proc
+- **sysadmin-toolbox** → Tool discovery ("what tool should I use?"), shell one-liners reference
+- **pm2** → Managing Node.js app processes specifically (start/stop/logs)
+- **homeassistant** → Smart home device control (lights, switches, thermostats)
+
 ## Usage
 
 ```bash

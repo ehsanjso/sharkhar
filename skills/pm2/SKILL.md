@@ -7,6 +7,19 @@ description: Manage Node.js applications with PM2 process manager. Use for deplo
 
 Production process manager for Node.js with built-in load balancer.
 
+## When to Use
+- Starting/stopping Node.js apps in production
+- Viewing app logs (`pm2 logs`)
+- Setting up auto-restart on boot (`pm2 startup`)
+- Monitoring Node.js processes (`pm2 monit`)
+- Zero-downtime reloads (`pm2 reload`)
+- Managing ecosystem files for multiple apps
+
+## When NOT to Use
+- **process-watch** → System-wide process monitoring (top, htop), finding CPU hogs
+- **pi-admin** → System services via systemctl, system updates, disk cleanup
+- **docker/compose** → Containerized apps (not raw Node processes)
+
 ## Install
 
 ```bash

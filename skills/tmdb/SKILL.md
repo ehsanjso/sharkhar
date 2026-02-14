@@ -9,6 +9,19 @@ metadata: {"clawdis":{"emoji":"🎬","requires":{"bins":["uv"],"env":["TMDB_API_
 
 Comprehensive movie and TV information with streaming availability, recommendations, and personalization.
 
+## When to Use
+- Movie/TV show searches ("what's that movie about...")
+- Finding where to stream content ("where can I watch...")
+- Getting cast, ratings, reviews
+- Personalized recommendations based on preferences
+- Trending movies/shows this week
+- Managing watchlists
+
+## When NOT to Use
+- **pollinations** → AI-generated video content, not movie database queries
+- **youtube-summarizer** → YouTube videos (trailers, reviews), not movie metadata
+- **web_search** → General entertainment news, actor interviews, non-movie questions
+
 ## Setup
 
 Set environment variable:
