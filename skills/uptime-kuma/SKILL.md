@@ -7,6 +7,19 @@ description: Interact with Uptime Kuma monitoring server. Use for checking monit
 
 Manage Uptime Kuma monitors via CLI wrapper around the Socket.IO API.
 
+## When to Use
+- Checking uptime monitor status ("is my server up?", "what's down?")
+- Adding/removing monitors for HTTP, ping, TCP port checks
+- Pausing/resuming monitoring checks
+- Viewing heartbeat history
+- User mentions "Uptime Kuma" or "uptime monitoring"
+
+## When NOT to Use
+- **System process monitoring** → Use `process-watch` (CPU, memory hogs)
+- **Pi system health** → Use `pi-admin` (disk, temps, services)
+- **General health checks** → Use `curl` for simple HTTP checks
+- **Network debugging** → Use `sysadmin-toolbox` for diagnostics
+
 ## Setup
 
 Requires `uptime-kuma-api` Python package:
