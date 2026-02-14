@@ -2,6 +2,19 @@
 
 Control your Pi-hole DNS ad blocker via the Pi-hole v6 API.
 
+## When to Use
+- Checking Pi-hole status (enabled/disabled, query stats)
+- Enabling or disabling ad blocking temporarily
+- Viewing blocked domains and recent DNS queries
+- Managing blocklists and whitelist/blacklist entries
+- Troubleshooting network issues caused by blocked domains
+
+## When NOT to Use
+- **Network configuration changes** → SSH into Pi directly
+- **Pi-hole installation/upgrades** → Use official Pi-hole CLI (`pihole -up`)
+- **System-level Pi administration** → Use `pi-admin` skill
+- **Non-v6 Pi-hole versions** → This skill requires Pi-hole v6 API
+
 ## Setup
 
 Set your Pi-hole API configuration in Clawdbot config:

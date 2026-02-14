@@ -7,6 +7,19 @@ metadata: {"clawdbot":{"emoji":"🧲","requires":{"bins":["gifgrep"]},"install":
 
 # gifgrep
 
+## When to Use
+- Searching Tenor/Giphy for reaction GIFs to send in messages
+- Downloading GIFs for use in projects or chats
+- Extracting still frames or contact sheets from GIFs
+- Interactive TUI browsing of GIF search results
+- Getting direct URLs for GIF embedding
+
+## When NOT to Use
+- **Creating GIFs from video** → Use FFmpeg or video-frames skill
+- **Editing GIFs** → Use ezgif.com or ImageMagick
+- **Searching for images (not GIFs)** → Use web search or image APIs
+- **Meme generation** → Use dedicated meme generators
+
 Use `gifgrep` to search GIF providers (Tenor/Giphy), browse in a TUI, download results, and extract stills or sheets.
 
 GIF-Grab (gifgrep workflow)
