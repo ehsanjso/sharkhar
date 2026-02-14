@@ -7,6 +7,17 @@ description: Opinionated constraints for building better interfaces with agents.
 
 Opinionated constraints for building better interfaces with agents.
 
+## When to Use
+- Building React/web interfaces
+- Implementing UI components with proper accessibility
+- Following animation/motion best practices
+- Tailwind CSS projects needing consistent patterns
+
+## When NOT to Use
+- **Distinct visual design** → Use `frontend-design` (aesthetic choices)
+- **Flowcharts/diagrams** → Use `excalidraw-flowchart`
+- **Non-web interfaces** → CLI tools, native apps
+
 ## Stack
 
 - MUST use Tailwind CSS defaults (spacing, radius, shadows) before custom values

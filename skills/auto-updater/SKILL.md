@@ -8,6 +8,17 @@ metadata: {"version":"1.0.0","clawdbot":{"emoji":"🔄","os":["darwin","linux"]}
 
 Keep your Clawdbot and skills up to date automatically with daily update checks.
 
+## When to Use
+- Setting up automatic Clawdbot updates
+- "Set up daily auto-updates"
+- Keeping skills up to date
+- Scheduling update checks via cron
+
+## When NOT to Use
+- **Manual update now** → Use `clawdbot doctor` or `clawdhub update`
+- **Gateway restart** → Use `gateway` tool with action=restart
+- **Checking for updates without installing** → Use `clawdhub` skill
+
 ## What It Does
 
 This skill sets up a daily cron job that:
