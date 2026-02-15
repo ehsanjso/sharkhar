@@ -1,6 +1,6 @@
 # 🧠 Long-term Memory
 
-*Last updated: 2026-02-12*
+*Last updated: 2026-02-15*
 
 ## About Ehsan
 
@@ -56,7 +56,13 @@ Mobile wardrobe management app with AI features.
 
 **Design research:** Airbnb UX patterns, Whering app (competitor) via Mobbin
 
-**⚠️ Pi limitation:** `npx expo export -p web` OOMs at ~88% — use external machine for web builds
+**⚠️ Pi limitation:** `npx expo export -p web` OOMs at ~88% — use EAS Build instead (cloud)
+
+**New Architecture (SDK 55+):**
+- JSI replaces bridge — direct memory refs, no serialization
+- iOS 15-40% faster rendering, Android 3-4% gains
+- `useLayoutEffect` now works properly for synchronous measurements
+- `startTransition` for interruptible renders (filter changes, search)
 
 ### Uptime Kuma (Service Monitoring)
 
@@ -150,6 +156,20 @@ The Agent Dashboard helps me wake up each session knowing what happened.
 **API:**
 - `/api/agent-context` — Fetches live data from gateway (quota, crons, activity)
 - Quota data from `memory/quota-cache.json` (updated by quota monitor cron)
+
+---
+
+### Cloudflare Pages Deployments (Feb 14)
+
+Created **cloudflare-deploy** skill for quick static site deployments with password protection.
+
+**Deployed Sites:**
+- Polymarket Dashboard: https://polymarket-dashboard-d48.pages.dev (admin/polymarket2024)
+
+**Setup:**
+- Token saved to `~/.cloudflare-token` (chmod 600)
+- Skill location: `~/clawd/skills/cloudflare-deploy/`
+- Patterns for JWT, CORS, rate limiting in `references/patterns.md`
 
 ---
 
@@ -305,6 +325,7 @@ The spare capacity cron runs at noon daily. Priority order:
 4. Documentation
 
 **Recent code improvements:**
+- investor-tracker: added `status` command for monitoring cache health (cache age, entry counts, DB state) (Feb 13)
 - devlog.sh: created quick daily logging tool with --yesterday, --edit flags, bash completion (Feb 9)
 - Investor-tracker: fixed indentation bug in `fetch_13f_summary()` — 13F processing only ran in fallback case (Feb 7)
 - Polymarket scanner: added timeouts, retry logic, specific exception handling, logging (Feb 3)
@@ -315,6 +336,8 @@ The spare capacity cron runs at noon daily. Priority order:
 - Remotion on Pi, competitor scanning, LLM routing (Jan 30-31)
 - Pi-hole advanced, MCP ecosystem, HA + AI, Ollama, ArXiv papers (Feb 1-4)
 - AI news digest with industry trends (Feb 3)
+- React Native New Architecture (Feb 13) — JSI, Fabric, TurboModules; SDK 55+ always uses it
+- Expo EAS Build (Feb 12) — Cloud builds bypass Pi OOM issues, 30 free builds/month
 
 ---
 
