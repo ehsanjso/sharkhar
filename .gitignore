@@ -1,3 +1,6 @@
 bambu.log
 **/venv/
 *.zip
+artifacts/*
+!artifacts/README.md
+!artifacts/.gitkeep

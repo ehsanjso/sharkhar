@@ -38,12 +38,12 @@ Priority queue of tasks for automated sessions. Pick from top.
 
 ---
 
-### 2. Create Artifacts Directory Convention
-**Goal:** Standardize output location for generated files
-**Action:**
-- Create ~/clawd/artifacts/ directory
-- Add README explaining the convention
-- Update skills that generate files to use this location
+### 2. ~~Create Artifacts Directory Convention~~ ✅ (Feb 15)
+**COMPLETED** - Session 1, Feb 15, 2026
+- Created ~/clawd/artifacts/ with README
+- Added .gitignore rules
+- Created prune-artifacts.sh cleanup script
+- Moved stray zip files to artifacts/
 
 ---
 

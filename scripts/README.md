@@ -124,6 +124,21 @@ deletion and supports preview mode.
 
 Archives kept for 30 days in `~/backups/clawdbot/archived-sessions/`.
 
+### prune-artifacts.sh
+Clean up old generated files from the artifacts directory. Perfect for keeping
+disk space free from temporary exports, downloads, and build outputs.
+
+```bash
+./prune-artifacts.sh              # Dry run (preview deletions)
+./prune-artifacts.sh --delete     # Actually delete old files
+./prune-artifacts.sh --days 3     # Delete files older than 3 days
+./prune-artifacts.sh --help       # Show full usage
+```
+
+**Target directory:** `~/clawd/artifacts/`
+**Default threshold:** 7 days
+**Protected files:** README.md, .gitkeep
+
 ### pi-health.sh
 Quick system health check for Raspberry Pi. Shows CPU temp, **CPU frequency**,
 **throttling**, memory, disk, ClawdBot status, and uptime with color-coded indicators.
