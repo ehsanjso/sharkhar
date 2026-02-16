@@ -621,5 +621,105 @@
     "total_value": 509.8252856226403,
     "pnl": -124.17471437735969,
     "timestamp": "2026-02-13T11:30:05.895375+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 8,
+    "bets_placed": 0,
+    "mana": 375.8252856226403,
+    "total_value": 509.8252856226403,
+    "pnl": -124.17471437735969,
+    "timestamp": "2026-02-13T17:30:05.797700+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 11,
+    "bets_placed": 0,
+    "mana": 375.8252856226403,
+    "total_value": 509.8252856226403,
+    "pnl": -124.17471437735969,
+    "timestamp": "2026-02-13T23:30:06.052421+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 11,
+    "bets_placed": 0,
+    "mana": 375.8252856226403,
+    "total_value": 509.8252856226403,
+    "pnl": -124.17471437735969,
+    "timestamp": "2026-02-14T05:30:05.669481+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 13,
+    "bets_placed": 0,
+    "mana": 375.8252856226403,
+    "total_value": 509.8252856226403,
+    "pnl": -124.17471437735969,
+    "timestamp": "2026-02-14T11:30:05.359069+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 12,
+    "bets_placed": 0,
+    "mana": 375.8252856226403,
+    "total_value": 509.8252856226403,
+    "pnl": -124.17471437735969,
+    "timestamp": "2026-02-14T17:30:07.774764+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 13,
+    "bets_placed": 0,
+    "mana": 375.8252856226403,
+    "total_value": 509.8252856226403,
+    "pnl": -124.17471437735969,
+    "timestamp": "2026-02-15T05:30:05.832619+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 9,
+    "bets_placed": 0,
+    "mana": 375.8252856226403,
+    "total_value": 509.8252856226403,
+    "pnl": -124.17471437735969,
+    "timestamp": "2026-02-15T11:30:05.159593+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 9,
+    "bets_placed": 0,
+    "mana": 375.8252856226403,
+    "total_value": 509.8252856226403,
+    "pnl": -124.17471437735969,
+    "timestamp": "2026-02-15T17:30:05.451423+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 10,
+    "bets_placed": 0,
+    "mana": 375.8252856226403,
+    "total_value": 509.8252856226403,
+    "pnl": -124.17471437735969,
+    "timestamp": "2026-02-15T23:30:04.699058+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 7,
+    "bets_placed": 0,
+    "mana": 375.8252856226403,
+    "total_value": 509.8252856226403,
+    "pnl": -124.17471437735969,
+    "timestamp": "2026-02-16T05:30:05.195294+00:00"
   }
 ]

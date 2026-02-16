@@ -106,6 +106,71 @@
   }
 }
 
+/* iOS Tab Bar - Apple HIG compliant */
+.ios-tab-bar {
+  background: rgba(28, 28, 30, 0.92);
+  backdrop-filter: blur(25px) saturate(1.8);
+  -webkit-backdrop-filter: blur(25px) saturate(1.8);
+  border-top: 0.5px solid rgba(255, 255, 255, 0.1);
+}
+
+:root .ios-tab-bar {
+  background: rgba(249, 249, 249, 0.92);
+  border-top: 0.5px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Safe area for notched devices */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* iOS Large Title Header */
+.ios-large-title {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+}
+
+.ios-navigation-title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+}
+
+/* iOS Navigation Bar */
+.ios-nav-bar {
+  background: var(--glass-bg);
+  backdrop-filter: blur(25px) saturate(1.8);
+  -webkit-backdrop-filter: blur(25px) saturate(1.8);
+  border-bottom: 0.5px solid var(--glass-border);
+}
+
+/* iOS List styling */
+.ios-list-item {
+  padding: 11px 16px;
+  background: var(--card);
+  border-bottom: 0.5px solid var(--glass-border);
+}
+
+.ios-list-item:first-child {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.ios-list-item:last-child {
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-bottom: none;
+}
+
+/* iOS Grouped list container */
+.ios-grouped-list {
+  background: var(--card);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
 /* Liquid Glass Components */
 .liquid-glass {
   background: var(--glass-bg);

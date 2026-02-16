@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   Clock, 
   CheckCircle, 
@@ -8,14 +8,10 @@ import {
   Play,
   Pause,
   RefreshCw,
-  Calendar,
   AlertTriangle
 } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface CronJob {
   id: string;
@@ -62,9 +58,14 @@ function formatDuration(ms: number): string {
   return `${minutes}m ${seconds % 60}s`;
 }
 
+type FilterType = 'all' | 'active' | 'paused' | 'failed';
+
 export default function CronJobsPage() {
   const [jobs, setJobs] = useState<CronJob[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [showLargeTitle, setShowLargeTitle] = useState(true);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const fetchJobs = async () => {
     setIsLoading(true);
@@ -83,165 +84,197 @@ export default function CronJobsPage() {
     fetchJobs();
   }, []);
 
+  // Handle scroll for large title transition
+  useEffect(() => {
+    const handleScroll = () => {
+      if (scrollRef.current) {
+        setShowLargeTitle(scrollRef.current.scrollTop < 20);
+      }
+    };
+
+    const scrollEl = scrollRef.current;
+    if (scrollEl) {
+      scrollEl.addEventListener('scroll', handleScroll);
+      return () => scrollEl.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
+
   const enabledJobs = jobs.filter(j => j.enabled);
   const disabledJobs = jobs.filter(j => !j.enabled);
   const failedJobs = jobs.filter(j => j.lastStatus === 'error');
 
+  const filteredJobs = jobs.filter(job => {
+    if (activeFilter === 'all') return true;
+    if (activeFilter === 'active') return job.enabled;
+    if (activeFilter === 'paused') return !job.enabled;
+    if (activeFilter === 'failed') return job.lastStatus === 'error';
+    return true;
+  });
+
+  const filterConfig: { id: FilterType; label: string; count: number }[] = [
+    { id: 'active', label: 'Active', count: enabledJobs.length },
+    { id: 'paused', label: 'Paused', count: disabledJobs.length },
+    { id: 'failed', label: 'Failed', count: failedJobs.length },
+  ];
+
+  const getStatusIcon = (job: CronJob) => {
+    if (job.lastStatus === 'ok') return CheckCircle;
+    if (job.lastStatus === 'error') return XCircle;
+    return Clock;
+  };
+
+  const getStatusColor = (job: CronJob) => {
+    if (job.lastStatus === 'ok') return 'text-green-500';
+    if (job.lastStatus === 'error') return 'text-red-500';
+    return 'text-muted-foreground';
+  };
+
   return (
-    <div className="min-h-[calc(100vh-3.5rem)]">
-      {/* Page Header */}
-      <div className="border-b bg-card/50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-                <Clock className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-semibold">Cron Jobs</h1>
-                <p className="text-sm text-muted-foreground">Scheduled automation tasks</p>
-              </div>
-            </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="gap-1.5"
+    <div className="min-h-screen flex flex-col">
+      {/* iOS Navigation Bar - shows when scrolled */}
+      <header className={`ios-nav-bar sticky top-0 z-40 transition-all duration-200 ${
+        showLargeTitle ? 'opacity-0 pointer-events-none' : 'opacity-100'
+      }`}>
+        <div className="flex items-center justify-between h-[44px] px-4">
+          <div className="w-[60px]" />
+          <h1 className="ios-navigation-title text-foreground">Crons</h1>
+          <button
+            onClick={fetchJobs}
+            disabled={isLoading}
+            className="w-[60px] flex justify-end text-primary"
+          >
+            <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
+      </header>
+
+      {/* Scrollable content */}
+      <div 
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto"
+      >
+        <div className="px-4">
+          {/* iOS Large Title with refresh button */}
+          <div className={`pt-2 pb-2 flex items-center justify-between transition-all duration-200 ${
+            showLargeTitle ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'
+          }`}>
+            <h1 className="ios-large-title text-foreground">Crons</h1>
+            <button
               onClick={fetchJobs}
               disabled={isLoading}
+              className="text-primary p-2"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-              Refresh
-            </Button>
+              <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
+            </button>
           </div>
-        </div>
-      </div>
 
-      <main className="max-w-7xl mx-auto p-6">
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Jobs</p>
-                  <p className="text-2xl font-bold">{jobs.length}</p>
-                </div>
-                <Calendar className="w-8 h-8 text-muted-foreground" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Active</p>
-                  <p className="text-2xl font-bold text-green-500">{enabledJobs.length}</p>
-                </div>
-                <Play className="w-8 h-8 text-green-500" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Paused</p>
-                  <p className="text-2xl font-bold text-yellow-500">{disabledJobs.length}</p>
-                </div>
-                <Pause className="w-8 h-8 text-yellow-500" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Failed</p>
-                  <p className="text-2xl font-bold text-red-500">{failedJobs.length}</p>
-                </div>
-                <AlertTriangle className="w-8 h-8 text-red-500" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+          {/* Summary Stats */}
+          <div className="flex gap-4 mb-4">
+            <div className="flex items-center gap-1.5">
+              <Play className="w-4 h-4 text-green-500" />
+              <span className="text-sm text-muted-foreground">{enabledJobs.length}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Pause className="w-4 h-4 text-yellow-500" />
+              <span className="text-sm text-muted-foreground">{disabledJobs.length}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <AlertTriangle className="w-4 h-4 text-red-500" />
+              <span className="text-sm text-muted-foreground">{failedJobs.length}</span>
+            </div>
+          </div>
 
-        {/* Jobs List */}
-        <Card>
-          <CardHeader>
-            <CardTitle>All Jobs</CardTitle>
-            <CardDescription>Click a job to see details</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[calc(100vh-400px)]">
-              <div className="space-y-4">
-                {isLoading ? (
-                  <div className="flex items-center justify-center py-12">
-                    <RefreshCw className="w-8 h-8 animate-spin text-muted-foreground" />
-                  </div>
-                ) : jobs.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-12">No cron jobs found</p>
-                ) : (
-                  jobs.map((job) => (
-                    <div 
-                      key={job.id}
-                      className={`p-4 rounded-lg border transition-colors ${
-                        job.lastStatus === 'error' 
-                          ? 'border-red-500/50 bg-red-500/5' 
-                          : 'bg-card hover:bg-accent/50'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3">
-                            {job.lastStatus === 'ok' ? (
-                              <CheckCircle className="w-5 h-5 text-green-500" />
-                            ) : job.lastStatus === 'error' ? (
-                              <XCircle className="w-5 h-5 text-red-500" />
-                            ) : (
-                              <Clock className="w-5 h-5 text-muted-foreground" />
-                            )}
-                            <h3 className="font-medium">{job.name}</h3>
-                            <Badge variant={job.enabled ? 'default' : 'secondary'}>
-                              {job.enabled ? 'active' : 'paused'}
-                            </Badge>
-                          </div>
-                          
-                          <div className="ml-8 mt-2 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                            <div>
-                              <p className="text-muted-foreground">Schedule</p>
-                              <p className="font-mono text-xs">{job.schedule}</p>
-                            </div>
-                            <div>
-                              <p className="text-muted-foreground">Last Run</p>
-                              <p>{job.lastRunAt ? formatRelativeTime(job.lastRunAt) : 'never'}</p>
-                            </div>
-                            <div>
-                              <p className="text-muted-foreground">Next Run</p>
-                              <p>{job.nextRunAt ? formatNextRun(job.nextRunAt) : 'N/A'}</p>
-                            </div>
-                            <div>
-                              <p className="text-muted-foreground">Duration</p>
-                              <p>{job.lastDurationMs ? formatDuration(job.lastDurationMs) : 'N/A'}</p>
-                            </div>
-                          </div>
-                          
-                          {job.lastError && (
-                            <div className="ml-8 mt-3 p-3 rounded bg-red-500/10 border border-red-500/20">
-                              <p className="text-sm text-red-400 font-mono break-all">
-                                {job.lastError}
-                              </p>
-                            </div>
+          {/* Filter Pills */}
+          <div className="flex gap-2 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
+            {filterConfig.map((filter) => {
+              const isActive = activeFilter === filter.id;
+              return (
+                <button
+                  key={filter.id}
+                  onClick={() => setActiveFilter(activeFilter === filter.id ? 'all' : filter.id)}
+                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap transition-all ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-muted/60 text-foreground'
+                  }`}
+                >
+                  {filter.label}
+                  <span className={`text-[11px] ${isActive ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
+                    {filter.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Jobs List */}
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <RefreshCw className="w-8 h-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : filteredJobs.length === 0 ? (
+            <div className="ios-grouped-list">
+              <div className="ios-list-item text-muted-foreground text-center rounded-[10px] py-8">
+                No cron jobs found
+              </div>
+            </div>
+          ) : (
+            <div className="ios-grouped-list mb-4">
+              {filteredJobs.map((job, index) => {
+                const StatusIcon = getStatusIcon(job);
+                const statusColor = getStatusColor(job);
+                
+                return (
+                  <div 
+                    key={job.id}
+                    className={`ios-list-item ${
+                      index === 0 ? 'rounded-t-[10px]' : ''
+                    } ${
+                      index === filteredJobs.length - 1 ? 'rounded-b-[10px] border-b-0' : ''
+                    } ${
+                      job.lastStatus === 'error' ? 'bg-red-500/5' : ''
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <StatusIcon className={`w-5 h-5 mt-0.5 ${statusColor}`} fill={job.lastStatus === 'ok' ? 'currentColor' : 'none'} />
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[17px] text-foreground truncate">{job.name}</span>
+                          <Badge variant={job.enabled ? 'default' : 'secondary'} className="text-[10px] px-1.5 py-0 h-4 shrink-0">
+                            {job.enabled ? 'active' : 'paused'}
+                          </Badge>
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5 text-[13px] text-muted-foreground">
+                          <span className="font-mono">{job.schedule}</span>
+                          {job.lastRunAt && (
+                            <span>Last: {formatRelativeTime(job.lastRunAt)}</span>
+                          )}
+                          {job.nextRunAt && (
+                            <span>Next: {formatNextRun(job.nextRunAt)}</span>
+                          )}
+                          {job.lastDurationMs && (
+                            <span>{formatDuration(job.lastDurationMs)}</span>
                           )}
                         </div>
+                        
+                        {job.lastError && (
+                          <div className="mt-2 p-2 rounded-lg bg-red-500/10 border border-red-500/20">
+                            <p className="text-[12px] text-red-400 font-mono break-all line-clamp-2">
+                              {job.lastError}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
-            </ScrollArea>
-          </CardContent>
-        </Card>
-      </main>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

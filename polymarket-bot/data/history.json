@@ -572,5 +572,105 @@
     "total_value": 33.699999999999996,
     "pnl": -18.740000000000002,
     "timestamp": "2026-02-13T11:00:04.851550+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 33.699999999999996,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-13T17:00:04.187148+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 33.699999999999996,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-13T23:00:10.329078+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 33.699999999999996,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-14T05:00:06.493532+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 33.699999999999996,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-14T11:00:06.871986+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 33.699999999999996,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-14T17:00:09.299558+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 33.699999999999996,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-15T05:00:04.312244+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 33.699999999999996,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-15T11:00:07.238981+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 33.699999999999996,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-15T17:00:06.018788+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 33.699999999999996,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-15T23:00:05.060288+00:00"
+  },
+  {
+    "type": "AUTO_RUN",
+    "resolutions": 0,
+    "signals": 0,
+    "bets_placed": 0,
+    "cash": 31.259999999999998,
+    "total_value": 33.699999999999996,
+    "pnl": -18.740000000000002,
+    "timestamp": "2026-02-16T05:00:06.611431+00:00"
   }
 ]

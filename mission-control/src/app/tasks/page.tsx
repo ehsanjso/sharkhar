@@ -1,12 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { CheckCircle, Circle, Clock, Zap, Plus } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { CheckCircle, Circle, Clock, ChevronRight } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface Task {
   id: string;
@@ -51,130 +48,190 @@ const initialTasks: Task[] = [
   { id: '19', title: 'Add Last30Days API keys', status: 'todo', tags: ['automation'] },
 ];
 
-const columnConfig = [
-  { id: 'todo' as const, title: 'To Do', icon: Circle },
-  { id: 'progress' as const, title: 'In Progress', icon: Clock },
-  { id: 'done' as const, title: 'Done', icon: CheckCircle },
+type FilterType = 'all' | 'todo' | 'progress' | 'done';
+
+const filterConfig: { id: FilterType; label: string; icon: typeof Circle }[] = [
+  { id: 'todo', label: 'To Do', icon: Circle },
+  { id: 'progress', label: 'In Progress', icon: Clock },
+  { id: 'done', label: 'Done', icon: CheckCircle },
 ];
 
 export default function TaskBoard() {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [showLargeTitle, setShowLargeTitle] = useState(true);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Handle scroll for large title transition
+  useEffect(() => {
+    const handleScroll = () => {
+      if (scrollRef.current) {
+        setShowLargeTitle(scrollRef.current.scrollTop < 20);
+      }
+    };
+
+    const scrollEl = scrollRef.current;
+    if (scrollEl) {
+      scrollEl.addEventListener('scroll', handleScroll);
+      return () => scrollEl.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
 
   const moveTask = (taskId: string, newStatus: Task['status']) => {
     setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
   };
 
+  const filteredTasks = tasks.filter(task => {
+    if (activeFilter === 'all') return true;
+    return task.status === activeFilter;
+  });
+
+  const counts = {
+    todo: tasks.filter(t => t.status === 'todo').length,
+    progress: tasks.filter(t => t.status === 'progress').length,
+    done: tasks.filter(t => t.status === 'done').length,
+  };
+
+  const getStatusIcon = (status: Task['status']) => {
+    switch (status) {
+      case 'todo': return Circle;
+      case 'progress': return Clock;
+      case 'done': return CheckCircle;
+    }
+  };
+
+  const getStatusColor = (status: Task['status']) => {
+    switch (status) {
+      case 'todo': return 'text-muted-foreground';
+      case 'progress': return 'text-yellow-500';
+      case 'done': return 'text-green-500';
+    }
+  };
+
   return (
-    <div className="min-h-[calc(100vh-3.5rem)]">
-      {/* Page Header */}
-      <div className="border-b bg-card/50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                <Zap className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <div>
-                <h1 className="text-xl font-semibold">Task Board</h1>
-                <p className="text-sm text-muted-foreground">ClawdBot automation tasks</p>
-              </div>
+    <div className="min-h-screen flex flex-col">
+      {/* iOS Navigation Bar - shows when scrolled */}
+      <header className={`ios-nav-bar sticky top-0 z-40 transition-all duration-200 ${
+        showLargeTitle ? 'opacity-0 pointer-events-none' : 'opacity-100'
+      }`}>
+        <div className="flex items-center justify-center h-[44px] px-4">
+          <h1 className="ios-navigation-title text-foreground">Tasks</h1>
+        </div>
+      </header>
+
+      {/* Scrollable content */}
+      <div 
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto"
+      >
+        <div className="px-4">
+          {/* iOS Large Title */}
+          <div className={`pt-2 pb-2 transition-all duration-200 ${
+            showLargeTitle ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'
+          }`}>
+            <h1 className="ios-large-title text-foreground">Tasks</h1>
+          </div>
+
+          {/* Status summary */}
+          <div className="flex gap-4 mb-4">
+            <div className="flex items-center gap-1.5">
+              <Circle className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">{counts.todo}</span>
             </div>
-            <Button size="sm" className="gap-1.5">
-              <Plus className="w-4 h-4" />
-              Add Task
-            </Button>
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-4 h-4 text-yellow-500" />
+              <span className="text-sm text-muted-foreground">{counts.progress}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span className="text-sm text-muted-foreground">{counts.done}</span>
+            </div>
+          </div>
+
+          {/* Filter Pills */}
+          <div className="flex gap-2 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
+            {filterConfig.map((filter) => {
+              const Icon = filter.icon;
+              const isActive = activeFilter === filter.id;
+              return (
+                <button
+                  key={filter.id}
+                  onClick={() => setActiveFilter(activeFilter === filter.id ? 'all' : filter.id)}
+                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap transition-all ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-muted/60 text-foreground'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {filter.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Task List - iOS grouped style */}
+          <div className="ios-grouped-list mb-4">
+            {filteredTasks.length === 0 ? (
+              <div className="ios-list-item text-center text-muted-foreground py-8">
+                No tasks
+              </div>
+            ) : (
+              filteredTasks.map((task, index) => {
+                const StatusIcon = getStatusIcon(task.status);
+                const statusColor = getStatusColor(task.status);
+                
+                return (
+                  <div
+                    key={task.id}
+                    className={`ios-list-item flex items-start gap-3 ${
+                      index === 0 ? 'rounded-t-[10px]' : ''
+                    } ${
+                      index === filteredTasks.length - 1 ? 'rounded-b-[10px] border-b-0' : ''
+                    }`}
+                  >
+                    <button
+                      onClick={() => {
+                        const nextStatus = task.status === 'todo' ? 'progress' : 
+                                          task.status === 'progress' ? 'done' : 'todo';
+                        moveTask(task.id, nextStatus);
+                      }}
+                      className={`mt-0.5 ${statusColor}`}
+                    >
+                      <StatusIcon className="w-5 h-5" fill={task.status === 'done' ? 'currentColor' : 'none'} />
+                    </button>
+                    
+                    <div className="flex-1 min-w-0">
+                      <span className={`text-[17px] ${task.status === 'done' ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
+                        {task.title}
+                      </span>
+                      <div className="flex gap-1.5 flex-wrap mt-1.5">
+                        {task.tags.map((tag) => (
+                          <Badge
+                            key={tag}
+                            variant="secondary"
+                            className="text-[10px] px-1.5 py-0 h-4"
+                          >
+                            {tag}
+                          </Badge>
+                        ))}
+                        {task.priority && (
+                          <Badge
+                            variant={task.priority === 'high' ? 'destructive' : 'secondary'}
+                            className="text-[10px] px-1.5 py-0 h-4"
+                          >
+                            {task.priority}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
       </div>
-
-      {/* Board */}
-      <main className="max-w-7xl mx-auto p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {columnConfig.map((column) => {
-            const columnTasks = tasks.filter(t => t.status === column.id);
-            const Icon = column.icon;
-            
-            return (
-              <Card key={column.id}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-base font-medium">
-                    <Icon className="w-4 h-4" />
-                    {column.title}
-                    <Badge variant="secondary" className="ml-auto">
-                      {columnTasks.length}
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <ScrollArea className="h-[calc(100vh-320px)]">
-                    <div className="space-y-3 pr-2">
-                      {columnTasks.map((task) => (
-                        <Card
-                          key={task.id}
-                          className="cursor-pointer hover:bg-accent/50 transition-colors group"
-                        >
-                          <CardContent className="p-3">
-                            <div className="text-sm font-medium mb-2">{task.title}</div>
-                            <div className="flex gap-1.5 flex-wrap">
-                              {task.tags.map((tag) => (
-                                <Badge
-                                  key={tag}
-                                  variant="outline"
-                                  className="text-[10px] px-1.5 py-0 h-5"
-                                >
-                                  {tag}
-                                </Badge>
-                              ))}
-                              {task.priority && (
-                                <Badge
-                                  variant={task.priority === 'high' ? 'destructive' : 'secondary'}
-                                  className="text-[10px] px-1.5 py-0 h-5"
-                                >
-                                  {task.priority}
-                                </Badge>
-                              )}
-                            </div>
-                            
-                            {/* Quick actions on hover */}
-                            {column.id !== 'done' && (
-                              <div className="hidden group-hover:flex gap-2 mt-3 pt-3 border-t">
-                                {column.id === 'todo' && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-6 text-xs px-2"
-                                    onClick={() => moveTask(task.id, 'progress')}
-                                  >
-                                    → Start
-                                  </Button>
-                                )}
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-6 text-xs px-2"
-                                  onClick={() => moveTask(task.id, 'done')}
-                                >
-                                  ✓ Done
-                                </Button>
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      ))}
-                      
-                      {columnTasks.length === 0 && (
-                        <div className="text-center py-8 text-muted-foreground text-sm">
-                          No tasks
-                        </div>
-                      )}
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      </main>
     </div>
   );
 }

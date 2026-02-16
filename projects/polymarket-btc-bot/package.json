@@ -1,0 +1,40 @@
+{
+  "name": "polymarket-btc-bot",
+  "version": "1.0.0",
+  "description": "Automated trading bot for Polymarket's 15-minute BTC up/down markets",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node --loader ts-node/esm src/index.ts",
+    "dev": "tsx watch src/index.ts",
+    "multi": "tsx src/start-multi.ts",
+    "multi:btc": "tsx src/start-multi.ts --assets BTC --timeframes 15min",
+    "multi:eth": "tsx src/start-multi.ts --assets ETH --timeframes 15min",
+    "multi:all": "tsx src/start-multi.ts --assets BTC,ETH --timeframes 5min,15min,1hr",
+    "find-markets": "tsx src/find-all-markets.ts",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "polymarket",
+    "btc",
+    "bitcoin",
+    "trading",
+    "bot"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@polymarket/clob-client": "^4.4.0",
+    "dotenv": "^16.4.5",
+    "ethers": "^5.8.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.11",
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

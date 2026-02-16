@@ -1,0 +1,12 @@
+{
+  "name": "polymarket-dashboard",
+  "version": "1.0.0",
+  "description": "Polymarket paper trading dashboard",
+  "scripts": {
+    "dev": "wrangler pages dev public --port 8083",
+    "deploy": "wrangler pages deploy public --project-name polymarket-dashboard"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
