@@ -9,6 +9,7 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { liveTrading } from './live-trading.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,24 +24,23 @@ const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || '99986888';
 
 interface AlertConfig {
   enabled: boolean;
-  extremeGainThreshold: number;    // Alert when total P&L gains this much since last check
-  extremeLossThreshold: number;    // Alert when total P&L drops this much since last check
+  gainPercentThreshold: number;    // Alert when strategy gains this % since last alert
+  lossPercentThreshold: number;    // Alert when strategy loses this % since last alert
   profitTakeMultiplier: number;    // Auto-withdraw initial when balance hits Nx starting
-  lastAlertedPnl: number;          // Track last P&L to detect swings
-  lastAlertTime: number;           // Cooldown between alerts
-  alertCooldownMs: number;         // Minimum time between alerts
+  alertCooldownMs: number;         // Minimum time between alerts per strategy
   withdrawnFunds: number;          // Track "withdrawn" (safe) funds
+  // Per-strategy tracking: { "ETH-5min:vol-regime": { lastPnl: 100, lastAlertTime: 123456 } }
+  strategyState: Record<string, { lastPnl: number; lastAlertTime: number }>;
 }
 
 const alertConfig: AlertConfig = {
   enabled: true,
-  extremeGainThreshold: 50000,     // Alert on +$50k swing
-  extremeLossThreshold: 25000,     // Alert on -$25k swing  
+  gainPercentThreshold: 50,        // Alert on +50% gain from last state
+  lossPercentThreshold: 30,        // Alert on -30% loss from last state
   profitTakeMultiplier: 3,         // At 3x, withdraw initial
-  lastAlertedPnl: 0,
-  lastAlertTime: 0,
-  alertCooldownMs: 5 * 60 * 1000,  // 5 min cooldown
+  alertCooldownMs: 5 * 60 * 1000,  // 5 min cooldown per strategy
   withdrawnFunds: 0,
+  strategyState: {},
 };
 
 // ============ Telegram Functions ============
@@ -87,46 +87,47 @@ function checkAlerts(): void {
   if (!alertConfig.enabled) return;
   
   const now = Date.now();
-  if (now - alertConfig.lastAlertTime < alertConfig.alertCooldownMs) return;
   
-  // Calculate total P&L across all markets
-  let totalPnl = 0;
-  let totalBalance = 0;
-  const startingTotal = 9600; // 16 strategies × $100 × 6 markets... wait, it's per market
-  
+  // Check each strategy individually (percentage-based)
   for (const market of state.markets) {
     for (const strategy of market.strategies) {
-      totalPnl += strategy.totalPnl;
-      totalBalance += strategy.balance;
-    }
-  }
-  
-  const pnlChange = totalPnl - alertConfig.lastAlertedPnl;
-  
-  // Check for extreme gain
-  if (pnlChange >= alertConfig.extremeGainThreshold) {
-    sendTelegramAlert(`🚀 *EXTREME GAIN ALERT*\n\nP&L jumped +$${pnlChange.toLocaleString()} since last check!\n\nTotal P&L: +$${totalPnl.toLocaleString()}\nTotal Balance: $${totalBalance.toLocaleString()}\n\nConsider taking profits!`);
-    alertConfig.lastAlertedPnl = totalPnl;
-    alertConfig.lastAlertTime = now;
-  }
-  
-  // Check for extreme loss
-  if (pnlChange <= -alertConfig.extremeLossThreshold) {
-    sendTelegramAlert(`💀 *EXTREME LOSS ALERT*\n\nP&L dropped -$${Math.abs(pnlChange).toLocaleString()} since last check!\n\nTotal P&L: ${totalPnl >= 0 ? '+' : ''}$${totalPnl.toLocaleString()}\nTotal Balance: $${totalBalance.toLocaleString()}\n\nConsider pausing! Use: \`/poly pause\``);
-    alertConfig.lastAlertedPnl = totalPnl;
-    alertConfig.lastAlertTime = now;
-  }
-  
-  // Auto profit-taking check (per market)
-  for (const market of state.markets) {
-    for (const strategy of market.strategies) {
+      // Only check live mode strategies OR strategies with significant balance
+      if (!strategy.liveMode && strategy.balance < 50) continue;
+      
+      const key = `${market.key}:${strategy.id}`;
+      const lastState = alertConfig.strategyState[key] || { lastPnl: 0, lastAlertTime: 0 };
+      
+      // Cooldown per strategy
+      if (now - lastState.lastAlertTime < alertConfig.alertCooldownMs) continue;
+      
+      const pnlChange = strategy.totalPnl - lastState.lastPnl;
+      const baseAmount = Math.max(strategy.startingBalance, 1); // Avoid division by zero
+      const changePercent = (pnlChange / baseAmount) * 100;
+      
+      // Check for significant gain
+      if (changePercent >= alertConfig.gainPercentThreshold) {
+        sendTelegramAlert(`🚀 *${market.key} ${strategy.name}*\n\n+${changePercent.toFixed(0)}% gain!\nP&L: $${lastState.lastPnl.toFixed(0)} → $${strategy.totalPnl.toFixed(0)}\nBalance: $${strategy.balance.toFixed(0)}`);
+        alertConfig.strategyState[key] = { lastPnl: strategy.totalPnl, lastAlertTime: now };
+      }
+      
+      // Check for significant loss
+      if (changePercent <= -alertConfig.lossPercentThreshold) {
+        sendTelegramAlert(`💀 *${market.key} ${strategy.name}*\n\n${changePercent.toFixed(0)}% loss!\nP&L: $${lastState.lastPnl.toFixed(0)} → $${strategy.totalPnl.toFixed(0)}\nBalance: $${strategy.balance.toFixed(0)}\n\nUse \`poly pause\` to halt.`);
+        alertConfig.strategyState[key] = { lastPnl: strategy.totalPnl, lastAlertTime: now };
+      }
+      
+      // Initialize tracking if first time
+      if (!alertConfig.strategyState[key]) {
+        alertConfig.strategyState[key] = { lastPnl: strategy.totalPnl, lastAlertTime: 0 };
+      }
+      
+      // Auto profit-taking check
       const multiplier = strategy.balance / strategy.startingBalance;
       if (multiplier >= alertConfig.profitTakeMultiplier && !strategy.profitTaken) {
-        // Mark profit taken and "withdraw" initial stake
         strategy.profitTaken = true;
         const withdrawn = strategy.startingBalance;
         alertConfig.withdrawnFunds += withdrawn;
-        sendTelegramAlert(`💰 *AUTO PROFIT-TAKE*\n\n${strategy.name} on ${market.key} hit ${multiplier.toFixed(1)}x!\n\n"Withdrew" initial $${withdrawn} stake.\nTotal safe funds: $${alertConfig.withdrawnFunds.toLocaleString()}\n\nNow trading with house money! 🎰`);
+        sendTelegramAlert(`💰 *PROFIT LOCK*\n\n${strategy.name} on ${market.key} hit ${multiplier.toFixed(1)}x!\n\nInitial $${withdrawn} "withdrawn" to safety.\nTotal safe: $${alertConfig.withdrawnFunds.toFixed(0)}\n\nNow playing with house money! 🎰`);
       }
     }
   }
@@ -1105,7 +1106,7 @@ function canPlaceBet(marketState: MarketState, strategy: StrategyState): boolean
   return true;
 }
 
-function placeBet(marketState: MarketState, strategy: StrategyState, amount: number, probability: number): void {
+async function placeBet(marketState: MarketState, strategy: StrategyState, amount: number, probability: number): Promise<void> {
   // Check if we can place bet
   if (!canPlaceBet(marketState, strategy)) return;
   
@@ -1119,11 +1120,37 @@ function placeBet(marketState: MarketState, strategy: StrategyState, amount: num
   const price = Math.max(0.45, probability - 0.03);
   const shares = Math.floor(amount / price);
   
-  // For live mode, would integrate with Polymarket API here
-  // For now, just log if live
+  // For live mode, place REAL orders on Polymarket
   if (strategy.liveMode) {
-    console.log(`   💰 [LIVE] ${strategy.name}: $${amount} @ ${(probability * 100).toFixed(0)}% - WOULD PLACE REAL BET`);
-    // TODO: Integrate with Polymarket client
+    try {
+      // Find the actual Polymarket market
+      const liveMarket = await liveTrading.findMarket(marketState.asset, marketState.timeframe);
+      
+      if (!liveMarket) {
+        console.log(`   ⚠️ [LIVE] No active ${marketState.asset} ${marketState.timeframe} market found`);
+        return;
+      }
+      
+      // Determine direction based on strategy decision
+      const side = market.side || 'Up';
+      const tokenId = side === 'Up' ? liveMarket.upTokenId : liveMarket.downTokenId;
+      
+      // Place the real order
+      const result = await liveTrading.placeOrder(tokenId, side, amount, price);
+      
+      if (result.success) {
+        console.log(`   💰 [LIVE] ${strategy.name}: $${amount} ${side} @ ${(price * 100).toFixed(0)}¢`);
+        console.log(`      Order ID: ${result.orderId}, Shares: ${result.shares}`);
+        sendTelegramAlert(`💰 *LIVE BET*\n\n${marketState.key} ${strategy.name}\n$${amount} on ${side}\nOrder: ${result.orderId}`);
+      } else {
+        console.log(`   ❌ [LIVE] Order failed: ${result.error}`);
+        sendTelegramAlert(`❌ *ORDER FAILED*\n\n${marketState.key} ${strategy.name}\n$${amount} ${side}\nError: ${result.error}`);
+        return; // Don't deduct balance if order failed
+      }
+    } catch (error: any) {
+      console.error(`   ❌ [LIVE] Error:`, error.message);
+      return;
+    }
   }
   
   market.bets.push({
@@ -1467,6 +1494,87 @@ const server = http.createServer(async (req, res) => {
         
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, config: alertConfig }));
+      } catch (e) {
+        res.writeHead(400);
+        res.end('Invalid JSON');
+      }
+    });
+    return;
+  }
+
+  // Enable/disable live trading for a strategy
+  if (url === '/api/poly/live' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', async () => {
+      try {
+        const data = JSON.parse(body);
+        // data: { market: "ETH-5min", strategy: "vol-regime", live: true, funding: 40 }
+        
+        const market = state.markets.find(m => m.key === data.market);
+        if (!market) {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Market not found' }));
+          return;
+        }
+        
+        const strategy = market.strategies.find(s => s.id === data.strategy);
+        if (!strategy) {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Strategy not found' }));
+          return;
+        }
+        
+        // Initialize live trading client if going live
+        if (data.live && !liveTrading.isDryRun()) {
+          await liveTrading.initialize();
+        }
+        
+        strategy.liveMode = data.live ?? false;
+        
+        // Set funding if provided
+        if (data.funding && data.live) {
+          strategy.balance = data.funding;
+          strategy.startingBalance = data.funding;
+          strategy.totalPnl = 0;
+          strategy.deployed = 0;
+          strategy.wins = 0;
+          strategy.losses = 0;
+        }
+        
+        saveState();
+        broadcastState();
+        
+        const modeStr = strategy.liveMode ? '🔴 LIVE' : '📄 PAPER';
+        console.log(`${modeStr} ${strategy.name} on ${market.key} - $${strategy.balance}`);
+        sendTelegramAlert(`${modeStr} *${strategy.name}* on ${market.key}\nBalance: $${strategy.balance}`);
+        
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ 
+          success: true, 
+          market: market.key,
+          strategy: strategy.id,
+          liveMode: strategy.liveMode,
+          balance: strategy.balance,
+        }));
+      } catch (e: any) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+    return;
+  }
+
+  // Set DRY_RUN mode
+  if (url === '/api/poly/dryrun' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body);
+        liveTrading.setDryRun(data.dryRun ?? true);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, dryRun: liveTrading.isDryRun() }));
       } catch (e) {
         res.writeHead(400);
         res.end('Invalid JSON');

@@ -7,15 +7,28 @@
       "strategies": [
         {
           "id": "adaptive-kelly",
-          "balance": 96,
-          "totalPnl": 16,
-          "totalMarkets": 29,
-          "deployed": 310,
+          "balance": 71,
+          "totalPnl": 6,
+          "totalMarkets": 30,
+          "deployed": 335,
           "wins": 17,
-          "losses": 12,
-          "winRate": 59,
-          "roi": 5.245901639344262,
+          "losses": 13,
+          "winRate": 57,
+          "roi": 1.8181818181818181,
           "history": [
+            {
+              "id": "BTC-15min-1771221603368-adaptive-kelly",
+              "time": "1:15:03 a.m.",
+              "marketId": "BTC-15min-1771221603368",
+              "side": "Up",
+              "shares": 18,
+              "cost": 10,
+              "payout": 0,
+              "pnl": -10,
+              "result": "LOSS",
+              "assetOpen": 68382.49,
+              "assetClose": 68360.38
+            },
             {
               "id": "BTC-15min-1771219808605-adaptive-kelly",
               "time": "12:45:08 a.m.",
@@ -565,6 +578,11 @@
               "market": 29,
               "pnl": -10,
               "cumulative": 16
+            },
+            {
+              "market": 30,
+              "pnl": -10,
+              "cumulative": 6
             }
           ],
           "liveMode": false,
@@ -871,14 +889,27 @@
         {
           "id": "rsi-divergence",
           "balance": 196,
-          "totalPnl": 96,
-          "totalMarkets": 38,
-          "deployed": 456,
-          "wins": 23,
+          "totalPnl": 108,
+          "totalMarkets": 39,
+          "deployed": 480,
+          "wins": 24,
           "losses": 15,
-          "winRate": 61,
-          "roi": 21.052631578947366,
+          "winRate": 62,
+          "roi": 22.5,
           "history": [
+            {
+              "id": "BTC-15min-1771221603368-rsi-divergence",
+              "time": "1:15:03 a.m.",
+              "marketId": "BTC-15min-1771221603368",
+              "side": "Down",
+              "shares": 24,
+              "cost": 12,
+              "payout": 24,
+              "pnl": 12,
+              "result": "WIN",
+              "assetOpen": 68382.49,
+              "assetClose": 68360.38
+            },
             {
               "id": "BTC-15min-1771219808605-rsi-divergence",
               "time": "12:45:08 a.m.",
@@ -1594,6 +1625,11 @@
               "market": 38,
               "pnl": 12,
               "cumulative": 96
+            },
+            {
+              "market": 39,
+              "pnl": 12,
+              "cumulative": 108
             }
           ],
           "liveMode": false,
@@ -4522,15 +4558,28 @@
         },
         {
           "id": "random",
-          "balance": 78,
-          "totalPnl": -2,
-          "totalMarkets": 38,
-          "deployed": 400,
-          "wins": 18,
+          "balance": 79,
+          "totalPnl": 9,
+          "totalMarkets": 39,
+          "deployed": 420,
+          "wins": 19,
           "losses": 20,
-          "winRate": 47,
-          "roi": -0.5128205128205128,
+          "winRate": 49,
+          "roi": 2.142857142857143,
           "history": [
+            {
+              "id": "BTC-15min-1771221603368-random",
+              "time": "1:15:03 a.m.",
+              "marketId": "BTC-15min-1771221603368",
+              "side": "Down",
+              "shares": 21,
+              "cost": 10,
+              "payout": 21,
+              "pnl": 11,
+              "result": "WIN",
+              "assetOpen": 68382.49,
+              "assetClose": 68360.38
+            },
             {
               "id": "BTC-15min-1771219808605-random",
               "time": "12:45:08 a.m.",
@@ -5246,6 +5295,11 @@
               "market": 38,
               "pnl": 11,
               "cumulative": -2
+            },
+            {
+              "market": 39,
+              "pnl": 11,
+              "cumulative": 9
             }
           ],
           "liveMode": false,
@@ -5291,8 +5345,8 @@
           "stopLossThreshold": 25
         }
       ],
-      "totalPnl": 232,
-      "totalBalance": 1744
+      "totalPnl": 245,
+      "totalBalance": 1710
     },
     {
       "key": "BTC-5min",
@@ -5300,15 +5354,28 @@
       "strategies": [
         {
           "id": "adaptive-kelly",
-          "balance": 162,
-          "totalPnl": 72,
-          "totalMarkets": 36,
-          "deployed": 370,
-          "wins": 24,
+          "balance": 170,
+          "totalPnl": 80,
+          "totalMarkets": 37,
+          "deployed": 380,
+          "wins": 25,
           "losses": 12,
-          "winRate": 67,
-          "roi": 19.45945945945946,
+          "winRate": 68,
+          "roi": 21.052631578947366,
           "history": [
+            {
+              "id": "BTC-5min-1771221613366-adaptive-kelly",
+              "time": "1:05:13 a.m.",
+              "marketId": "BTC-5min-1771221613366",
+              "side": "Up",
+              "shares": 18,
+              "cost": 10,
+              "payout": 18,
+              "pnl": 8,
+              "result": "WIN",
+              "assetOpen": 68371.06,
+              "assetClose": 68437.3
+            },
             {
               "id": "BTC-5min-1771220763770-adaptive-kelly",
               "time": "12:51:03 a.m.",
@@ -5958,6 +6025,11 @@
               "market": 36,
               "pnl": -10,
               "cumulative": 72
+            },
+            {
+              "market": 37,
+              "pnl": 8,
+              "cumulative": 80
             }
           ],
           "liveMode": false,
@@ -6076,14 +6148,66 @@
         {
           "id": "rsi-divergence",
           "balance": 208,
-          "totalPnl": 120,
-          "totalMarkets": 70,
-          "deployed": 852,
-          "wins": 40,
-          "losses": 30,
-          "winRate": 57,
-          "roi": 14.084507042253522,
+          "totalPnl": 144,
+          "totalMarkets": 74,
+          "deployed": 924,
+          "wins": 43,
+          "losses": 31,
+          "winRate": 58,
+          "roi": 15.789473684210526,
           "history": [
+            {
+              "id": "BTC-5min-1771222243490-rsi-divergence",
+              "time": "1:15:43 a.m.",
+              "marketId": "BTC-5min-1771222243490",
+              "side": "Up",
+              "shares": 24,
+              "cost": 12,
+              "payout": 0,
+              "pnl": -12,
+              "result": "LOSS",
+              "assetOpen": 68396.57,
+              "assetClose": 68376.18
+            },
+            {
+              "id": "BTC-5min-1771221928469-rsi-divergence",
+              "time": "1:10:28 a.m.",
+              "marketId": "BTC-5min-1771221928469",
+              "side": "Down",
+              "shares": 24,
+              "cost": 12,
+              "payout": 24,
+              "pnl": 12,
+              "result": "WIN",
+              "assetOpen": 68428.14,
+              "assetClose": 68396.57
+            },
+            {
+              "id": "BTC-5min-1771221613366-rsi-divergence",
+              "time": "1:05:13 a.m.",
+              "marketId": "BTC-5min-1771221613366",
+              "side": "Up",
+              "shares": 24,
+              "cost": 12,
+              "payout": 24,
+              "pnl": 12,
+              "result": "WIN",
+              "assetOpen": 68371.06,
+              "assetClose": 68437.3
+            },
+            {
+              "id": "BTC-5min-1771221113172-rsi-divergence",
+              "time": "12:56:53 a.m.",
+              "marketId": "BTC-5min-1771221113172",
+              "side": "Up",
+              "shares": 24,
+              "cost": 12,
+              "payout": 24,
+              "pnl": 12,
+              "result": "WIN",
+              "assetOpen": 68388.99,
+              "assetClose": 68420.18
+            },
             {
               "id": "BTC-5min-1771220763770-rsi-divergence",
               "time": "12:51:03 a.m.",
@@ -6681,58 +6805,6 @@
               "result": "LOSS",
               "assetOpen": 68670.95,
               "assetClose": 68624.87
-            },
-            {
-              "id": "BTC-5min-1771206271668-rsi-divergence",
-              "time": "8:49:31 p.m.",
-              "marketId": "BTC-5min-1771206271668",
-              "side": "Up",
-              "shares": 24,
-              "cost": 12,
-              "payout": 24,
-              "pnl": 12,
-              "result": "WIN",
-              "assetOpen": 68570.21,
-              "assetClose": 68670.95
-            },
-            {
-              "id": "BTC-5min-1771205956615-rsi-divergence",
-              "time": "8:44:16 p.m.",
-              "marketId": "BTC-5min-1771205956615",
-              "side": "Up",
-              "shares": 24,
-              "cost": 12,
-              "payout": 24,
-              "pnl": 12,
-              "result": "WIN",
-              "assetOpen": 68563.15,
-              "assetClose": 68576
-            },
-            {
-              "id": "BTC-5min-1771205641583-rsi-divergence",
-              "time": "8:39:01 p.m.",
-              "marketId": "BTC-5min-1771205641583",
-              "side": "Up",
-              "shares": 24,
-              "cost": 12,
-              "payout": 0,
-              "pnl": -12,
-              "result": "LOSS",
-              "assetOpen": 68644.28,
-              "assetClose": 68576.31
-            },
-            {
-              "id": "BTC-5min-1771205326552-rsi-divergence",
-              "time": "8:33:46 p.m.",
-              "marketId": "BTC-5min-1771205326552",
-              "side": "Up",
-              "shares": 24,
-              "cost": 12,
-              "payout": 0,
-              "pnl": -12,
-              "result": "LOSS",
-              "assetOpen": 68687.99,
-              "assetClose": 68665
             }
           ],
           "pnlHistory": [
@@ -7085,6 +7157,26 @@
               "market": 70,
               "pnl": -12,
               "cumulative": 120
+            },
+            {
+              "market": 71,
+              "pnl": 12,
+              "cumulative": 132
+            },
+            {
+              "market": 72,
+              "pnl": 12,
+              "cumulative": 144
+            },
+            {
+              "market": 73,
+              "pnl": 12,
+              "cumulative": 156
+            },
+            {
+              "market": 74,
+              "pnl": -12,
+              "cumulative": 144
             }
           ],
           "liveMode": false,
@@ -7109,15 +7201,41 @@
         },
         {
           "id": "ensemble",
-          "balance": 1226380,
-          "totalPnl": 1226504,
-          "totalMarkets": 46,
-          "deployed": 2833016,
-          "wins": 39,
+          "balance": 2416926,
+          "totalPnl": 2417050,
+          "totalMarkets": 48,
+          "deployed": 4122777,
+          "wins": 41,
           "losses": 7,
           "winRate": 85,
-          "roi": 43.29322531182316,
+          "roi": 58.62674600154216,
           "history": [
+            {
+              "id": "BTC-5min-1771222243490-ensemble",
+              "time": "1:15:43 a.m.",
+              "marketId": "BTC-5min-1771222243490",
+              "side": "Down",
+              "shares": 1448499,
+              "cost": 753220,
+              "payout": 1448499,
+              "pnl": 695279,
+              "result": "WIN",
+              "assetOpen": 68396.57,
+              "assetClose": 68376.18
+            },
+            {
+              "id": "BTC-5min-1771221928469-ensemble",
+              "time": "1:10:28 a.m.",
+              "marketId": "BTC-5min-1771221928469",
+              "side": "Down",
+              "shares": 1031808,
+              "cost": 536541,
+              "payout": 1031808,
+              "pnl": 495267,
+              "result": "WIN",
+              "assetOpen": 68428.14,
+              "assetClose": 68396.57
+            },
             {
               "id": "BTC-5min-1771220133660-ensemble",
               "time": "12:40:33 a.m.",
@@ -7947,6 +8065,16 @@
               "market": 46,
               "pnl": 412963,
               "cumulative": 1226504
+            },
+            {
+              "market": 47,
+              "pnl": 495267,
+              "cumulative": 1721771
+            },
+            {
+              "market": 48,
+              "pnl": 695279,
+              "cumulative": 2417050
             }
           ],
           "liveMode": false,
@@ -8010,15 +8138,67 @@
         },
         {
           "id": "stoikov",
-          "balance": 559,
-          "totalPnl": 486,
-          "totalMarkets": 70,
-          "deployed": 1917,
-          "wins": 44,
+          "balance": 631,
+          "totalPnl": 594,
+          "totalMarkets": 74,
+          "deployed": 2061,
+          "wins": 48,
           "losses": 26,
-          "winRate": 63,
-          "roi": 25.352112676056336,
+          "winRate": 65,
+          "roi": 29.074889867841406,
           "history": [
+            {
+              "id": "BTC-5min-1771222243490-stoikov",
+              "time": "1:15:43 a.m.",
+              "marketId": "BTC-5min-1771222243490",
+              "side": "Down",
+              "shares": 54,
+              "cost": 27,
+              "payout": 54,
+              "pnl": 27,
+              "result": "WIN",
+              "assetOpen": 68396.57,
+              "assetClose": 68376.18
+            },
+            {
+              "id": "BTC-5min-1771221928469-stoikov",
+              "time": "1:10:28 a.m.",
+              "marketId": "BTC-5min-1771221928469",
+              "side": "Down",
+              "shares": 54,
+              "cost": 27,
+              "payout": 54,
+              "pnl": 27,
+              "result": "WIN",
+              "assetOpen": 68428.14,
+              "assetClose": 68396.57
+            },
+            {
+              "id": "BTC-5min-1771221613366-stoikov",
+              "time": "1:05:13 a.m.",
+              "marketId": "BTC-5min-1771221613366",
+              "side": "Up",
+              "shares": 54,
+              "cost": 27,
+              "payout": 54,
+              "pnl": 27,
+              "result": "WIN",
+              "assetOpen": 68371.06,
+              "assetClose": 68437.3
+            },
+            {
+              "id": "BTC-5min-1771221113172-stoikov",
+              "time": "12:56:53 a.m.",
+              "marketId": "BTC-5min-1771221113172",
+              "side": "Up",
+              "shares": 54,
+              "cost": 27,
+              "payout": 54,
+              "pnl": 27,
+              "result": "WIN",
+              "assetOpen": 68388.99,
+              "assetClose": 68420.18
+            },
             {
               "id": "BTC-5min-1771220763770-stoikov",
               "time": "12:51:03 a.m.",
@@ -8616,58 +8796,6 @@
               "result": "WIN",
               "assetOpen": 68670.95,
               "assetClose": 68624.87
-            },
-            {
-              "id": "BTC-5min-1771206271668-stoikov",
-              "time": "8:49:31 p.m.",
-              "marketId": "BTC-5min-1771206271668",
-              "side": "Up",
-              "shares": 54,
-              "cost": 27,
-              "payout": 54,
-              "pnl": 27,
-              "result": "WIN",
-              "assetOpen": 68570.21,
-              "assetClose": 68670.95
-            },
-            {
-              "id": "BTC-5min-1771205956615-stoikov",
-              "time": "8:44:16 p.m.",
-              "marketId": "BTC-5min-1771205956615",
-              "side": "Down",
-              "shares": 54,
-              "cost": 27,
-              "payout": 0,
-              "pnl": -27,
-              "result": "LOSS",
-              "assetOpen": 68563.15,
-              "assetClose": 68576
-            },
-            {
-              "id": "BTC-5min-1771205641583-stoikov",
-              "time": "8:39:01 p.m.",
-              "marketId": "BTC-5min-1771205641583",
-              "side": "Down",
-              "shares": 54,
-              "cost": 27,
-              "payout": 54,
-              "pnl": 27,
-              "result": "WIN",
-              "assetOpen": 68644.28,
-              "assetClose": 68576.31
-            },
-            {
-              "id": "BTC-5min-1771205326552-stoikov",
-              "time": "8:33:46 p.m.",
-              "marketId": "BTC-5min-1771205326552",
-              "side": "Up",
-              "shares": 54,
-              "cost": 27,
-              "payout": 0,
-              "pnl": -27,
-              "result": "LOSS",
-              "assetOpen": 68687.99,
-              "assetClose": 68665
             }
           ],
           "pnlHistory": [
@@ -9020,6 +9148,26 @@
               "market": 70,
               "pnl": -27,
               "cumulative": 486
+            },
+            {
+              "market": 71,
+              "pnl": 27,
+              "cumulative": 513
+            },
+            {
+              "market": 72,
+              "pnl": 27,
+              "cumulative": 540
+            },
+            {
+              "market": 73,
+              "pnl": 27,
+              "cumulative": 567
+            },
+            {
+              "market": 74,
+              "pnl": 27,
+              "cumulative": 594
             }
           ],
           "liveMode": false,
@@ -9028,15 +9176,28 @@
         },
         {
           "id": "bayesian",
-          "balance": 150,
-          "totalPnl": 50,
-          "totalMarkets": 53,
-          "deployed": 588,
-          "wins": 38,
+          "balance": 156,
+          "totalPnl": 56,
+          "totalMarkets": 54,
+          "deployed": 599,
+          "wins": 39,
           "losses": 15,
           "winRate": 72,
-          "roi": 8.503401360544217,
+          "roi": 9.348914858096828,
           "history": [
+            {
+              "id": "BTC-5min-1771221613366-bayesian",
+              "time": "1:05:13 a.m.",
+              "marketId": "BTC-5min-1771221613366",
+              "side": "Up",
+              "shares": 17,
+              "cost": 11,
+              "payout": 17,
+              "pnl": 6,
+              "result": "WIN",
+              "assetOpen": 68371.06,
+              "assetClose": 68437.3
+            },
             {
               "id": "BTC-5min-1771220763770-bayesian",
               "time": "12:51:03 a.m.",
@@ -9673,19 +9834,6 @@
               "result": "WIN",
               "assetOpen": 68760.42,
               "assetClose": 68979.69
-            },
-            {
-              "id": "BTC-5min-1771199604415-bayesian",
-              "time": "6:58:24 p.m.",
-              "marketId": "BTC-5min-1771199604415",
-              "side": "Up",
-              "shares": 16,
-              "cost": 11,
-              "payout": 16,
-              "pnl": 5,
-              "result": "WIN",
-              "assetOpen": 68742.26,
-              "assetClose": 68817.79
             }
           ],
           "pnlHistory": [
@@ -9953,6 +10101,11 @@
               "market": 53,
               "pnl": 6,
               "cumulative": 50
+            },
+            {
+              "market": 54,
+              "pnl": 6,
+              "cumulative": 56
             }
           ],
           "liveMode": false,
@@ -11417,8 +11570,8 @@
           "stopLossThreshold": 25
         }
       ],
-      "totalPnl": 1227637,
-      "totalBalance": 1228779
+      "totalPnl": 2418329,
+      "totalBalance": 2419441
     },
     {
       "key": "ETH-15min",
@@ -11426,15 +11579,28 @@
       "strategies": [
         {
           "id": "adaptive-kelly",
-          "balance": 160,
-          "totalPnl": 70,
-          "totalMarkets": 20,
-          "deployed": 210,
-          "wins": 15,
+          "balance": 158,
+          "totalPnl": 78,
+          "totalMarkets": 21,
+          "deployed": 230,
+          "wins": 16,
           "losses": 5,
-          "winRate": 75,
-          "roi": 34.146341463414636,
+          "winRate": 76,
+          "roi": 34.66666666666667,
           "history": [
+            {
+              "id": "ETH-15min-1771221623367-adaptive-kelly",
+              "time": "1:15:23 a.m.",
+              "marketId": "ETH-15min-1771221623367",
+              "side": "Up",
+              "shares": 18,
+              "cost": 10,
+              "payout": 18,
+              "pnl": 8,
+              "result": "WIN",
+              "assetOpen": 1957.37,
+              "assetClose": 1959.83
+            },
             {
               "id": "ETH-15min-1771219828602-adaptive-kelly",
               "time": "12:45:28 a.m.",
@@ -11796,6 +11962,11 @@
               "market": 20,
               "pnl": 8,
               "cumulative": 70
+            },
+            {
+              "market": 21,
+              "pnl": 8,
+              "cumulative": 78
             }
           ],
           "liveMode": false,
@@ -12617,15 +12788,28 @@
         },
         {
           "id": "bayesian",
-          "balance": 134,
-          "totalPnl": 34,
-          "totalMarkets": 23,
-          "deployed": 253,
-          "wins": 17,
+          "balance": 128,
+          "totalPnl": 39,
+          "totalMarkets": 24,
+          "deployed": 275,
+          "wins": 18,
           "losses": 6,
-          "winRate": 74,
-          "roi": 13.438735177865613,
+          "winRate": 75,
+          "roi": 14.181818181818182,
           "history": [
+            {
+              "id": "ETH-15min-1771221623367-bayesian",
+              "time": "1:15:23 a.m.",
+              "marketId": "ETH-15min-1771221623367",
+              "side": "Up",
+              "shares": 16,
+              "cost": 11,
+              "payout": 16,
+              "pnl": 5,
+              "result": "WIN",
+              "assetOpen": 1957.37,
+              "assetClose": 1959.83
+            },
             {
               "id": "ETH-15min-1771219828602-bayesian",
               "time": "12:45:28 a.m.",
@@ -13041,6 +13225,11 @@
               "market": 23,
               "pnl": 6,
               "cumulative": 34
+            },
+            {
+              "market": 24,
+              "pnl": 5,
+              "cumulative": 39
             }
           ],
           "liveMode": false,
@@ -13122,15 +13311,28 @@
         },
         {
           "id": "breakout",
-          "balance": 397,
-          "totalPnl": 297,
-          "totalMarkets": 21,
-          "deployed": 567,
-          "wins": 18,
+          "balance": 418,
+          "totalPnl": 318,
+          "totalMarkets": 22,
+          "deployed": 594,
+          "wins": 19,
           "losses": 3,
           "winRate": 86,
-          "roi": 52.38095238095239,
+          "roi": 53.535353535353536,
           "history": [
+            {
+              "id": "ETH-15min-1771221623367-breakout",
+              "time": "1:15:23 a.m.",
+              "marketId": "ETH-15min-1771221623367",
+              "side": "Up",
+              "shares": 48,
+              "cost": 27,
+              "payout": 48,
+              "pnl": 21,
+              "result": "WIN",
+              "assetOpen": 1957.37,
+              "assetClose": 1959.83
+            },
             {
               "id": "ETH-15min-1771219828602-breakout",
               "time": "12:45:28 a.m.",
@@ -13510,6 +13712,11 @@
               "market": 21,
               "pnl": 21,
               "cumulative": 297
+            },
+            {
+              "market": 22,
+              "pnl": 21,
+              "cumulative": 318
             }
           ],
           "liveMode": false,
@@ -13985,15 +14192,28 @@
         },
         {
           "id": "random",
-          "balance": 123,
-          "totalPnl": 43,
-          "totalMarkets": 23,
-          "deployed": 250,
+          "balance": 103,
+          "totalPnl": 33,
+          "totalMarkets": 24,
+          "deployed": 270,
           "wins": 13,
-          "losses": 10,
-          "winRate": 57,
-          "roi": 17.916666666666668,
+          "losses": 11,
+          "winRate": 54,
+          "roi": 12.222222222222221,
           "history": [
+            {
+              "id": "ETH-15min-1771221623367-random",
+              "time": "1:15:23 a.m.",
+              "marketId": "ETH-15min-1771221623367",
+              "side": "Down",
+              "shares": 21,
+              "cost": 10,
+              "payout": 0,
+              "pnl": -10,
+              "result": "LOSS",
+              "assetOpen": 1957.37,
+              "assetClose": 1959.83
+            },
             {
               "id": "ETH-15min-1771219828602-random",
               "time": "12:45:28 a.m.",
@@ -14409,6 +14629,11 @@
               "market": 23,
               "pnl": 11,
               "cumulative": 43
+            },
+            {
+              "market": 24,
+              "pnl": -10,
+              "cumulative": 33
             }
           ],
           "liveMode": false,
@@ -14432,8 +14657,8 @@
           "stopLossThreshold": 25
         }
       ],
-      "totalPnl": 91,
-      "totalBalance": 1644
+      "totalPnl": 115,
+      "totalBalance": 1627
     },
     {
       "key": "ETH-5min",
@@ -14441,15 +14666,54 @@
       "strategies": [
         {
           "id": "adaptive-kelly",
-          "balance": 166,
-          "totalPnl": 76,
-          "totalMarkets": 50,
-          "deployed": 510,
-          "wins": 32,
+          "balance": 180,
+          "totalPnl": 100,
+          "totalMarkets": 53,
+          "deployed": 550,
+          "wins": 35,
           "losses": 18,
-          "winRate": 64,
-          "roi": 14.901960784313726,
+          "winRate": 66,
+          "roi": 18.51851851851852,
           "history": [
+            {
+              "id": "ETH-5min-1771221948431-adaptive-kelly",
+              "time": "1:10:48 a.m.",
+              "marketId": "ETH-5min-1771221948431",
+              "side": "Down",
+              "shares": 18,
+              "cost": 10,
+              "payout": 18,
+              "pnl": 8,
+              "result": "WIN",
+              "assetOpen": 1960.61,
+              "assetClose": 1959.59
+            },
+            {
+              "id": "ETH-5min-1771221633369-adaptive-kelly",
+              "time": "1:05:33 a.m.",
+              "marketId": "ETH-5min-1771221633369",
+              "side": "Up",
+              "shares": 18,
+              "cost": 10,
+              "payout": 18,
+              "pnl": 8,
+              "result": "WIN",
+              "assetOpen": 1957.38,
+              "assetClose": 1960.69
+            },
+            {
+              "id": "ETH-5min-1771221133172-adaptive-kelly",
+              "time": "12:57:13 a.m.",
+              "marketId": "ETH-5min-1771221133172",
+              "side": "Up",
+              "shares": 18,
+              "cost": 10,
+              "payout": 18,
+              "pnl": 8,
+              "result": "WIN",
+              "assetOpen": 1956.59,
+              "assetClose": 1958.01
+            },
             {
               "id": "ETH-5min-1771220783837-adaptive-kelly",
               "time": "12:51:23 a.m.",
@@ -15060,45 +15324,6 @@
               "result": "WIN",
               "assetOpen": 1974.41,
               "assetClose": 1974.87
-            },
-            {
-              "id": "ETH-5min-1771200305920-adaptive-kelly",
-              "time": "7:10:05 p.m.",
-              "marketId": "ETH-5min-1771200305920",
-              "side": "Up",
-              "shares": 18,
-              "cost": 10,
-              "payout": 18,
-              "pnl": 8,
-              "result": "WIN",
-              "assetOpen": 1965.31,
-              "assetClose": 1975.54
-            },
-            {
-              "id": "ETH-5min-1771199309358-adaptive-kelly",
-              "time": "6:53:29 p.m.",
-              "marketId": "ETH-5min-1771199309358",
-              "side": "Down",
-              "shares": 18,
-              "cost": 10,
-              "payout": 0,
-              "pnl": -10,
-              "result": "LOSS",
-              "assetOpen": 1964.14,
-              "assetClose": 1964.14
-            },
-            {
-              "id": "ETH-5min-1771198679277-adaptive-kelly",
-              "time": "6:42:59 p.m.",
-              "marketId": "ETH-5min-1771198679277",
-              "side": "Down",
-              "shares": 18,
-              "cost": 10,
-              "payout": 0,
-              "pnl": -10,
-              "result": "LOSS",
-              "assetOpen": 1960.05,
-              "assetClose": 1961.16
             }
           ],
           "pnlHistory": [
@@ -15351,6 +15576,21 @@
               "market": 50,
               "pnl": 8,
               "cumulative": 76
+            },
+            {
+              "market": 51,
+              "pnl": 8,
+              "cumulative": 84
+            },
+            {
+              "market": 52,
+              "pnl": 8,
+              "cumulative": 92
+            },
+            {
+              "market": 53,
+              "pnl": 8,
+              "cumulative": 100
             }
           ],
           "liveMode": false,
@@ -15359,15 +15599,54 @@
         },
         {
           "id": "vol-regime",
-          "balance": 12575923,
-          "totalPnl": 12576240,
-          "totalMarkets": 55,
-          "deployed": 14782356,
-          "wins": 46,
+          "balance": 45320296,
+          "totalPnl": 45320613,
+          "totalMarkets": 58,
+          "deployed": 48863235,
+          "wins": 49,
           "losses": 9,
           "winRate": 84,
-          "roi": 85.07601900536017,
+          "roi": 92.7499233319284,
           "history": [
+            {
+              "id": "ETH-5min-1771221948431-vol-regime",
+              "time": "1:10:48 a.m.",
+              "marketId": "ETH-5min-1771221948431",
+              "side": "Down",
+              "shares": 20694198,
+              "cost": 10554041,
+              "payout": 20694198,
+              "pnl": 10140157,
+              "result": "WIN",
+              "assetOpen": 1960.61,
+              "assetClose": 1959.59
+            },
+            {
+              "id": "ETH-5min-1771221633369-vol-regime",
+              "time": "1:05:33 a.m.",
+              "marketId": "ETH-5min-1771221633369",
+              "side": "Up",
+              "shares": 28869984,
+              "cost": 14723692,
+              "payout": 28869984,
+              "pnl": 14146292,
+              "result": "WIN",
+              "assetOpen": 1957.38,
+              "assetClose": 1960.69
+            },
+            {
+              "id": "ETH-5min-1771221133172-vol-regime",
+              "time": "12:57:13 a.m.",
+              "marketId": "ETH-5min-1771221133172",
+              "side": "Up",
+              "shares": 17261070,
+              "cost": 8803146,
+              "payout": 17261070,
+              "pnl": 8457924,
+              "result": "WIN",
+              "assetOpen": 1956.59,
+              "assetClose": 1958.01
+            },
             {
               "id": "ETH-5min-1771220468717-vol-regime",
               "time": "12:46:08 a.m.",
@@ -15978,45 +16257,6 @@
               "result": "WIN",
               "assetOpen": 1967.66,
               "assetClose": 1973.87
-            },
-            {
-              "id": "ETH-5min-1771201566061-vol-regime",
-              "time": "7:31:06 p.m.",
-              "marketId": "ETH-5min-1771201566061",
-              "side": "Up",
-              "shares": 190,
-              "cost": 97,
-              "payout": 190,
-              "pnl": 93,
-              "result": "WIN",
-              "assetOpen": 1965.94,
-              "assetClose": 1967.72
-            },
-            {
-              "id": "ETH-5min-1771201251036-vol-regime",
-              "time": "7:25:51 p.m.",
-              "marketId": "ETH-5min-1771201251036",
-              "side": "Down",
-              "shares": 101,
-              "cost": 52,
-              "payout": 101,
-              "pnl": 49,
-              "result": "WIN",
-              "assetOpen": 1971.43,
-              "assetClose": 1966.65
-            },
-            {
-              "id": "ETH-5min-1771200935996-vol-regime",
-              "time": "7:20:36 p.m.",
-              "marketId": "ETH-5min-1771200935996",
-              "side": "Up",
-              "shares": 240,
-              "cost": 123,
-              "payout": 0,
-              "pnl": -123,
-              "result": "LOSS",
-              "assetOpen": 1975.47,
-              "assetClose": 1972.24
             }
           ],
           "pnlHistory": [
@@ -16294,6 +16534,21 @@
               "market": 55,
               "pnl": 5056906,
               "cumulative": 12576240
+            },
+            {
+              "market": 56,
+              "pnl": 8457924,
+              "cumulative": 21034164
+            },
+            {
+              "market": 57,
+              "pnl": 14146292,
+              "cumulative": 35180456
+            },
+            {
+              "market": 58,
+              "pnl": 10140157,
+              "cumulative": 45320613
             }
           ],
           "liveMode": false,
@@ -16697,15 +16952,67 @@
         },
         {
           "id": "ensemble",
-          "balance": 26321,
-          "totalPnl": 26327,
-          "totalMarkets": 59,
-          "deployed": 99408,
-          "wins": 43,
-          "losses": 16,
+          "balance": 23040,
+          "totalPnl": 40965,
+          "totalMarkets": 63,
+          "deployed": 199555,
+          "wins": 46,
+          "losses": 17,
           "winRate": 73,
-          "roi": 26.483784001287624,
+          "roi": 22.55334845515206,
           "history": [
+            {
+              "id": "ETH-5min-1771222263479-ensemble",
+              "time": "1:16:03 a.m.",
+              "marketId": "ETH-5min-1771222263479",
+              "side": "Down",
+              "shares": 61260,
+              "cost": 31856,
+              "payout": 0,
+              "pnl": -31856,
+              "result": "LOSS",
+              "assetOpen": 1959.8,
+              "assetClose": 1959.92
+            },
+            {
+              "id": "ETH-5min-1771221948431-ensemble",
+              "time": "1:10:48 a.m.",
+              "marketId": "ETH-5min-1771221948431",
+              "side": "Down",
+              "shares": 43637,
+              "cost": 22692,
+              "payout": 43637,
+              "pnl": 20945,
+              "result": "WIN",
+              "assetOpen": 1960.61,
+              "assetClose": 1959.59
+            },
+            {
+              "id": "ETH-5min-1771221633369-ensemble",
+              "time": "1:05:33 a.m.",
+              "marketId": "ETH-5min-1771221633369",
+              "side": "Up",
+              "shares": 31086,
+              "cost": 16165,
+              "payout": 31086,
+              "pnl": 14921,
+              "result": "WIN",
+              "assetOpen": 1957.38,
+              "assetClose": 1960.69
+            },
+            {
+              "id": "ETH-5min-1771221133172-ensemble",
+              "time": "12:57:13 a.m.",
+              "marketId": "ETH-5min-1771221133172",
+              "side": "Up",
+              "shares": 22143,
+              "cost": 11515,
+              "payout": 22143,
+              "pnl": 10628,
+              "result": "WIN",
+              "assetOpen": 1956.59,
+              "assetClose": 1958.01
+            },
             {
               "id": "ETH-5min-1771220783837-ensemble",
               "time": "12:51:23 a.m.",
@@ -17303,58 +17610,6 @@
               "result": "LOSS",
               "assetOpen": 1974.19,
               "assetClose": 1973.69
-            },
-            {
-              "id": "ETH-5min-1771203771314-ensemble",
-              "time": "8:07:51 p.m.",
-              "marketId": "ETH-5min-1771203771314",
-              "side": "Up",
-              "shares": 219,
-              "cost": 114,
-              "payout": 219,
-              "pnl": 105,
-              "result": "WIN",
-              "assetOpen": 1969.73,
-              "assetClose": 1974.6
-            },
-            {
-              "id": "ETH-5min-1771203141206-ensemble",
-              "time": "7:57:21 p.m.",
-              "marketId": "ETH-5min-1771203141206",
-              "side": "Down",
-              "shares": 201,
-              "cost": 105,
-              "payout": 201,
-              "pnl": 96,
-              "result": "WIN",
-              "assetOpen": 1972.1,
-              "assetClose": 1968.62
-            },
-            {
-              "id": "ETH-5min-1771202826161-ensemble",
-              "time": "7:52:06 p.m.",
-              "marketId": "ETH-5min-1771202826161",
-              "side": "Up",
-              "shares": 97,
-              "cost": 51,
-              "payout": 97,
-              "pnl": 46,
-              "result": "WIN",
-              "assetOpen": 1967.35,
-              "assetClose": 1972.01
-            },
-            {
-              "id": "ETH-5min-1771202511143-ensemble",
-              "time": "7:46:51 p.m.",
-              "marketId": "ETH-5min-1771202511143",
-              "side": "Down",
-              "shares": 175,
-              "cost": 91,
-              "payout": 0,
-              "pnl": -91,
-              "result": "LOSS",
-              "assetOpen": 1967.01,
-              "assetClose": 1967.55
             }
           ],
           "pnlHistory": [
@@ -17652,6 +17907,26 @@
               "market": 59,
               "pnl": -20470,
               "cumulative": 26327
+            },
+            {
+              "market": 60,
+              "pnl": 10628,
+              "cumulative": 36955
+            },
+            {
+              "market": 61,
+              "pnl": 14921,
+              "cumulative": 51876
+            },
+            {
+              "market": 62,
+              "pnl": 20945,
+              "cumulative": 72821
+            },
+            {
+              "market": 63,
+              "pnl": -31856,
+              "cumulative": 40965
             }
           ],
           "liveMode": false,
@@ -17733,15 +18008,67 @@
         },
         {
           "id": "stoikov",
-          "balance": 667,
-          "totalPnl": 594,
-          "totalMarkets": 70,
-          "deployed": 1917,
-          "wins": 46,
-          "losses": 24,
+          "balance": 685,
+          "totalPnl": 648,
+          "totalMarkets": 74,
+          "deployed": 2061,
+          "wins": 49,
+          "losses": 25,
           "winRate": 66,
-          "roi": 30.985915492957744,
+          "roi": 31.718061674008812,
           "history": [
+            {
+              "id": "ETH-5min-1771222263479-stoikov",
+              "time": "1:16:03 a.m.",
+              "marketId": "ETH-5min-1771222263479",
+              "side": "Down",
+              "shares": 54,
+              "cost": 27,
+              "payout": 0,
+              "pnl": -27,
+              "result": "LOSS",
+              "assetOpen": 1959.8,
+              "assetClose": 1959.92
+            },
+            {
+              "id": "ETH-5min-1771221948431-stoikov",
+              "time": "1:10:48 a.m.",
+              "marketId": "ETH-5min-1771221948431",
+              "side": "Down",
+              "shares": 54,
+              "cost": 27,
+              "payout": 54,
+              "pnl": 27,
+              "result": "WIN",
+              "assetOpen": 1960.61,
+              "assetClose": 1959.59
+            },
+            {
+              "id": "ETH-5min-1771221633369-stoikov",
+              "time": "1:05:33 a.m.",
+              "marketId": "ETH-5min-1771221633369",
+              "side": "Up",
+              "shares": 54,
+              "cost": 27,
+              "payout": 54,
+              "pnl": 27,
+              "result": "WIN",
+              "assetOpen": 1957.38,
+              "assetClose": 1960.69
+            },
+            {
+              "id": "ETH-5min-1771221133172-stoikov",
+              "time": "12:57:13 a.m.",
+              "marketId": "ETH-5min-1771221133172",
+              "side": "Up",
+              "shares": 54,
+              "cost": 27,
+              "payout": 54,
+              "pnl": 27,
+              "result": "WIN",
+              "assetOpen": 1956.59,
+              "assetClose": 1958.01
+            },
             {
               "id": "ETH-5min-1771220783837-stoikov",
               "time": "12:51:23 a.m.",
@@ -18339,58 +18666,6 @@
               "result": "LOSS",
               "assetOpen": 1963.35,
               "assetClose": 1963.1
-            },
-            {
-              "id": "ETH-5min-1771206291660-stoikov",
-              "time": "8:49:51 p.m.",
-              "marketId": "ETH-5min-1771206291660",
-              "side": "Up",
-              "shares": 54,
-              "cost": 27,
-              "payout": 54,
-              "pnl": 27,
-              "result": "WIN",
-              "assetOpen": 1960.76,
-              "assetClose": 1964.15
-            },
-            {
-              "id": "ETH-5min-1771205976613-stoikov",
-              "time": "8:44:36 p.m.",
-              "marketId": "ETH-5min-1771205976613",
-              "side": "Down",
-              "shares": 54,
-              "cost": 27,
-              "payout": 0,
-              "pnl": -27,
-              "result": "LOSS",
-              "assetOpen": 1959.24,
-              "assetClose": 1960.26
-            },
-            {
-              "id": "ETH-5min-1771205661576-stoikov",
-              "time": "8:39:21 p.m.",
-              "marketId": "ETH-5min-1771205661576",
-              "side": "Down",
-              "shares": 54,
-              "cost": 27,
-              "payout": 54,
-              "pnl": 27,
-              "result": "WIN",
-              "assetOpen": 1964.42,
-              "assetClose": 1959.77
-            },
-            {
-              "id": "ETH-5min-1771205346548-stoikov",
-              "time": "8:34:06 p.m.",
-              "marketId": "ETH-5min-1771205346548",
-              "side": "Up",
-              "shares": 54,
-              "cost": 27,
-              "payout": 0,
-              "pnl": -27,
-              "result": "LOSS",
-              "assetOpen": 1966.54,
-              "assetClose": 1962.91
             }
           ],
           "pnlHistory": [
@@ -18743,6 +19018,26 @@
               "market": 70,
               "pnl": 27,
               "cumulative": 594
+            },
+            {
+              "market": 71,
+              "pnl": 27,
+              "cumulative": 621
+            },
+            {
+              "market": 72,
+              "pnl": 27,
+              "cumulative": 648
+            },
+            {
+              "market": 73,
+              "pnl": 27,
+              "cumulative": 675
+            },
+            {
+              "market": 74,
+              "pnl": -27,
+              "cumulative": 648
             }
           ],
           "liveMode": false,
@@ -18751,15 +19046,41 @@
         },
         {
           "id": "bayesian",
-          "balance": 119,
-          "totalPnl": 30,
-          "totalMarkets": 52,
-          "deployed": 587,
-          "wins": 36,
+          "balance": 107,
+          "totalPnl": 40,
+          "totalMarkets": 54,
+          "deployed": 632,
+          "wins": 38,
           "losses": 16,
-          "winRate": 69,
-          "roi": 5.110732538330494,
+          "winRate": 70,
+          "roi": 6.44122383252818,
           "history": [
+            {
+              "id": "ETH-5min-1771222263479-bayesian",
+              "time": "1:16:03 a.m.",
+              "marketId": "ETH-5min-1771222263479",
+              "side": "Up",
+              "shares": 16,
+              "cost": 12,
+              "payout": 16,
+              "pnl": 4,
+              "result": "WIN",
+              "assetOpen": 1959.8,
+              "assetClose": 1959.92
+            },
+            {
+              "id": "ETH-5min-1771221633369-bayesian",
+              "time": "1:05:33 a.m.",
+              "marketId": "ETH-5min-1771221633369",
+              "side": "Up",
+              "shares": 17,
+              "cost": 11,
+              "payout": 17,
+              "pnl": 6,
+              "result": "WIN",
+              "assetOpen": 1957.38,
+              "assetClose": 1960.69
+            },
             {
               "id": "ETH-5min-1771220468717-bayesian",
               "time": "12:46:08 a.m.",
@@ -19383,32 +19704,6 @@
               "result": "WIN",
               "assetOpen": 1975.47,
               "assetClose": 1972.24
-            },
-            {
-              "id": "ETH-5min-1771200620960-bayesian",
-              "time": "7:15:20 p.m.",
-              "marketId": "ETH-5min-1771200620960",
-              "side": "Up",
-              "shares": 17,
-              "cost": 11,
-              "payout": 17,
-              "pnl": 6,
-              "result": "WIN",
-              "assetOpen": 1974.41,
-              "assetClose": 1974.87
-            },
-            {
-              "id": "ETH-5min-1771200305920-bayesian",
-              "time": "7:10:05 p.m.",
-              "marketId": "ETH-5min-1771200305920",
-              "side": "Up",
-              "shares": 16,
-              "cost": 11,
-              "payout": 16,
-              "pnl": 5,
-              "result": "WIN",
-              "assetOpen": 1965.31,
-              "assetClose": 1975.54
             }
           ],
           "pnlHistory": [
@@ -19671,6 +19966,16 @@
               "market": 52,
               "pnl": -11,
               "cumulative": 30
+            },
+            {
+              "market": 53,
+              "pnl": 6,
+              "cumulative": 36
+            },
+            {
+              "market": 54,
+              "pnl": 4,
+              "cumulative": 40
             }
           ],
           "liveMode": false,
@@ -19734,15 +20039,28 @@
         },
         {
           "id": "breakout",
-          "balance": 718,
-          "totalPnl": 618,
-          "totalMarkets": 34,
-          "deployed": 918,
-          "wins": 32,
+          "balance": 739,
+          "totalPnl": 639,
+          "totalMarkets": 35,
+          "deployed": 945,
+          "wins": 33,
           "losses": 2,
           "winRate": 94,
-          "roi": 67.3202614379085,
+          "roi": 67.61904761904762,
           "history": [
+            {
+              "id": "ETH-5min-1771221633369-breakout",
+              "time": "1:05:33 a.m.",
+              "marketId": "ETH-5min-1771221633369",
+              "side": "Up",
+              "shares": 48,
+              "cost": 27,
+              "payout": 48,
+              "pnl": 21,
+              "result": "WIN",
+              "assetOpen": 1957.38,
+              "assetClose": 1960.69
+            },
             {
               "id": "ETH-5min-1771220153674-breakout",
               "time": "12:40:53 a.m.",
@@ -20356,6 +20674,11 @@
               "market": 34,
               "pnl": 21,
               "cumulative": 618
+            },
+            {
+              "market": 35,
+              "pnl": 21,
+              "cumulative": 639
             }
           ],
           "liveMode": false,
@@ -20921,15 +21244,67 @@
         },
         {
           "id": "random",
-          "balance": 167,
-          "totalPnl": 77,
-          "totalMarkets": 70,
-          "deployed": 710,
-          "wins": 37,
+          "balance": 191,
+          "totalPnl": 121,
+          "totalMarkets": 74,
+          "deployed": 770,
+          "wins": 41,
           "losses": 33,
-          "winRate": 53,
-          "roi": 10.84507042253521,
+          "winRate": 55,
+          "roi": 15.921052631578947,
           "history": [
+            {
+              "id": "ETH-5min-1771222263479-random",
+              "time": "1:16:03 a.m.",
+              "marketId": "ETH-5min-1771222263479",
+              "side": "Up",
+              "shares": 21,
+              "cost": 10,
+              "payout": 21,
+              "pnl": 11,
+              "result": "WIN",
+              "assetOpen": 1959.8,
+              "assetClose": 1959.92
+            },
+            {
+              "id": "ETH-5min-1771221948431-random",
+              "time": "1:10:48 a.m.",
+              "marketId": "ETH-5min-1771221948431",
+              "side": "Down",
+              "shares": 21,
+              "cost": 10,
+              "payout": 21,
+              "pnl": 11,
+              "result": "WIN",
+              "assetOpen": 1960.61,
+              "assetClose": 1959.59
+            },
+            {
+              "id": "ETH-5min-1771221633369-random",
+              "time": "1:05:33 a.m.",
+              "marketId": "ETH-5min-1771221633369",
+              "side": "Up",
+              "shares": 21,
+              "cost": 10,
+              "payout": 21,
+              "pnl": 11,
+              "result": "WIN",
+              "assetOpen": 1957.38,
+              "assetClose": 1960.69
+            },
+            {
+              "id": "ETH-5min-1771221133172-random",
+              "time": "12:57:13 a.m.",
+              "marketId": "ETH-5min-1771221133172",
+              "side": "Up",
+              "shares": 21,
+              "cost": 10,
+              "payout": 21,
+              "pnl": 11,
+              "result": "WIN",
+              "assetOpen": 1956.59,
+              "assetClose": 1958.01
+            },
             {
               "id": "ETH-5min-1771220783837-random",
               "time": "12:51:23 a.m.",
@@ -21527,58 +21902,6 @@
               "result": "WIN",
               "assetOpen": 1963.35,
               "assetClose": 1963.1
-            },
-            {
-              "id": "ETH-5min-1771206291660-random",
-              "time": "8:49:51 p.m.",
-              "marketId": "ETH-5min-1771206291660",
-              "side": "Up",
-              "shares": 21,
-              "cost": 10,
-              "payout": 21,
-              "pnl": 11,
-              "result": "WIN",
-              "assetOpen": 1960.76,
-              "assetClose": 1964.15
-            },
-            {
-              "id": "ETH-5min-1771205976613-random",
-              "time": "8:44:36 p.m.",
-              "marketId": "ETH-5min-1771205976613",
-              "side": "Down",
-              "shares": 21,
-              "cost": 10,
-              "payout": 0,
-              "pnl": -10,
-              "result": "LOSS",
-              "assetOpen": 1959.24,
-              "assetClose": 1960.26
-            },
-            {
-              "id": "ETH-5min-1771205661576-random",
-              "time": "8:39:21 p.m.",
-              "marketId": "ETH-5min-1771205661576",
-              "side": "Up",
-              "shares": 21,
-              "cost": 10,
-              "payout": 0,
-              "pnl": -10,
-              "result": "LOSS",
-              "assetOpen": 1964.42,
-              "assetClose": 1959.77
-            },
-            {
-              "id": "ETH-5min-1771205346548-random",
-              "time": "8:34:06 p.m.",
-              "marketId": "ETH-5min-1771205346548",
-              "side": "Up",
-              "shares": 21,
-              "cost": 10,
-              "payout": 0,
-              "pnl": -10,
-              "result": "LOSS",
-              "assetOpen": 1966.54,
-              "assetClose": 1962.91
             }
           ],
           "pnlHistory": [
@@ -21931,6 +22254,26 @@
               "market": 70,
               "pnl": 11,
               "cumulative": 77
+            },
+            {
+              "market": 71,
+              "pnl": 11,
+              "cumulative": 88
+            },
+            {
+              "market": 72,
+              "pnl": 11,
+              "cumulative": 99
+            },
+            {
+              "market": 73,
+              "pnl": 11,
+              "cumulative": 110
+            },
+            {
+              "market": 74,
+              "pnl": 11,
+              "cumulative": 121
             }
           ],
           "liveMode": false,
@@ -21954,8 +22297,8 @@
           "stopLossThreshold": 25
         }
       ],
-      "totalPnl": 12603866,
-      "totalBalance": 12604839
+      "totalPnl": 45363030,
+      "totalBalance": 45363964
     },
     {
       "key": "SOL-15min",
@@ -21963,15 +22306,28 @@
       "strategies": [
         {
           "id": "adaptive-kelly",
-          "balance": 161,
-          "totalPnl": 76,
-          "totalMarkets": 23,
-          "deployed": 245,
-          "wins": 17,
+          "balance": 159,
+          "totalPnl": 84,
+          "totalMarkets": 24,
+          "deployed": 265,
+          "wins": 18,
           "losses": 6,
-          "winRate": 74,
-          "roi": 31.666666666666664,
+          "winRate": 75,
+          "roi": 32.30769230769231,
           "history": [
+            {
+              "id": "SOL-15min-1771221643368-adaptive-kelly",
+              "time": "1:15:43 a.m.",
+              "marketId": "SOL-15min-1771221643368",
+              "side": "Up",
+              "shares": 18,
+              "cost": 10,
+              "payout": 18,
+              "pnl": 8,
+              "result": "WIN",
+              "assetOpen": 84.74,
+              "assetClose": 84.85
+            },
             {
               "id": "SOL-15min-1771219848604-adaptive-kelly",
               "time": "12:45:48 a.m.",
@@ -22387,6 +22743,11 @@
               "market": 23,
               "pnl": -10,
               "cumulative": 76
+            },
+            {
+              "market": 24,
+              "pnl": 8,
+              "cumulative": 84
             }
           ],
           "liveMode": false,
@@ -22955,15 +23316,28 @@
         },
         {
           "id": "stoikov",
-          "balance": 325,
-          "totalPnl": 243,
-          "totalMarkets": 23,
-          "deployed": 639,
-          "wins": 16,
+          "balance": 334,
+          "totalPnl": 270,
+          "totalMarkets": 24,
+          "deployed": 684,
+          "wins": 17,
           "losses": 7,
-          "winRate": 70,
-          "roi": 38.57142857142858,
+          "winRate": 71,
+          "roi": 39.473684210526315,
           "history": [
+            {
+              "id": "SOL-15min-1771221643368-stoikov",
+              "time": "1:15:43 a.m.",
+              "marketId": "SOL-15min-1771221643368",
+              "side": "Up",
+              "shares": 54,
+              "cost": 27,
+              "payout": 54,
+              "pnl": 27,
+              "result": "WIN",
+              "assetOpen": 84.74,
+              "assetClose": 84.85
+            },
             {
               "id": "SOL-15min-1771219848604-stoikov",
               "time": "12:45:48 a.m.",
@@ -23379,6 +23753,11 @@
               "market": 23,
               "pnl": 27,
               "cumulative": 243
+            },
+            {
+              "market": 24,
+              "pnl": 27,
+              "cumulative": 270
             }
           ],
           "liveMode": false,
@@ -24683,15 +25062,28 @@
         },
         {
           "id": "random",
-          "balance": 165,
-          "totalPnl": 85,
-          "totalMarkets": 23,
-          "deployed": 250,
+          "balance": 145,
+          "totalPnl": 75,
+          "totalMarkets": 24,
+          "deployed": 270,
           "wins": 15,
-          "losses": 8,
-          "winRate": 65,
-          "roi": 35.41666666666667,
+          "losses": 9,
+          "winRate": 63,
+          "roi": 27.77777777777778,
           "history": [
+            {
+              "id": "SOL-15min-1771221643368-random",
+              "time": "1:15:43 a.m.",
+              "marketId": "SOL-15min-1771221643368",
+              "side": "Down",
+              "shares": 21,
+              "cost": 10,
+              "payout": 0,
+              "pnl": -10,
+              "result": "LOSS",
+              "assetOpen": 84.74,
+              "assetClose": 84.85
+            },
             {
               "id": "SOL-15min-1771219848604-random",
               "time": "12:45:48 a.m.",
@@ -25107,6 +25499,11 @@
               "market": 23,
               "pnl": 11,
               "cumulative": 85
+            },
+            {
+              "market": 24,
+              "pnl": -10,
+              "cumulative": 75
             }
           ],
           "liveMode": false,
@@ -25186,8 +25583,8 @@
           "stopLossThreshold": 25
         }
       ],
-      "totalPnl": 616,
-      "totalBalance": 2155
+      "totalPnl": 641,
+      "totalBalance": 2123
     },
     {
       "key": "SOL-5min",
@@ -25195,15 +25592,54 @@
       "strategies": [
         {
           "id": "adaptive-kelly",
-          "balance": 244,
-          "totalPnl": 174,
-          "totalMarkets": 51,
-          "deployed": 540,
-          "wins": 38,
+          "balance": 258,
+          "totalPnl": 198,
+          "totalMarkets": 54,
+          "deployed": 580,
+          "wins": 41,
           "losses": 13,
-          "winRate": 75,
-          "roi": 32.83018867924528,
+          "winRate": 76,
+          "roi": 34.43478260869565,
           "history": [
+            {
+              "id": "SOL-5min-1771221968423-adaptive-kelly",
+              "time": "1:11:08 a.m.",
+              "marketId": "SOL-5min-1771221968423",
+              "side": "Down",
+              "shares": 18,
+              "cost": 10,
+              "payout": 18,
+              "pnl": 8,
+              "result": "WIN",
+              "assetOpen": 84.86,
+              "assetClose": 84.83
+            },
+            {
+              "id": "SOL-5min-1771221653368-adaptive-kelly",
+              "time": "1:05:53 a.m.",
+              "marketId": "SOL-5min-1771221653368",
+              "side": "Up",
+              "shares": 18,
+              "cost": 10,
+              "payout": 18,
+              "pnl": 8,
+              "result": "WIN",
+              "assetOpen": 84.74,
+              "assetClose": 84.86
+            },
+            {
+              "id": "SOL-5min-1771221153172-adaptive-kelly",
+              "time": "12:57:33 a.m.",
+              "marketId": "SOL-5min-1771221153172",
+              "side": "Up",
+              "shares": 18,
+              "cost": 10,
+              "payout": 18,
+              "pnl": 8,
+              "result": "WIN",
+              "assetOpen": 84.63,
+              "assetClose": 84.72
+            },
             {
               "id": "SOL-5min-1771220173691-adaptive-kelly",
               "time": "12:41:13 a.m.",
@@ -25814,45 +26250,6 @@
               "result": "WIN",
               "assetOpen": 86.43,
               "assetClose": 86.24
-            },
-            {
-              "id": "SOL-5min-1771200325924-adaptive-kelly",
-              "time": "7:10:25 p.m.",
-              "marketId": "SOL-5min-1771200325924",
-              "side": "Up",
-              "shares": 18,
-              "cost": 10,
-              "payout": 18,
-              "pnl": 8,
-              "result": "WIN",
-              "assetOpen": 86.02,
-              "assetClose": 86.37
-            },
-            {
-              "id": "SOL-5min-1771199329356-adaptive-kelly",
-              "time": "6:53:49 p.m.",
-              "marketId": "SOL-5min-1771199329356",
-              "side": "Up",
-              "shares": 18,
-              "cost": 10,
-              "payout": 18,
-              "pnl": 8,
-              "result": "WIN",
-              "assetOpen": 85.94,
-              "assetClose": 86
-            },
-            {
-              "id": "SOL-5min-1771199014316-adaptive-kelly",
-              "time": "6:48:34 p.m.",
-              "marketId": "SOL-5min-1771199014316",
-              "side": "Up",
-              "shares": 18,
-              "cost": 10,
-              "payout": 18,
-              "pnl": 8,
-              "result": "WIN",
-              "assetOpen": 85.9,
-              "assetClose": 85.97
             }
           ],
           "pnlHistory": [
@@ -26110,6 +26507,21 @@
               "market": 51,
               "pnl": 8,
               "cumulative": 174
+            },
+            {
+              "market": 52,
+              "pnl": 8,
+              "cumulative": 182
+            },
+            {
+              "market": 53,
+              "pnl": 8,
+              "cumulative": 190
+            },
+            {
+              "market": 54,
+              "pnl": 8,
+              "cumulative": 198
             }
           ],
           "liveMode": false,
@@ -26191,15 +26603,67 @@
         },
         {
           "id": "rsi-divergence",
-          "balance": 160,
+          "balance": 136,
           "totalPnl": 96,
-          "totalMarkets": 68,
-          "deployed": 852,
-          "wins": 38,
-          "losses": 30,
+          "totalMarkets": 72,
+          "deployed": 924,
+          "wins": 40,
+          "losses": 32,
           "winRate": 56,
-          "roi": 11.428571428571429,
+          "roi": 10.526315789473683,
           "history": [
+            {
+              "id": "SOL-5min-1771222283471-rsi-divergence",
+              "time": "1:16:23 a.m.",
+              "marketId": "SOL-5min-1771222283471",
+              "side": "Down",
+              "shares": 24,
+              "cost": 12,
+              "payout": 0,
+              "pnl": -12,
+              "result": "LOSS",
+              "assetOpen": 84.82,
+              "assetClose": 84.82
+            },
+            {
+              "id": "SOL-5min-1771221968423-rsi-divergence",
+              "time": "1:11:08 a.m.",
+              "marketId": "SOL-5min-1771221968423",
+              "side": "Up",
+              "shares": 24,
+              "cost": 12,
+              "payout": 0,
+              "pnl": -12,
+              "result": "LOSS",
+              "assetOpen": 84.86,
+              "assetClose": 84.83
+            },
+            {
+              "id": "SOL-5min-1771221653368-rsi-divergence",
+              "time": "1:05:53 a.m.",
+              "marketId": "SOL-5min-1771221653368",
+              "side": "Up",
+              "shares": 24,
+              "cost": 12,
+              "payout": 24,
+              "pnl": 12,
+              "result": "WIN",
+              "assetOpen": 84.74,
+              "assetClose": 84.86
+            },
+            {
+              "id": "SOL-5min-1771221153172-rsi-divergence",
+              "time": "12:57:33 a.m.",
+              "marketId": "SOL-5min-1771221153172",
+              "side": "Up",
+              "shares": 24,
+              "cost": 12,
+              "payout": 24,
+              "pnl": 12,
+              "result": "WIN",
+              "assetOpen": 84.63,
+              "assetClose": 84.72
+            },
             {
               "id": "SOL-5min-1771220488731-rsi-divergence",
               "time": "12:46:28 a.m.",
@@ -26797,58 +27261,6 @@
               "result": "LOSS",
               "assetOpen": 85.53,
               "assetClose": 85.62
-            },
-            {
-              "id": "SOL-5min-1771205996625-rsi-divergence",
-              "time": "8:44:56 p.m.",
-              "marketId": "SOL-5min-1771205996625",
-              "side": "Up",
-              "shares": 24,
-              "cost": 12,
-              "payout": 24,
-              "pnl": 12,
-              "result": "WIN",
-              "assetOpen": 85.47,
-              "assetClose": 85.53
-            },
-            {
-              "id": "SOL-5min-1771205681586-rsi-divergence",
-              "time": "8:39:41 p.m.",
-              "marketId": "SOL-5min-1771205681586",
-              "side": "Up",
-              "shares": 24,
-              "cost": 12,
-              "payout": 0,
-              "pnl": -12,
-              "result": "LOSS",
-              "assetOpen": 85.93,
-              "assetClose": 85.5
-            },
-            {
-              "id": "SOL-5min-1771205366558-rsi-divergence",
-              "time": "8:34:26 p.m.",
-              "marketId": "SOL-5min-1771205366558",
-              "side": "Up",
-              "shares": 24,
-              "cost": 12,
-              "payout": 24,
-              "pnl": 12,
-              "result": "WIN",
-              "assetOpen": 85.86,
-              "assetClose": 85.93
-            },
-            {
-              "id": "SOL-5min-1771205051517-rsi-divergence",
-              "time": "8:29:11 p.m.",
-              "marketId": "SOL-5min-1771205051517",
-              "side": "Down",
-              "shares": 24,
-              "cost": 12,
-              "payout": 24,
-              "pnl": 12,
-              "result": "WIN",
-              "assetOpen": 85.91,
-              "assetClose": 85.87
             }
           ],
           "pnlHistory": [
@@ -27191,6 +27603,26 @@
               "market": 68,
               "pnl": -12,
               "cumulative": 96
+            },
+            {
+              "market": 69,
+              "pnl": 12,
+              "cumulative": 108
+            },
+            {
+              "market": 70,
+              "pnl": 12,
+              "cumulative": 120
+            },
+            {
+              "market": 71,
+              "pnl": -12,
+              "cumulative": 108
+            },
+            {
+              "market": 72,
+              "pnl": -12,
+              "cumulative": 96
             }
           ],
           "liveMode": false,
@@ -27215,15 +27647,67 @@
         },
         {
           "id": "ensemble",
-          "balance": 180696,
-          "totalPnl": 321178,
-          "totalMarkets": 57,
-          "deployed": 879495,
-          "wins": 45,
-          "losses": 12,
+          "balance": 158178,
+          "totalPnl": 414803,
+          "totalMarkets": 61,
+          "deployed": 1438810,
+          "wins": 48,
+          "losses": 13,
           "winRate": 79,
-          "roi": 43.46381038087569,
+          "roi": 29.926252665783604,
           "history": [
+            {
+              "id": "SOL-5min-1771222283471-ensemble",
+              "time": "1:16:23 a.m.",
+              "marketId": "SOL-5min-1771222283471",
+              "side": "Down",
+              "shares": 315453,
+              "cost": 164036,
+              "payout": 0,
+              "pnl": -164036,
+              "result": "LOSS",
+              "assetOpen": 84.82,
+              "assetClose": 84.82
+            },
+            {
+              "id": "SOL-5min-1771221968423-ensemble",
+              "time": "1:11:08 a.m.",
+              "marketId": "SOL-5min-1771221968423",
+              "side": "Down",
+              "shares": 224706,
+              "cost": 116848,
+              "payout": 224706,
+              "pnl": 107858,
+              "result": "WIN",
+              "assetOpen": 84.86,
+              "assetClose": 84.83
+            },
+            {
+              "id": "SOL-5min-1771221653368-ensemble",
+              "time": "1:05:53 a.m.",
+              "marketId": "SOL-5min-1771221653368",
+              "side": "Up",
+              "shares": 160065,
+              "cost": 83234,
+              "payout": 160065,
+              "pnl": 76831,
+              "result": "WIN",
+              "assetOpen": 84.74,
+              "assetClose": 84.86
+            },
+            {
+              "id": "SOL-5min-1771221153172-ensemble",
+              "time": "12:57:33 a.m.",
+              "marketId": "SOL-5min-1771221153172",
+              "side": "Up",
+              "shares": 152026,
+              "cost": 79054,
+              "payout": 152026,
+              "pnl": 72972,
+              "result": "WIN",
+              "assetOpen": 84.63,
+              "assetClose": 84.72
+            },
             {
               "id": "SOL-5min-1771220173691-ensemble",
               "time": "12:41:13 a.m.",
@@ -27821,58 +28305,6 @@
               "result": "WIN",
               "assetOpen": 86.21,
               "assetClose": 86.16
-            },
-            {
-              "id": "SOL-5min-1771203161230-ensemble",
-              "time": "7:57:41 p.m.",
-              "marketId": "SOL-5min-1771203161230",
-              "side": "Down",
-              "shares": 668,
-              "cost": 348,
-              "payout": 0,
-              "pnl": -348,
-              "result": "LOSS",
-              "assetOpen": 86.2,
-              "assetClose": 86.21
-            },
-            {
-              "id": "SOL-5min-1771202846167-ensemble",
-              "time": "7:52:26 p.m.",
-              "marketId": "SOL-5min-1771202846167",
-              "side": "Up",
-              "shares": 476,
-              "cost": 248,
-              "payout": 476,
-              "pnl": 228,
-              "result": "WIN",
-              "assetOpen": 86.01,
-              "assetClose": 86.21
-            },
-            {
-              "id": "SOL-5min-1771202531151-ensemble",
-              "time": "7:47:11 p.m.",
-              "marketId": "SOL-5min-1771202531151",
-              "side": "Down",
-              "shares": 397,
-              "cost": 207,
-              "payout": 397,
-              "pnl": 190,
-              "result": "WIN",
-              "assetOpen": 85.99,
-              "assetClose": 85.96
-            },
-            {
-              "id": "SOL-5min-1771202216125-ensemble",
-              "time": "7:41:56 p.m.",
-              "marketId": "SOL-5min-1771202216125",
-              "side": "Down",
-              "shares": 291,
-              "cost": 152,
-              "payout": 291,
-              "pnl": 139,
-              "result": "WIN",
-              "assetOpen": 86.24,
-              "assetClose": 86.02
             }
           ],
           "pnlHistory": [
@@ -28160,6 +28592,26 @@
               "market": 57,
               "pnl": 119297,
               "cumulative": 321178
+            },
+            {
+              "market": 58,
+              "pnl": 72972,
+              "cumulative": 394150
+            },
+            {
+              "market": 59,
+              "pnl": 76831,
+              "cumulative": 470981
+            },
+            {
+              "market": 60,
+              "pnl": 107858,
+              "cumulative": 578839
+            },
+            {
+              "market": 61,
+              "pnl": -164036,
+              "cumulative": 414803
             }
           ],
           "liveMode": false,
@@ -28223,15 +28675,67 @@
         },
         {
           "id": "stoikov",
-          "balance": 505,
-          "totalPnl": 486,
-          "totalMarkets": 68,
-          "deployed": 1917,
-          "wins": 43,
-          "losses": 25,
-          "winRate": 63,
-          "roi": 25.71428571428571,
+          "balance": 532,
+          "totalPnl": 540,
+          "totalMarkets": 72,
+          "deployed": 2052,
+          "wins": 46,
+          "losses": 26,
+          "winRate": 64,
+          "roi": 26.548672566371685,
           "history": [
+            {
+              "id": "SOL-5min-1771222283471-stoikov",
+              "time": "1:16:23 a.m.",
+              "marketId": "SOL-5min-1771222283471",
+              "side": "Down",
+              "shares": 54,
+              "cost": 27,
+              "payout": 0,
+              "pnl": -27,
+              "result": "LOSS",
+              "assetOpen": 84.82,
+              "assetClose": 84.82
+            },
+            {
+              "id": "SOL-5min-1771221968423-stoikov",
+              "time": "1:11:08 a.m.",
+              "marketId": "SOL-5min-1771221968423",
+              "side": "Down",
+              "shares": 54,
+              "cost": 27,
+              "payout": 54,
+              "pnl": 27,
+              "result": "WIN",
+              "assetOpen": 84.86,
+              "assetClose": 84.83
+            },
+            {
+              "id": "SOL-5min-1771221653368-stoikov",
+              "time": "1:05:53 a.m.",
+              "marketId": "SOL-5min-1771221653368",
+              "side": "Up",
+              "shares": 54,
+              "cost": 27,
+              "payout": 54,
+              "pnl": 27,
+              "result": "WIN",
+              "assetOpen": 84.74,
+              "assetClose": 84.86
+            },
+            {
+              "id": "SOL-5min-1771221153172-stoikov",
+              "time": "12:57:33 a.m.",
+              "marketId": "SOL-5min-1771221153172",
+              "side": "Up",
+              "shares": 54,
+              "cost": 27,
+              "payout": 54,
+              "pnl": 27,
+              "result": "WIN",
+              "assetOpen": 84.63,
+              "assetClose": 84.72
+            },
             {
               "id": "SOL-5min-1771220488731-stoikov",
               "time": "12:46:28 a.m.",
@@ -28829,58 +29333,6 @@
               "result": "WIN",
               "assetOpen": 85.53,
               "assetClose": 85.62
-            },
-            {
-              "id": "SOL-5min-1771205996625-stoikov",
-              "time": "8:44:56 p.m.",
-              "marketId": "SOL-5min-1771205996625",
-              "side": "Up",
-              "shares": 54,
-              "cost": 27,
-              "payout": 54,
-              "pnl": 27,
-              "result": "WIN",
-              "assetOpen": 85.47,
-              "assetClose": 85.53
-            },
-            {
-              "id": "SOL-5min-1771205681586-stoikov",
-              "time": "8:39:41 p.m.",
-              "marketId": "SOL-5min-1771205681586",
-              "side": "Down",
-              "shares": 54,
-              "cost": 27,
-              "payout": 54,
-              "pnl": 27,
-              "result": "WIN",
-              "assetOpen": 85.93,
-              "assetClose": 85.5
-            },
-            {
-              "id": "SOL-5min-1771205366558-stoikov",
-              "time": "8:34:26 p.m.",
-              "marketId": "SOL-5min-1771205366558",
-              "side": "Up",
-              "shares": 54,
-              "cost": 27,
-              "payout": 54,
-              "pnl": 27,
-              "result": "WIN",
-              "assetOpen": 85.86,
-              "assetClose": 85.93
-            },
-            {
-              "id": "SOL-5min-1771205051517-stoikov",
-              "time": "8:29:11 p.m.",
-              "marketId": "SOL-5min-1771205051517",
-              "side": "Up",
-              "shares": 54,
-              "cost": 27,
-              "payout": 0,
-              "pnl": -27,
-              "result": "LOSS",
-              "assetOpen": 85.91,
-              "assetClose": 85.87
             }
           ],
           "pnlHistory": [
@@ -29223,6 +29675,26 @@
               "market": 68,
               "pnl": -27,
               "cumulative": 486
+            },
+            {
+              "market": 69,
+              "pnl": 27,
+              "cumulative": 513
+            },
+            {
+              "market": 70,
+              "pnl": 27,
+              "cumulative": 540
+            },
+            {
+              "market": 71,
+              "pnl": 27,
+              "cumulative": 567
+            },
+            {
+              "market": 72,
+              "pnl": -27,
+              "cumulative": 540
             }
           ],
           "liveMode": false,
@@ -29862,15 +30334,28 @@
         },
         {
           "id": "breakout",
-          "balance": 775,
-          "totalPnl": 702,
-          "totalMarkets": 38,
-          "deployed": 1053,
-          "wins": 36,
+          "balance": 796,
+          "totalPnl": 723,
+          "totalMarkets": 39,
+          "deployed": 1080,
+          "wins": 37,
           "losses": 2,
           "winRate": 95,
-          "roi": 66.66666666666666,
+          "roi": 66.94444444444444,
           "history": [
+            {
+              "id": "SOL-5min-1771221653368-breakout",
+              "time": "1:05:53 a.m.",
+              "marketId": "SOL-5min-1771221653368",
+              "side": "Up",
+              "shares": 48,
+              "cost": 27,
+              "payout": 48,
+              "pnl": 21,
+              "result": "WIN",
+              "assetOpen": 84.74,
+              "assetClose": 84.86
+            },
             {
               "id": "SOL-5min-1771220173691-breakout",
               "time": "12:41:13 a.m.",
@@ -30556,6 +31041,11 @@
               "market": 38,
               "pnl": 21,
               "cumulative": 702
+            },
+            {
+              "market": 39,
+              "pnl": 21,
+              "cumulative": 723
             }
           ],
           "liveMode": false,
@@ -31711,9 +32201,9 @@
           "stopLossThreshold": 25
         }
       ],
-      "totalPnl": 322634,
-      "totalBalance": 323887
+      "totalPnl": 416358,
+      "totalBalance": 213579
     }
   ],
-  "savedAt": 1771221097059
+  "savedAt": 1771222758084
 }
