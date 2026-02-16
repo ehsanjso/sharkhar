@@ -8,6 +8,11 @@ import argparse
 import json
 import sys
 import os
+
+# Fix encoding issues when piping output
+if sys.stdout.encoding != 'utf-8':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 from typing import Optional, List
 
 
