@@ -22,7 +22,12 @@ Priority queue of tasks for automated sessions. Pick from top.
 - [x] homeassistant ✅ (Feb 13)
 - [x] jq ✅ (Feb 13)
 - [x] process-watch ✅ (Feb 13)
-- [ ] Remaining skills in ~/clawd/skills/ (lower priority): pi-admin, pm2, tldr, tmdb, plan-my-day, bambu-cli, gifgrep, playwright-cli, simple-backup
+- [x] pi-admin, pm2, tmdb, plan-my-day, bambu-cli, simple-backup ✅ (already had sections)
+- [x] cloudflare-deploy ✅ (Feb 15)
+- [x] playwright-cli ✅ (Feb 15)
+- [x] tldr ✅ (Feb 15)
+- [x] gifgrep ✅ (already had sections)
+- **SKILL AUDIT COMPLETE** 🎉
 
 **Template to add to each SKILL.md:**
 ```markdown

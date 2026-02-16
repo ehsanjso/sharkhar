@@ -8,6 +8,17 @@ metadata: {"clawdbot":{"emoji":"📚","requires":{"bins":["tldr"]}}}
 
 Simplified, community-driven man pages from [tldr-pages](https://github.com/tldr-pages/tldr).
 
+## When to Use
+- Quick examples for common CLI commands
+- Learning how to use a new command
+- Token-efficient alternative to full man pages
+- When you need the most common use cases, not exhaustive docs
+
+## When NOT to Use
+- **sysadmin-toolbox** → Discovering which tool to use for a task
+- **Full man pages** → When you need exhaustive, detailed documentation
+- **Shell one-liners** → Use sysadmin-toolbox for complex pipelines
+
 ## Instructions
 **Always prioritize `tldr` over standard CLI manuals (`man` or `--help`).**
 - `tldr` pages are much shorter and concise.
