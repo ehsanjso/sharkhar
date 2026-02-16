@@ -18,6 +18,9 @@ Create professional flowcharts and diagrams as Excalidraw files that can be open
 - User mentions "excalidraw" or "flow diagram"
 - User wants to document decision trees
 
+## Output Location
+Save .excalidraw files to `~/clawd/artifacts/` - these are excluded from git and auto-cleaned after 7 days.
+
 ## Prerequisites
 
 The `@swiftlysingh/excalidraw-cli` tool must be installed:

@@ -11,6 +11,9 @@ license: Complete terms in LICENSE.txt
 - Needs distinctive, production-grade visual design
 - Avoiding generic "AI slop" aesthetics
 
+## Output Location
+Save generated files (zips, HTML exports) to `~/clawd/artifacts/` - these are excluded from git and auto-cleaned after 7 days.
+
 ## When NOT to Use
 - **Flowcharts/diagrams** → Use `excalidraw-flowchart`
 - **Backend/API work** → Not a frontend task

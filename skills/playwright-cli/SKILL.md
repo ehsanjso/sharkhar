@@ -8,6 +8,18 @@ metadata: {"clawdbot":{"emoji":"🎭","requires":{"bins":["playwright-cli"]},"in
 
 Browser automation via Playwright. Token-efficient CLI for coding agents.
 
+## When to Use
+- Automating browser interactions in scripts/tests
+- Scraping pages that require JavaScript rendering
+- Taking screenshots of web pages
+- Filling forms and clicking buttons programmatically
+- E2E testing workflows
+
+## When NOT to Use
+- **browser tool** → Interactive browsing within Clawdbot session (built-in)
+- **web_fetch** → Simple page content extraction (no JS needed)
+- **web_search** → Finding information (not page automation)
+
 ## Installation
 
 ```bash
