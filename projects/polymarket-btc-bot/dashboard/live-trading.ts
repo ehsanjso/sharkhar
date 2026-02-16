@@ -6,6 +6,7 @@
 import { ClobClient, Side } from '@polymarket/clob-client';
 import * as ethers from 'ethers';
 import dotenv from 'dotenv';
+import { getSimpleProvider, createSigner, withRetry, markRpcSuccess, markRpcFailed } from './rpc.js';
 
 dotenv.config({ path: '../.env' });
 
@@ -17,6 +18,7 @@ interface LiveMarket {
   eventId: string;
   slug: string;
   title: string;
+  conditionId: string;
   upTokenId: string;
   downTokenId: string;
   upPrice: number;
@@ -52,9 +54,8 @@ class LiveTradingClient {
     if (!this.privateKey) return false;
 
     try {
-      // ethers v5 in ESM: use ethers.providers and ethers.Wallet
-      const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
-      const signer = new ethers.Wallet(this.privateKey, provider);
+      // Use centralized RPC module for reliable connection
+      const signer = createSigner(this.privateKey);
       
       // Create temp client to get API credentials (use deriveApiKey, not createOrDeriveApiKey)
       const tempClient = new ClobClient(CLOB_API, CHAIN_ID, signer);
@@ -233,8 +234,7 @@ class LiveTradingClient {
     if (!this.privateKey) return 0;
     
     try {
-      const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
-      const signer = new ethers.Wallet(this.privateKey, provider);
+      const signer = createSigner(this.privateKey);
       console.log(`   Wallet address: ${signer.address}`);
       return 0;
     } catch {
@@ -261,38 +261,42 @@ const CTF_ABI = [
 export async function redeemWinnings(conditionId: string, tokenIds: string[]): Promise<{ success: boolean; txHash?: string; error?: string }> {
   try {
     const { ethers } = await import('ethers');
-    const provider = new ethers.providers.StaticJsonRpcProvider('https://polygon-rpc.com', 137);
-    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
     
-    const ctf = new ethers.Contract(CTF_ADDRESS, CTF_ABI, wallet);
-    
-    // Check balances first
-    let hasBalance = false;
-    for (const tokenId of tokenIds) {
-      const balance = await ctf.balanceOf(wallet.address, tokenId);
-      if (balance.gt(0)) {
-        hasBalance = true;
-        console.log(`   Found ${ethers.utils.formatUnits(balance, 6)} tokens for ${tokenId.slice(0, 10)}...`);
+    // Use RPC module with retry for balance checks
+    const result = await withRetry(async (provider) => {
+      const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
+      const ctf = new ethers.Contract(CTF_ADDRESS, CTF_ABI, wallet);
+      
+      // Check balances first
+      let hasBalance = false;
+      for (const tokenId of tokenIds) {
+        const balance = await ctf.balanceOf(wallet.address, tokenId);
+        if (balance.gt(0)) {
+          hasBalance = true;
+          console.log(`   Found ${ethers.utils.formatUnits(balance, 6)} tokens for ${tokenId.slice(0, 10)}...`);
+        }
       }
-    }
+      
+      if (!hasBalance) {
+        return { success: false, error: 'No tokens to redeem' };
+      }
+      
+      // Redeem - indexSets [1, 2] for both outcomes
+      const tx = await ctf.redeemPositions(
+        USDC_E,
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+        conditionId,
+        [1, 2],
+        { gasLimit: 300000 }
+      );
+      
+      console.log(`   🔄 Redeeming... TX: ${tx.hash}`);
+      await tx.wait(1);
+      
+      return { success: true, txHash: tx.hash };
+    }, 3);
     
-    if (!hasBalance) {
-      return { success: false, error: 'No tokens to redeem' };
-    }
-    
-    // Redeem - indexSets [1, 2] for both outcomes
-    const tx = await ctf.redeemPositions(
-      USDC_E,
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-      conditionId,
-      [1, 2],
-      { gasLimit: 300000 }
-    );
-    
-    console.log(`   🔄 Redeeming... TX: ${tx.hash}`);
-    await tx.wait(1);
-    
-    return { success: true, txHash: tx.hash };
+    return result;
   } catch (error: any) {
     console.error('Redeem error:', error.message);
     return { success: false, error: error.message };

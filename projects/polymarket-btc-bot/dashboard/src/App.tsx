@@ -5,17 +5,32 @@ import type { MarketState } from './hooks/usePolymarketData';
 function App() {
   const data = usePolymarketData();
   const [view, setView] = useState<'markets' | 'overview' | 'detail'>('markets');
-  const [liveOnly, setLiveOnly] = useState(false);
+  const [tradingMode, setTradingMode] = useState<'paper' | 'live'>('paper');
 
   const selectedStrategy = data.selectedStrategy 
     ? data.strategies.find(s => s.id === data.selectedStrategy) 
     : null;
+  
+  // Filter strategies based on trading mode - STRICT filtering
+  const filteredStrategies = tradingMode === 'live' 
+    ? data.strategies.filter(s => s.liveMode)
+    : data.strategies.filter(s => !s.liveMode);
+  
+  // Calculate totals based on mode
+  const modeTotalPnl = tradingMode === 'live'
+    ? filteredStrategies.reduce((sum, s) => sum + (s.livePnl || 0), 0)
+    : filteredStrategies.reduce((sum, s) => sum + s.totalPnl, 0);
+  
+  const modeTotalBalance = tradingMode === 'live'
+    ? filteredStrategies.reduce((sum, s) => sum + (s.liveBalance || 0), 0)
+    : filteredStrategies.reduce((sum, s) => sum + s.balance, 0);
 
   // If no market selected, show market selector
   if (!data.selectedMarketKey || view === 'markets') {
     return (
       <div className="min-h-screen bg-gray-950 text-white">
-        <MarketSelector data={data} liveOnly={liveOnly} setLiveOnly={setLiveOnly} onSelect={(key) => {
+        <MarketSelector data={data} onSelect={(key, mode) => {
+          setTradingMode(mode);
           data.selectMarket(key);
           setView('overview');
         }} />
@@ -63,6 +78,26 @@ function App() {
         </div>
       </header>
 
+      {/* Mode Indicator Badge */}
+      <div className={`border-b px-3 sm:px-4 py-2 ${
+        tradingMode === 'live' 
+          ? 'bg-green-900/30 border-green-800' 
+          : 'bg-purple-900/30 border-purple-800'
+      }`}>
+        <div className="flex items-center justify-center gap-2">
+          <span className={`px-4 py-1.5 rounded-full font-bold text-sm ${
+            tradingMode === 'live'
+              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+              : 'bg-gradient-to-r from-purple-500 to-violet-600 text-white'
+          }`}>
+            {tradingMode === 'live' ? '💵 LIVE TRADING' : '📝 PAPER TRADING'}
+          </span>
+          <span className="text-gray-400 text-sm">
+            {filteredStrategies.length} strategies
+          </span>
+        </div>
+      </div>
+
       {/* Price Bar */}
       <div className="bg-gray-900 border-b border-gray-800 px-3 sm:px-4 py-2">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -87,18 +122,22 @@ function App() {
             )}
           </div>
           <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6">
+            {tradingMode === 'live' && (
+              <div className="flex items-center gap-1">
+                <span className="text-gray-400 text-xs">💰 Wallet:</span>
+                <span className="text-sm sm:text-lg font-mono text-yellow-400">${data.walletBalance.toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex items-center gap-1">
-              <span className="text-gray-400 text-xs">💰 Wallet:</span>
-              <span className="text-sm sm:text-lg font-mono text-yellow-400">${data.walletBalance.toFixed(2)}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-gray-400 text-xs">Bal:</span>
-              <span className="text-sm sm:text-lg font-mono text-green-400">${data.totalBalance.toFixed(0)}</span>
+              <span className="text-gray-400 text-xs">{tradingMode === 'live' ? 'Budget:' : 'Bal:'}</span>
+              <span className={`text-sm sm:text-lg font-mono ${tradingMode === 'live' ? 'text-yellow-400' : 'text-green-400'}`}>
+                ${modeTotalBalance.toFixed(0)}
+              </span>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-gray-400 text-xs">P&L:</span>
-              <span className={`text-sm sm:text-lg font-mono ${data.totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {data.totalPnl >= 0 ? '+' : ''}${data.totalPnl.toFixed(0)}
+              <span className={`text-sm sm:text-lg font-mono ${modeTotalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                {modeTotalPnl >= 0 ? '+' : ''}${modeTotalPnl.toFixed(0)}
               </span>
             </div>
           </div>
@@ -114,7 +153,7 @@ function App() {
           >
             📊 All
           </button>
-          {(liveOnly ? data.strategies.filter(s => s.liveMode) : data.strategies).map(s => (
+          {filteredStrategies.map(s => (
             <button
               key={s.id}
               onClick={() => { setView('detail'); data.setSelectedStrategy(s.id); }}
@@ -132,7 +171,7 @@ function App() {
 
       <main className="p-2 sm:p-4">
         {view === 'overview' ? (
-          <OverviewView data={data} liveOnly={liveOnly} />
+          <OverviewView data={data} tradingMode={tradingMode} filteredStrategies={filteredStrategies} />
         ) : selectedStrategy ? (
           <DetailView strategy={selectedStrategy} market={data.currentMarket} assetPrice={data.btcPrice} />
         ) : null}
@@ -141,11 +180,9 @@ function App() {
   );
 }
 
-function MarketSelector({ data, onSelect, liveOnly, setLiveOnly }: { 
+function MarketSelector({ data, onSelect }: { 
   data: ReturnType<typeof usePolymarketData>; 
-  onSelect: (key: string) => void;
-  liveOnly: boolean;
-  setLiveOnly: (v: boolean) => void;
+  onSelect: (key: string, mode: 'live' | 'paper') => void;
 }) {
   // Group markets by asset
   const marketsByAsset = data.markets.reduce((acc, m) => {
@@ -166,17 +203,25 @@ function MarketSelector({ data, onSelect, liveOnly, setLiveOnly }: {
     SOL: '◎',
   };
 
-  // Calculate total P&L and balance across all markets (filtered by liveOnly)
-  const filteredStrategies = (m: typeof data.markets[0]) => 
-    liveOnly ? m.strategies.filter(s => s.liveMode) : m.strategies;
+  // Calculate LIVE totals (only strategies in live mode)
+  const liveStrategies = data.markets.flatMap(m => m.strategies.filter(s => s.liveMode));
+  const liveTotalPnL = liveStrategies.reduce((sum, s) => sum + (s.livePnl || 0), 0);
+  const liveTotalBalance = liveStrategies.reduce((sum, s) => sum + (s.liveBalance || 0), 0);
+  const liveTotalAllocation = liveStrategies.reduce((sum, s) => sum + (s.liveAllocation || 0), 0);
+  const liveWins = liveStrategies.reduce((sum, s) => sum + (s.liveWins || 0), 0);
+  const liveLosses = liveStrategies.reduce((sum, s) => sum + (s.liveLosses || 0), 0);
   
-  const totalPnL = data.markets.reduce((sum, m) => 
-    sum + filteredStrategies(m).reduce((s, st) => s + st.totalPnl, 0), 0);
-  const totalBalance = data.markets.reduce((sum, m) => 
-    sum + filteredStrategies(m).reduce((s, st) => s + st.balance, 0), 0);
-  const totalStarting = data.markets.reduce((sum, m) => 
-    sum + filteredStrategies(m).reduce((s, st) => s + st.startingBalance, 0), 0);
-  const startingBalance = totalStarting || data.markets.length * 16 * 100;
+  // Calculate PAPER totals (only strategies NOT in live mode)
+  const paperStrategies = data.markets.flatMap(m => m.strategies.filter(s => !s.liveMode));
+  const paperTotalPnL = paperStrategies.reduce((sum, s) => sum + s.totalPnl, 0);
+  const paperTotalBalance = paperStrategies.reduce((sum, s) => sum + s.balance, 0);
+  const paperStartingBalance = paperStrategies.reduce((sum, s) => sum + s.startingBalance, 0) || 1;
+  const paperWins = paperStrategies.reduce((sum, s) => sum + s.wins, 0);
+  const paperLosses = paperStrategies.reduce((sum, s) => sum + s.losses, 0);
+  
+  // Combined totals
+  const totalPnL = liveTotalPnL + paperTotalPnL;
+  const totalBalance = liveTotalBalance + paperTotalBalance;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -199,16 +244,6 @@ function MarketSelector({ data, onSelect, liveOnly, setLiveOnly }: {
             >
               {data.globalHalt ? 'Resume All' : 'Stop All'}
             </button>
-            <button
-              onClick={() => setLiveOnly(!liveOnly)}
-              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all border ${
-                liveOnly 
-                  ? 'border-green-500 bg-green-500/20 text-green-400' 
-                  : 'border-gray-600 text-gray-400 hover:bg-gray-700'
-              }`}
-            >
-              {liveOnly ? '🟢 LIVE Only' : '📊 All Bots'}
-            </button>
             <div className="flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full ${data.globalHalt ? 'bg-red-500' : data.live ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'}`} />
               <span className={`text-sm ${data.globalHalt ? 'text-red-400' : data.live ? 'text-green-400' : 'text-yellow-400'}`}>
@@ -226,207 +261,353 @@ function MarketSelector({ data, onSelect, liveOnly, setLiveOnly }: {
         </div>
       )}
 
-      {/* Summary Stats */}
-      <div className="bg-gray-900 border-b border-gray-800 px-4 py-4">
+      {/* Combined Summary Stats */}
+      <div className="bg-gray-900 border-b border-gray-800 px-4 py-3">
         <div className="max-w-6xl mx-auto">
-          {/* Stats Row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-            <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="bg-gray-800 rounded-lg p-3 text-center">
               <div className="text-gray-400 text-xs uppercase mb-1">Total Balance</div>
-              <div className="text-2xl font-mono text-green-400">${totalBalance.toFixed(0)}</div>
-              <div className="text-xs text-gray-500">started ${startingBalance.toFixed(0)}</div>
+              <div className="text-xl font-mono text-white">${totalBalance.toFixed(0)}</div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4 text-center">
-              <div className="text-gray-400 text-xs uppercase mb-1">Paper P&L</div>
-              <div className={`text-2xl font-mono ${totalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            <div className="bg-gray-800 rounded-lg p-3 text-center">
+              <div className="text-gray-400 text-xs uppercase mb-1">Total P&L</div>
+              <div className={`text-xl font-mono ${totalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                 {totalPnL >= 0 ? '+' : ''}${totalPnL.toFixed(0)}
               </div>
-              <div className="text-xs text-gray-500">
-                📄 {((totalPnL / startingBalance) * 100).toFixed(1)}% ROI
-              </div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4 text-center">
-              <div className="text-gray-400 text-xs uppercase mb-1">💰 Live P&L</div>
-              <div className="text-2xl font-mono text-gray-500">$0</div>
-              <div className="text-xs text-gray-500">No live bots yet</div>
+            <div className="bg-gray-800 rounded-lg p-3 text-center">
+              <div className="text-gray-400 text-xs uppercase mb-1">💰 Wallet</div>
+              <div className="text-xl font-mono text-yellow-400">${data.walletBalance.toFixed(2)}</div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4 text-center">
+            <div className="bg-gray-800 rounded-lg p-3 text-center">
               <div className="text-gray-400 text-xs uppercase mb-1">Active Bids</div>
-              <div className="text-2xl font-mono text-blue-400">
+              <div className="text-xl font-mono text-blue-400">
                 {data.markets.reduce((sum, m) => 
                   sum + m.strategies.filter(s => s.currentMarket?.side && !s.halted).length, 0
                 )}
               </div>
-              <div className="text-xs text-gray-500">across {data.markets.filter(m => m.currentMarket).length} markets</div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Two Sections: Live Markets & Paper Markets */}
+      <main className="flex-1 p-4">
+        <div className="max-w-6xl mx-auto space-y-8">
           
-          {/* Active Bids Section */}
-          {data.markets.some(m => m.strategies.some(s => s.currentMarket?.side && !s.halted)) && (
-            <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-sm font-semibold">Active Bids Now</span>
+          {/* ==================== LIVE MARKETS SECTION ==================== */}
+          <section>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="px-3 py-1.5 rounded-full text-sm font-bold text-white shadow-lg bg-gradient-to-r from-green-500 to-emerald-600">
+                💵 LIVE
+              </span>
+              <h2 className="text-xl font-bold text-green-400">Live Markets</h2>
+              <span className="text-gray-500 text-sm">Real Money</span>
+            </div>
+
+            {/* Live Stats Row */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+              <div className="bg-gray-900 rounded-lg p-3 border-l-4 border-green-500">
+                <div className="text-gray-400 text-xs">Budget</div>
+                <div className="text-lg font-mono text-green-400">${liveTotalBalance.toFixed(0)}</div>
+                <div className="text-xs text-gray-500">of ${liveTotalAllocation.toFixed(0)}</div>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-                {data.markets.filter(m => m.currentMarket).map(market => {
-                  const activeBids = market.strategies.filter(s => s.currentMarket?.side && !s.halted);
-                  if (activeBids.length === 0) return null;
-                  
-                  const upBids = activeBids.filter(s => s.currentMarket?.side === 'Up');
-                  const downBids = activeBids.filter(s => s.currentMarket?.side === 'Down');
-                  const totalCost = activeBids.reduce((sum, s) => sum + (s.currentMarket?.costBet || 0), 0);
+              <div className="bg-gray-900 rounded-lg p-3 border-l-4 border-green-500">
+                <div className="text-gray-400 text-xs">Live P&L</div>
+                <div className={`text-lg font-mono ${liveTotalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {liveTotalPnL >= 0 ? '+' : ''}${liveTotalPnL.toFixed(0)}
+                </div>
+              </div>
+              <div className="bg-gray-900 rounded-lg p-3 border-l-4 border-green-500">
+                <div className="text-gray-400 text-xs">Win Rate</div>
+                <div className="text-lg font-mono">
+                  {liveWins + liveLosses > 0 ? `${((liveWins / (liveWins + liveLosses)) * 100).toFixed(0)}%` : '—'}
+                </div>
+              </div>
+              <div className="bg-gray-900 rounded-lg p-3 border-l-4 border-green-500">
+                <div className="text-gray-400 text-xs">Record</div>
+                <div className="text-lg font-mono">{liveWins}W / {liveLosses}L</div>
+              </div>
+              <div className="bg-gray-900 rounded-lg p-3 border-l-4 border-green-500">
+                <div className="text-gray-400 text-xs">Strategies</div>
+                <div className="text-lg font-mono text-green-400">{liveStrategies.length}</div>
+              </div>
+            </div>
+
+            {/* Live Market Cards */}
+            {liveStrategies.length === 0 ? (
+              <div className="bg-gray-900 rounded-xl p-8 border border-green-900/30 text-center">
+                <div className="text-4xl mb-3">💵</div>
+                <p className="text-gray-400">No live strategies active</p>
+                <p className="text-gray-500 text-sm mt-1">Enable live mode on a strategy to start real trading</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {Object.entries(marketsByAsset).map(([asset, assetMarkets]) => {
+                  const hasLive = assetMarkets.some(m => m.strategies.some(s => s.liveMode));
+                  if (!hasLive) return null;
                   
                   return (
-                    <div key={market.key} className="bg-gray-900 rounded p-2 text-xs">
-                      <div className="font-bold mb-1">{market.asset} {market.timeframe}</div>
-                      <div className="flex items-center gap-2">
-                        {upBids.length > 0 && (
-                          <span className="text-green-400">↑{upBids.length}</span>
-                        )}
-                        {downBids.length > 0 && (
-                          <span className="text-red-400">↓{downBids.length}</span>
-                        )}
-                        <span className="text-gray-400">${totalCost.toFixed(0)}</span>
+                    <div key={asset}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xl" style={{ color: assetColors[asset] }}>{assetIcons[asset]}</span>
+                        <span className="font-semibold">{asset}</span>
+                        <span className="text-gray-500 font-mono text-sm">
+                          ${data.prices[asset as keyof typeof data.prices]?.toLocaleString(undefined, { maximumFractionDigits: 0 }) || '—'}
+                        </span>
                       </div>
-                      <div className="text-gray-500 mt-1">
-                        {market.currentMarket?.elapsed.toFixed(1)}m / {market.timeframe === '5min' ? '5' : '15'}m
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {assetMarkets.map(market => {
+                          const liveStrats = market.strategies.filter(s => s.liveMode);
+                          if (liveStrats.length === 0) return null;
+                          
+                          const marketLivePnl = liveStrats.reduce((sum, s) => sum + (s.livePnl || 0), 0);
+                          const marketLiveBal = liveStrats.reduce((sum, s) => sum + (s.liveBalance || 0), 0);
+                          
+                          return (
+                            <div
+                              key={market.key}
+                              className={`bg-gray-900 border rounded-xl p-4 text-left transition-all ${
+                                market.halted ? 'border-red-600 opacity-75' : 'border-green-900/50 hover:border-green-500/50'
+                              }`}
+                              style={{ borderLeftWidth: '4px', borderLeftColor: market.halted ? '#dc2626' : '#22c55e' }}
+                            >
+                              {/* Halt banner */}
+                              {market.halted && (
+                                <div className="bg-red-900/50 text-red-300 text-xs text-center py-1 px-2 rounded mb-3 -mt-1 -mx-1">
+                                  🛑 HALTED
+                                </div>
+                              )}
+                              <button
+                                onClick={() => onSelect(market.key, 'live')}
+                                className="w-full text-left"
+                              >
+                                <div className="flex items-center justify-between mb-2">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-bold">{market.asset} {market.timeframe}</span>
+                                    {!market.halted && market.currentMarket && (
+                                      <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); data.toggleMarketHalt(market.key); }}
+                                      className={`px-2 py-0.5 rounded text-xs font-medium border transition-all ${
+                                        market.halted 
+                                          ? 'border-green-500 text-green-400 hover:bg-green-500/10' 
+                                          : 'border-red-500/50 text-red-400 hover:bg-red-500/10'
+                                      }`}
+                                    >
+                                      {market.halted ? 'Resume' : 'Stop'}
+                                    </button>
+                                    <span className={`text-lg font-mono ${marketLivePnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                      {marketLivePnl >= 0 ? '+' : ''}${marketLivePnl.toFixed(0)}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2 text-sm">
+                                  <div>
+                                    <div className="text-gray-500 text-xs">Budget</div>
+                                    <div className="font-mono text-green-400">${marketLiveBal.toFixed(0)}</div>
+                                  </div>
+                                  <div>
+                                    <div className="text-gray-500 text-xs">Strategies</div>
+                                    <div className="font-mono">{liveStrats.length}</div>
+                                  </div>
+                                  <div>
+                                    <div className="text-gray-500 text-xs">Status</div>
+                                    <div className={market.halted ? 'text-red-400' : market.currentMarket ? 'text-green-400' : 'text-gray-500'}>
+                                      {market.halted ? 'Halted' : market.currentMarket ? 
+                                        `${market.currentMarket.elapsed.toFixed(1)}m` : 
+                                        'Waiting'
+                                      }
+                                    </div>
+                                  </div>
+                                </div>
+                                {market.currentMarket && !market.halted && (
+                                  <div className="mt-3 pt-3 border-t border-gray-800">
+                                    <div className="flex items-center justify-between text-xs">
+                                      <span className="text-gray-400">Current: ${market.currentMarket.openPrice.toFixed(0)}</span>
+                                      <span className={market.currentMarket.changePercent >= 0 ? 'text-green-400' : 'text-red-400'}>
+                                        {market.currentMarket.changePercent >= 0 ? '↑' : '↓'} {Math.abs(market.currentMarket.changePercent).toFixed(3)}%
+                                      </span>
+                                    </div>
+                                    <div className="mt-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                                      <div 
+                                        className="h-full bg-green-500 transition-all"
+                                        style={{ width: `${(market.currentMarket.elapsed / (market.timeframe === '5min' ? 5 : 15)) * 100}%` }}
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+                              </button>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   );
                 })}
               </div>
-            </div>
-          )}
-        </div>
-      </div>
+            )}
+          </section>
 
-      {/* Market Cards */}
-      <main className="flex-1 p-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-lg font-semibold mb-4">Select a Market</h2>
-          
-          <div className="space-y-6">
-            {Object.entries(marketsByAsset).map(([asset, assetMarkets]) => (
-              <div key={asset}>
-                <div className="flex items-center gap-2 mb-3">
-                  <span 
-                    className="text-2xl" 
-                    style={{ color: assetColors[asset] }}
-                  >
-                    {assetIcons[asset]}
-                  </span>
-                  <span className="font-semibold text-lg">{asset}</span>
-                  <span className="text-gray-400 font-mono text-sm">
-                    ${data.prices[asset as keyof typeof data.prices]?.toLocaleString(undefined, { maximumFractionDigits: 0 }) || '—'}
-                  </span>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {assetMarkets.map(market => (
-                    <div
-                      key={market.key}
-                      className={`bg-gray-900 border rounded-xl p-4 transition-all ${
-                        market.halted ? 'border-red-600 opacity-75' : 'border-gray-800 hover:border-gray-600'
-                      }`}
-                      style={{ borderLeftWidth: '4px', borderLeftColor: market.halted ? '#dc2626' : assetColors[asset] }}
-                    >
-                      {/* Halt banner */}
-                      {market.halted && (
-                        <div className="bg-red-900/50 text-red-300 text-xs text-center py-1 px-2 rounded mb-3 -mt-1 -mx-1">
-                          🛑 HALTED
-                        </div>
-                      )}
-                      
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xl font-bold">{market.timeframe}</span>
-                          {!market.halted && market.currentMarket && (
-                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                          )}
-                          {/* Live strategies count */}
-                          {market.strategies.some(s => s.liveMode) && (
-                            <span className="text-xs bg-yellow-600 text-yellow-100 px-1.5 py-0.5 rounded">
-                              💰 {market.strategies.filter(s => s.liveMode).length} LIVE
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {/* Market halt button */}
-                          <button
-                            onClick={(e) => { e.stopPropagation(); data.toggleMarketHalt(market.key); }}
-                            className={`px-2 py-1 rounded text-xs font-medium border transition-all ${
-                              market.halted 
-                                ? 'border-green-500 text-green-400 hover:bg-green-500/10' 
-                                : 'border-red-500/50 text-red-400 hover:bg-red-500/10'
-                            }`}
-                          >
-                            {market.halted ? 'Resume' : 'Stop'}
-                          </button>
-                          <span className={`text-lg font-mono ${market.totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                            {market.totalPnl >= 0 ? '+' : ''}${market.totalPnl.toFixed(0)}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      {/* Click to view */}
-                      <button
-                        onClick={() => onSelect(market.key)}
-                        className="w-full text-left hover:bg-gray-800/50 rounded-lg p-2 -m-2 transition-all"
-                      >
-                        <div className="grid grid-cols-3 gap-2 text-sm">
-                          <div>
-                            <div className="text-gray-500 text-xs">Balance</div>
-                            <div className="font-mono">${market.totalBalance.toFixed(0)}</div>
-                          </div>
-                          <div>
-                            <div className="text-gray-500 text-xs">ROI</div>
-                            <div className={`font-mono ${market.totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                              {((market.totalPnl / (16 * 100)) * 100).toFixed(1)}%
-                            </div>
-                          </div>
-                          <div>
-                            <div className="text-gray-500 text-xs">Status</div>
-                            <div className={market.halted ? 'text-red-400' : market.currentMarket ? 'text-green-400' : 'text-gray-500'}>
-                              {market.halted ? 'Halted' : market.currentMarket ? 
-                                `${market.currentMarket.elapsed.toFixed(1)}m` : 
-                                'Waiting'
-                              }
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {market.currentMarket && !market.halted && (
-                          <div className="mt-3 pt-3 border-t border-gray-800">
-                            <div className="flex items-center justify-between text-xs">
-                              <span className="text-gray-400">Current: ${market.currentMarket.openPrice.toFixed(0)}</span>
-                              <span className={market.currentMarket.changePercent >= 0 ? 'text-green-400' : 'text-red-400'}>
-                                {market.currentMarket.changePercent >= 0 ? '↑' : '↓'} {Math.abs(market.currentMarket.changePercent).toFixed(3)}%
-                              </span>
-                            </div>
-                            <div className="mt-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-blue-500 transition-all"
-                                style={{ width: `${(market.currentMarket.elapsed / (market.timeframe === '5min' ? 5 : 15)) * 100}%` }}
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </button>
-                    </div>
-                  ))}
+          {/* ==================== PAPER MARKETS SECTION ==================== */}
+          <section>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="px-3 py-1.5 rounded-full text-sm font-bold text-white shadow-lg bg-gradient-to-r from-purple-500 to-violet-600">
+                📝 PAPER
+              </span>
+              <h2 className="text-xl font-bold text-purple-400">Paper Markets</h2>
+              <span className="text-gray-500 text-sm">Simulation</span>
+            </div>
+
+            {/* Paper Stats Row */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+              <div className="bg-gray-900 rounded-lg p-3 border-l-4 border-purple-500">
+                <div className="text-gray-400 text-xs">Balance</div>
+                <div className="text-lg font-mono text-purple-400">${paperTotalBalance.toFixed(0)}</div>
+                <div className="text-xs text-gray-500">started ${paperStartingBalance.toFixed(0)}</div>
+              </div>
+              <div className="bg-gray-900 rounded-lg p-3 border-l-4 border-purple-500">
+                <div className="text-gray-400 text-xs">Paper P&L</div>
+                <div className={`text-lg font-mono ${paperTotalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {paperTotalPnL >= 0 ? '+' : ''}${paperTotalPnL.toFixed(0)}
                 </div>
               </div>
-            ))}
-          </div>
+              <div className="bg-gray-900 rounded-lg p-3 border-l-4 border-purple-500">
+                <div className="text-gray-400 text-xs">ROI</div>
+                <div className={`text-lg font-mono ${paperTotalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {((paperTotalPnL / paperStartingBalance) * 100).toFixed(1)}%
+                </div>
+              </div>
+              <div className="bg-gray-900 rounded-lg p-3 border-l-4 border-purple-500">
+                <div className="text-gray-400 text-xs">Record</div>
+                <div className="text-lg font-mono">{paperWins}W / {paperLosses}L</div>
+              </div>
+              <div className="bg-gray-900 rounded-lg p-3 border-l-4 border-purple-500">
+                <div className="text-gray-400 text-xs">Strategies</div>
+                <div className="text-lg font-mono text-purple-400">{paperStrategies.length}</div>
+              </div>
+            </div>
+
+            {/* Paper Market Cards */}
+            <div className="space-y-4">
+              {Object.entries(marketsByAsset).map(([asset, assetMarkets]) => {
+                const hasPaper = assetMarkets.some(m => m.strategies.some(s => !s.liveMode));
+                if (!hasPaper) return null;
+                
+                return (
+                  <div key={asset}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl" style={{ color: assetColors[asset] }}>{assetIcons[asset]}</span>
+                      <span className="font-semibold">{asset}</span>
+                      <span className="text-gray-500 font-mono text-sm">
+                        ${data.prices[asset as keyof typeof data.prices]?.toLocaleString(undefined, { maximumFractionDigits: 0 }) || '—'}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {assetMarkets.map(market => {
+                        const paperStrats = market.strategies.filter(s => !s.liveMode);
+                        if (paperStrats.length === 0) return null;
+                        
+                        const marketPaperPnl = paperStrats.reduce((sum, s) => sum + s.totalPnl, 0);
+                        const marketPaperBal = paperStrats.reduce((sum, s) => sum + s.balance, 0);
+                        
+                        return (
+                          <button
+                            key={market.key}
+                            onClick={() => onSelect(market.key, 'paper')}
+                            className={`bg-gray-900 border rounded-xl p-4 text-left transition-all ${
+                              market.halted ? 'border-red-600 opacity-75' : 'border-purple-900/50 hover:border-purple-500/50'
+                            }`}
+                            style={{ borderLeftWidth: '4px', borderLeftColor: market.halted ? '#dc2626' : '#a855f7' }}
+                          >
+                            {market.halted && (
+                              <div className="bg-red-900/50 text-red-300 text-xs text-center py-1 px-2 rounded mb-2 -mt-1 -mx-1">
+                                🛑 HALTED
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold">{market.asset} {market.timeframe}</span>
+                                {!market.halted && market.currentMarket && (
+                                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); data.toggleMarketHalt(market.key); }}
+                                  className={`px-2 py-0.5 rounded text-xs font-medium border transition-all ${
+                                    market.halted 
+                                      ? 'border-green-500 text-green-400 hover:bg-green-500/10' 
+                                      : 'border-red-500/50 text-red-400 hover:bg-red-500/10'
+                                  }`}
+                                >
+                                  {market.halted ? 'Resume' : 'Stop'}
+                                </button>
+                                <span className={`text-lg font-mono ${marketPaperPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                  {marketPaperPnl >= 0 ? '+' : ''}${marketPaperPnl.toFixed(0)}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2 text-sm">
+                              <div>
+                                <div className="text-gray-500 text-xs">Balance</div>
+                                <div className="font-mono">${marketPaperBal.toFixed(0)}</div>
+                              </div>
+                              <div>
+                                <div className="text-gray-500 text-xs">Strategies</div>
+                                <div className="font-mono">{paperStrats.length}</div>
+                              </div>
+                              <div>
+                                <div className="text-gray-500 text-xs">Status</div>
+                                <div className={market.halted ? 'text-red-400' : market.currentMarket ? 'text-green-400' : 'text-gray-500'}>
+                                  {market.halted ? 'Halted' : market.currentMarket ? 
+                                    `${market.currentMarket.elapsed.toFixed(1)}m` : 
+                                    'Waiting'
+                                  }
+                                </div>
+                              </div>
+                            </div>
+                            {market.currentMarket && !market.halted && (
+                              <div className="mt-3 pt-3 border-t border-gray-800">
+                                <div className="flex items-center justify-between text-xs">
+                                  <span className="text-gray-400">Current: ${market.currentMarket.openPrice.toFixed(0)}</span>
+                                  <span className={market.currentMarket.changePercent >= 0 ? 'text-green-400' : 'text-red-400'}>
+                                    {market.currentMarket.changePercent >= 0 ? '↑' : '↓'} {Math.abs(market.currentMarket.changePercent).toFixed(3)}%
+                                  </span>
+                                </div>
+                                <div className="mt-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                                  <div 
+                                    className="h-full bg-purple-500 transition-all"
+                                    style={{ width: `${(market.currentMarket.elapsed / (market.timeframe === '5min' ? 5 : 15)) * 100}%` }}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
         </div>
       </main>
     </div>
   );
 }
 
-function OverviewView({ data, liveOnly }: { data: ReturnType<typeof usePolymarketData>; liveOnly: boolean }) {
-  const liveBets = data.strategies.flatMap(s => 
+function OverviewView({ data, tradingMode, filteredStrategies }: { 
+  data: ReturnType<typeof usePolymarketData>; 
+  tradingMode: 'paper' | 'live';
+  filteredStrategies: ReturnType<typeof usePolymarketData>['strategies'];
+}) {
+  // Only show bets from strategies matching current trading mode
+  const liveBets = filteredStrategies.flatMap(s => 
     (s.currentMarket?.bets || [])
       .filter(b => b.executed)
       .map(b => ({
@@ -440,7 +621,8 @@ function OverviewView({ data, liveOnly }: { data: ReturnType<typeof usePolymarke
       }))
   ).sort((a, b) => a.minute - b.minute);
 
-  const activeStrategies = data.strategies.filter(s => s.currentMarket?.side);
+  // Only show active strategies matching current trading mode
+  const activeStrategies = filteredStrategies.filter(s => s.currentMarket?.side);
   const btcUp = (data.currentMarket?.changePercent || 0) >= 0;
   const duration = data.selectedMarket?.timeframe === '5min' ? 5 : 15;
 
@@ -559,15 +741,30 @@ function OverviewView({ data, liveOnly }: { data: ReturnType<typeof usePolymarke
       )}
 
       {/* Strategy Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-        {(liveOnly ? data.strategies.filter(s => s.liveMode) : data.strategies).map(strategy => (
-          <StrategyCard 
-            key={strategy.id} 
-            strategy={strategy} 
-            onClick={() => data.setSelectedStrategy(strategy.id)}
-          />
-        ))}
-      </div>
+      {filteredStrategies.length === 0 && tradingMode === 'live' ? (
+        <div className="bg-gray-900 rounded-lg p-8 border border-gray-800 text-center">
+          <div className="text-4xl mb-4">{tradingMode === 'live' ? '💵' : '📝'}</div>
+          <h3 className="text-xl font-semibold mb-2">
+            No {tradingMode === 'live' ? 'Live' : 'Paper'} Strategies
+          </h3>
+          <p className="text-gray-400">
+            {tradingMode === 'live' 
+              ? 'Enable live trading on a strategy to see it here.'
+              : 'All strategies are in live mode.'}
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          {filteredStrategies.map(strategy => (
+            <StrategyCard 
+              key={strategy.id} 
+              strategy={strategy}
+              tradingMode={tradingMode}
+              onClick={() => data.setSelectedStrategy(strategy.id)}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Comparison Table */}
       <div className="bg-gray-900 rounded-lg p-3 sm:p-4 border border-gray-800">
@@ -585,7 +782,11 @@ function OverviewView({ data, liveOnly }: { data: ReturnType<typeof usePolymarke
               </tr>
             </thead>
             <tbody className="text-xs sm:text-sm">
-              {[...(liveOnly ? data.strategies.filter(s => s.liveMode) : data.strategies)].sort((a, b) => b.totalPnl - a.totalPnl).map(s => (
+              {[...filteredStrategies].sort((a, b) => 
+                tradingMode === 'live' 
+                  ? (b.livePnl || 0) - (a.livePnl || 0)
+                  : b.totalPnl - a.totalPnl
+              ).map(s => (
                 <tr key={s.id} className="border-b border-gray-800/50">
                   <td className="py-2 sm:py-3 pr-2">
                     <div className="flex items-center gap-1 sm:gap-2">
@@ -593,18 +794,37 @@ function OverviewView({ data, liveOnly }: { data: ReturnType<typeof usePolymarke
                       <span className="font-medium truncate max-w-[80px] sm:max-w-none">{s.name.split(' ')[0]}</span>
                     </div>
                   </td>
-                  <td className="py-2 sm:py-3 pr-2 font-mono">${s.balance.toFixed(0)}</td>
-                  <td className={`py-2 sm:py-3 pr-2 font-mono ${s.totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {s.totalPnl >= 0 ? '+' : ''}${s.totalPnl.toFixed(0)}
+                  <td className="py-2 sm:py-3 pr-2 font-mono">
+                    ${tradingMode === 'live' ? (s.liveBalance || 0).toFixed(0) : s.balance.toFixed(0)}
                   </td>
-                  <td className={`py-2 sm:py-3 pr-2 font-mono ${s.roi >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {s.roi >= 0 ? '+' : ''}{s.roi.toFixed(0)}%
+                  <td className={`py-2 sm:py-3 pr-2 font-mono ${
+                    (tradingMode === 'live' ? (s.livePnl || 0) : s.totalPnl) >= 0 ? 'text-green-400' : 'text-red-400'
+                  }`}>
+                    {(tradingMode === 'live' ? (s.livePnl || 0) : s.totalPnl) >= 0 ? '+' : ''}
+                    ${(tradingMode === 'live' ? (s.livePnl || 0) : s.totalPnl).toFixed(0)}
                   </td>
-                  <td className="py-2 sm:py-3 pr-2">{s.winRate}%</td>
+                  <td className={`py-2 sm:py-3 pr-2 font-mono ${
+                    (tradingMode === 'live' 
+                      ? ((s.liveDeployed || 0) > 0 ? ((s.livePnl || 0) / (s.liveDeployed || 1)) * 100 : 0)
+                      : s.roi) >= 0 ? 'text-green-400' : 'text-red-400'
+                  }`}>
+                    {tradingMode === 'live'
+                      ? `${((s.liveDeployed || 0) > 0 ? ((s.livePnl || 0) / (s.liveDeployed || 1)) * 100 : 0).toFixed(0)}%`
+                      : `${s.roi >= 0 ? '+' : ''}${s.roi.toFixed(0)}%`
+                    }
+                  </td>
+                  <td className="py-2 sm:py-3 pr-2">
+                    {tradingMode === 'live'
+                      ? `${((s.liveWins || 0) + (s.liveLosses || 0)) > 0 
+                          ? (((s.liveWins || 0) / ((s.liveWins || 0) + (s.liveLosses || 0))) * 100).toFixed(0) 
+                          : 0}%`
+                      : `${s.winRate}%`
+                    }
+                  </td>
                   <td className="py-2 sm:py-3 whitespace-nowrap">
-                    <span className="text-green-400">{s.wins}</span>
+                    <span className="text-green-400">{tradingMode === 'live' ? (s.liveWins || 0) : s.wins}</span>
                     <span className="text-gray-500">/</span>
-                    <span className="text-red-400">{s.losses}</span>
+                    <span className="text-red-400">{tradingMode === 'live' ? (s.liveLosses || 0) : s.losses}</span>
                   </td>
                 </tr>
               ))}
@@ -646,70 +866,103 @@ function OverviewView({ data, liveOnly }: { data: ReturnType<typeof usePolymarke
   );
 }
 
-function StrategyCard({ strategy, onClick }: { 
+function StrategyCard({ strategy, tradingMode = 'paper', onClick }: { 
   strategy: ReturnType<typeof usePolymarketData>['strategies'][0]; 
+  tradingMode?: 'paper' | 'live';
   onClick: () => void;
 }) {
   const isActive = strategy.currentMarket && strategy.currentMarket.fills > 0;
+  const isLiveView = tradingMode === 'live';
+  
+  // Calculate stats based on mode
+  const balance = isLiveView ? (strategy.liveBalance || 0) : strategy.balance;
+  const pnl = isLiveView ? (strategy.livePnl || 0) : strategy.totalPnl;
+  const wins = isLiveView ? (strategy.liveWins || 0) : strategy.wins;
+  const losses = isLiveView ? (strategy.liveLosses || 0) : strategy.losses;
+  const winRate = (wins + losses) > 0 ? Math.round((wins / (wins + losses)) * 100) : 0;
+  const allocation = strategy.liveAllocation || 0;
+  const budgetPct = allocation > 0 ? (balance / allocation) * 100 : 100;
+  
+  // Determine halt status based on mode
+  const isHaltedForMode = isLiveView ? strategy.liveHalted : strategy.halted;
   
   return (
     <div 
       onClick={onClick}
       className={`bg-gray-900 rounded-lg p-3 sm:p-4 border cursor-pointer transition-all ${
-        strategy.halted ? 'border-red-600 opacity-60' : 'border-gray-800 hover:border-gray-700'
+        isHaltedForMode ? 'border-red-600 opacity-60' : 'border-gray-800 hover:border-gray-700'
       }`}
-      style={{ borderTopWidth: '3px', borderTopColor: strategy.halted ? '#dc2626' : strategy.color }}
+      style={{ borderTopWidth: '3px', borderTopColor: isHaltedForMode ? '#dc2626' : strategy.color }}
     >
       {/* Status badges */}
-      <div className="flex items-center gap-1 mb-1">
-        {strategy.liveMode && (
+      <div className="flex items-center gap-1 mb-1 flex-wrap">
+        {isLiveView ? (
           <span className="text-xs bg-yellow-600 text-yellow-100 px-1.5 py-0.5 rounded font-bold">💰 LIVE</span>
+        ) : (
+          <span className="text-xs bg-blue-600 text-blue-100 px-1.5 py-0.5 rounded">📄 Paper</span>
         )}
-        {strategy.halted && (
+        {/* Show appropriate halt status based on mode */}
+        {isLiveView && strategy.liveHalted && (
+          <span className="text-xs bg-red-600 text-red-100 px-1.5 py-0.5 rounded font-bold">🛑 LIVE HALTED</span>
+        )}
+        {!isLiveView && strategy.halted && (
           <span className="text-xs bg-red-600 text-red-100 px-1.5 py-0.5 rounded font-bold">🛑 HALTED</span>
         )}
-        {!strategy.liveMode && !strategy.halted && (
-          <span className="text-xs bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded">📄 Paper</span>
+        {/* Show locked funds indicator for live mode */}
+        {isLiveView && (strategy.lockedFunds || 0) > 0 && (
+          <span className="text-xs bg-orange-600 text-orange-100 px-1.5 py-0.5 rounded">🔒 ${(strategy.lockedFunds || 0).toFixed(0)}</span>
         )}
       </div>
       
       <div className="flex items-center justify-between mb-1 sm:mb-2">
         <h3 className="font-semibold text-sm sm:text-base truncate">{strategy.name}</h3>
-        {isActive && !strategy.halted && <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0 ml-1" />}
+        {isActive && !isHaltedForMode && <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0 ml-1" />}
       </div>
       <p className="text-xs text-gray-500 mb-2 sm:mb-3 line-clamp-2">{strategy.description}</p>
       
-      {/* Stop loss indicator */}
-      {strategy.balance <= strategy.stopLossThreshold * 1.5 && (
-        <div className="text-xs text-red-400 mb-2">
-          ⚠️ Near stop loss (${strategy.stopLossThreshold})
+      {/* Budget indicator for live mode */}
+      {isLiveView && (
+        <div className="mb-2">
+          <div className="flex justify-between text-xs mb-1">
+            <span className="text-gray-400">Budget</span>
+            <span className={`font-mono ${budgetPct < 25 ? 'text-red-400' : 'text-yellow-400'}`}>
+              ${balance.toFixed(0)}/${allocation}
+            </span>
+          </div>
+          <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+            <div 
+              className={`h-full transition-all ${budgetPct < 25 ? 'bg-red-500' : budgetPct < 50 ? 'bg-yellow-500' : 'bg-green-500'}`}
+              style={{ width: `${Math.min(100, budgetPct)}%` }}
+            />
+          </div>
         </div>
       )}
       
+      {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-1 sm:gap-2 text-xs sm:text-sm">
         <div>
-          <div className="text-gray-400 text-xs">Balance</div>
-          <div className={`font-mono truncate ${strategy.balance <= strategy.stopLossThreshold ? 'text-red-400' : 'text-green-400'}`}>
-            ${strategy.balance.toFixed(0)}
+          <div className="text-gray-400 text-xs">{isLiveView ? 'Budget' : 'Balance'}</div>
+          <div className={`font-mono truncate ${isLiveView ? (budgetPct < 25 ? 'text-red-400' : 'text-yellow-400') : (strategy.balance <= strategy.stopLossThreshold ? 'text-red-400' : 'text-green-400')}`}>
+            ${balance.toFixed(0)}
           </div>
         </div>
         <div>
           <div className="text-gray-400 text-xs">P&L</div>
-          <div className={`font-mono truncate ${strategy.totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-            {strategy.totalPnl >= 0 ? '+' : ''}${strategy.totalPnl.toFixed(0)}
+          <div className={`font-mono truncate ${pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            {pnl >= 0 ? '+' : ''}${pnl.toFixed(0)}
           </div>
         </div>
         <div>
           <div className="text-gray-400 text-xs">Win Rate</div>
-          <div>{strategy.winRate}%</div>
+          <div>{winRate}%</div>
         </div>
         <div>
-          <div className="text-gray-400 text-xs">Markets</div>
-          <div>{strategy.totalMarkets}</div>
+          <div className="text-gray-400 text-xs">{isLiveView ? 'Record' : 'Markets'}</div>
+          <div>{isLiveView ? `${wins}W/${losses}L` : strategy.totalMarkets}</div>
         </div>
       </div>
       
-      {strategy.currentMarket?.side && !strategy.halted && (
+      {strategy.currentMarket?.side && !isHaltedForMode && (
         <div className={`mt-2 sm:mt-3 px-2 py-1 rounded text-center text-xs sm:text-sm ${
           strategy.currentMarket.side === 'Up' ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'
         }`}>
@@ -717,9 +970,21 @@ function StrategyCard({ strategy, onClick }: {
         </div>
       )}
       
-      {strategy.haltedReason && (
+      {/* Show appropriate halt reason based on mode */}
+      {isLiveView && strategy.liveHaltedReason && (
+        <div className="mt-2 text-xs text-red-400 bg-red-900/30 rounded p-1 text-center">
+          {strategy.liveHaltedReason}
+        </div>
+      )}
+      {!isLiveView && strategy.haltedReason && (
         <div className="mt-2 text-xs text-red-400 bg-red-900/30 rounded p-1 text-center">
           {strategy.haltedReason}
+        </div>
+      )}
+      {/* Show pending bets info for live mode */}
+      {isLiveView && (strategy.pendingBets?.length || 0) > 0 && (
+        <div className="mt-2 text-xs text-orange-400 bg-orange-900/30 rounded p-1 text-center">
+          {strategy.pendingBets?.length || 0} pending bet(s)
         </div>
       )}
     </div>
@@ -824,10 +1089,53 @@ function DetailView({ strategy, market, assetPrice }: {
         </div>
       </div>
 
-      {/* Stats Summary */}
+      {/* Live Trading Stats (if in live mode) */}
+      {strategy.liveMode && (
+        <div className="bg-yellow-900/20 rounded-lg p-4 border border-yellow-600/50">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-semibold text-yellow-400">🔴 Live Trading</h3>
+            <div className={`text-lg font-mono ${((strategy.liveBalance || 0) / (strategy.liveAllocation || 1) * 100) < 25 ? 'text-red-400' : 'text-yellow-400'}`}>
+              Budget: ${(strategy.liveBalance || 0).toFixed(2)} / ${strategy.liveAllocation || 0}
+              <span className="text-sm ml-1">({(((strategy.liveBalance || 0) / (strategy.liveAllocation || 1)) * 100).toFixed(0)}%)</span>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="bg-gray-900/50 rounded p-3">
+              <div className="text-gray-400 text-xs uppercase">Budget Left</div>
+              <div className={`text-2xl font-mono ${((strategy.liveBalance || 0) / (strategy.liveAllocation || 1) * 100) < 25 ? 'text-red-400' : 'text-yellow-400'}`}>
+                ${(strategy.liveBalance || 0).toFixed(2)}
+              </div>
+              <div className="text-gray-500 text-xs">stops at 10%</div>
+            </div>
+            <div className="bg-gray-900/50 rounded p-3">
+              <div className="text-gray-400 text-xs uppercase">Live P&L</div>
+              <div className={`text-2xl font-mono ${(strategy.livePnl || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                {(strategy.livePnl || 0) >= 0 ? '+' : ''}${(strategy.livePnl || 0).toFixed(2)}
+              </div>
+              <div className="text-gray-500 text-xs">deployed: ${(strategy.liveDeployed || 0).toFixed(2)}</div>
+            </div>
+            <div className="bg-gray-900/50 rounded p-3">
+              <div className="text-gray-400 text-xs uppercase">Live Record</div>
+              <div className="text-2xl font-mono">{strategy.liveWins || 0}W / {strategy.liveLosses || 0}L</div>
+              <div className="text-gray-500 text-xs">
+                {((strategy.liveWins || 0) + (strategy.liveLosses || 0)) > 0 
+                  ? `${(((strategy.liveWins || 0) / ((strategy.liveWins || 0) + (strategy.liveLosses || 0))) * 100).toFixed(0)}% win rate`
+                  : 'No trades yet'}
+              </div>
+            </div>
+            <div className="bg-gray-900/50 rounded p-3">
+              <div className="text-gray-400 text-xs uppercase">Initial Budget</div>
+              <div className="text-2xl font-mono text-white">${strategy.liveAllocation || 10}</div>
+              <div className="text-gray-500 text-xs">from wallet</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Paper Trading Stats Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <div className="bg-gray-900 rounded-lg p-3 border border-gray-800">
-          <div className="text-gray-400 text-xs uppercase">Total P&L</div>
+          <div className="text-gray-400 text-xs uppercase">{strategy.liveMode ? '📄 Paper P&L' : 'Total P&L'}</div>
           <div className={`text-2xl font-mono ${strategy.totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
             {strategy.totalPnl >= 0 ? '+' : ''}${strategy.totalPnl.toFixed(2)}
           </div>

@@ -1,0 +1,14 @@
+{
+  "lastCheck": 1771259616989,
+  "pendingRedemptions": [],
+  "completedRedemptions": [
+    {
+      "conditionId": "0x2aae4f2bfb329f23c4bf159e51d63f00dab628a049b0b016f529054efdb20a55",
+      "tokenId": "61389490052363105952980171003554758500470085139713480254186817857196609277679",
+      "marketSlug": "Bitcoin Up or Down - February 16, 8:40AM-8:45AM ET",
+      "amount": 11,
+      "txHash": "0x5db6e043a67f75696fce11e10866204700e76c4c97351b988951763f8348be9d",
+      "timestamp": 1771259616895
+    }
+  ]
+}

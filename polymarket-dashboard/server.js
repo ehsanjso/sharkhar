@@ -6,6 +6,9 @@ const PORT = process.env.PORT || 8083;
 const USER = process.env.DASHBOARD_USER || 'admin';
 const PASS = process.env.DASHBOARD_PASS || 'polymarket2024';
 
+// Path to bot data directory
+const BOT_DATA_DIR = path.join(__dirname, '..', 'polymarket-bot', 'data');
+
 const MIME_TYPES = {
   '.html': 'text/html',
   '.js': 'text/javascript',
@@ -24,6 +27,20 @@ function parseBasicAuth(req) {
   return { user, pass };
 }
 
+function sendJSON(res, data, status = 200) {
+  res.writeHead(status, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(data));
+}
+
+function readJSONFile(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    return JSON.parse(content);
+  } catch (e) {
+    return null;
+  }
+}
+
 const server = http.createServer((req, res) => {
   // Basic auth check
   const credentials = parseBasicAuth(req);
@@ -36,8 +53,58 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  const url = new URL(req.url, `http://${req.headers.host}`);
+  const pathname = url.pathname;
+
+  // API endpoints
+  if (pathname === '/api/portfolio') {
+    const portfolio = readJSONFile(path.join(BOT_DATA_DIR, 'portfolio.json'));
+    if (portfolio) {
+      sendJSON(res, portfolio);
+    } else {
+      sendJSON(res, { error: 'Portfolio not found' }, 404);
+    }
+    return;
+  }
+
+  if (pathname === '/api/bets') {
+    const bets = readJSONFile(path.join(BOT_DATA_DIR, 'bets.json'));
+    if (bets) {
+      sendJSON(res, bets);
+    } else {
+      sendJSON(res, []);
+    }
+    return;
+  }
+
+  if (pathname === '/api/history') {
+    const history = readJSONFile(path.join(BOT_DATA_DIR, 'history.json'));
+    if (history) {
+      sendJSON(res, history);
+    } else {
+      sendJSON(res, []);
+    }
+    return;
+  }
+
+  if (pathname === '/api/status') {
+    const portfolio = readJSONFile(path.join(BOT_DATA_DIR, 'portfolio.json'));
+    const bets = readJSONFile(path.join(BOT_DATA_DIR, 'bets.json')) || [];
+    
+    const pending = bets.filter(b => !b.resolved);
+    const resolved = bets.filter(b => b.resolved);
+    
+    sendJSON(res, {
+      portfolio,
+      pending_count: pending.length,
+      resolved_count: resolved.length,
+      last_updated: new Date().toISOString()
+    });
+    return;
+  }
+
   // Serve static files
-  let filePath = path.join(__dirname, 'public', req.url === '/' ? 'index.html' : req.url);
+  let filePath = path.join(__dirname, 'public', pathname === '/' ? 'index.html' : pathname);
   const ext = path.extname(filePath);
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
@@ -64,4 +131,5 @@ server.listen(PORT, () => {
   console.log(`🎰 Polymarket Dashboard running at http://localhost:${PORT}`);
   console.log(`   Username: ${USER}`);
   console.log(`   Password: ${'*'.repeat(PASS.length)}`);
+  console.log(`   Bot data: ${BOT_DATA_DIR}`);
 });

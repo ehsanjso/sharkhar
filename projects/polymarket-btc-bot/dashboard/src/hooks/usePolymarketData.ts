@@ -15,6 +15,7 @@ export interface Strategy {
   name: string;
   description: string;
   color: string;
+  // Paper trading stats (simulation)
   balance: number;
   startingBalance: number;
   totalPnl: number;
@@ -29,10 +30,22 @@ export interface Strategy {
   history: Trade[];
   pnlHistory: { market: number; pnl: number; cumulative: number }[];
   currentMarket: StrategyMarket | null;
+  // Live trading stats (separate from paper)
+  liveDeployed: number;
+  livePnl: number;
+  liveWins: number;
+  liveLosses: number;
+  liveHistory: Trade[];
+  liveAllocation: number;
+  liveBalance: number;
+  lockedFunds: number;
+  pendingBets: { conditionId: string; betAmount: number; won: boolean | null }[];
   // Control flags
   liveMode: boolean;
-  halted: boolean;
+  halted: boolean;           // Paper trading halt
   haltedReason?: string;
+  liveHalted: boolean;       // Live trading halt (separate)
+  liveHaltedReason?: string;
   stopLossThreshold: number;
   // Activity logs
   logs: StrategyLog[];
@@ -100,7 +113,7 @@ export interface PolymarketData {
   // Control functions
   toggleGlobalHalt: () => void;
   toggleMarketHalt: (key: string) => void;
-  toggleStrategyHalt: (key: string, strategyId: string) => void;
+  toggleStrategyHalt: (key: string, strategyId: string, isLive?: boolean) => void;
   setLiveMode: (key: string, strategyId: string, live: boolean, funding?: number) => void;
   setStopLoss: (key: string, strategyId: string, threshold: number) => void;
   // Legacy compatibility for current market view
@@ -223,14 +236,20 @@ export function usePolymarketData(): PolymarketData {
     }
   }, [ws, markets]);
 
-  const toggleStrategyHalt = useCallback((key: string, strategyId: string) => {
+  const toggleStrategyHalt = useCallback((key: string, strategyId: string, isLive?: boolean) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
       const market = markets.find(m => m.key === key);
       const strategy = market?.strategies.find(s => s.id === strategyId);
+      
+      // Determine which halt to toggle based on isLive flag or strategy's liveMode
+      const targetLive = isLive ?? strategy?.liveMode;
+      const isHalted = targetLive ? strategy?.liveHalted : strategy?.halted;
+      
       ws.send(JSON.stringify({ 
-        type: strategy?.halted ? 'resumeStrategy' : 'haltStrategy', 
+        type: isHalted ? 'resumeStrategy' : 'haltStrategy', 
         key, 
-        strategyId 
+        strategyId,
+        live: targetLive,
       }));
     }
   }, [ws, markets]);

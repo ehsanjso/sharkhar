@@ -6,11 +6,13 @@
 
 import { WebSocket, WebSocketServer } from 'ws';
 import { recordBet, redeemAllWinnings } from './auto-redeem.js';
+import { trackBetPlaced, trackBetFilled, checkAndRedeemAll, getStats as getBetTrackerStats, getPendingBets, getRecentHistory } from './bet-tracker.js';
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { liveTrading } from './live-trading.js';
+import * as db from './database.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -210,6 +212,7 @@ interface StrategyState {
   name: string;
   description: string;
   color: string;
+  // Paper trading stats (simulation)
   balance: number;
   startingBalance: number;
   totalPnl: number;
@@ -224,10 +227,31 @@ interface StrategyState {
   history: Trade[];
   pnlHistory: { market: number; pnl: number; cumulative: number }[];
   currentMarket: StrategyMarket | null;
+  // Live trading stats (separate from paper)
+  liveDeployed: number;    // Total $ deployed in live mode
+  livePnl: number;         // P&L from live trades only
+  liveWins: number;        // Live wins count
+  liveLosses: number;      // Live losses count
+  liveHistory: Trade[];    // History of live trades only
+  liveAllocation: number;  // Initial budget assigned from wallet
+  liveBalance: number;     // Current balance (starts at allocation, updated with wins/losses)
+  // Funds tracking - what's locked vs available
+  lockedFunds: number;         // Money currently in bets or awaiting redemption (unavailable)
+  pendingBets: {               // Track all pending bets for this strategy
+    conditionId: string;
+    tokenId: string;
+    betAmount: number;         // What we bet (locked)
+    expectedPayout: number;    // What we'll get if we win
+    marketResolved: boolean;
+    won: boolean | null;       // null = not resolved, true/false = outcome
+    timestamp: number;
+  }[];
   // Control flags
   liveMode: boolean;       // true = real money, false = paper
-  halted: boolean;         // true = stopped trading
+  halted: boolean;         // true = paper trading stopped
   haltedReason?: string;   // why halted (manual, stop-loss, etc)
+  liveHalted: boolean;     // true = live trading stopped (separate from paper)
+  liveHaltedReason?: string;
   stopLossThreshold: number; // halt when balance drops below this (default 25)
   profitTaken?: boolean;   // true = initial stake "withdrawn" after hitting multiplier
   // Per-strategy logs
@@ -299,6 +323,7 @@ function initializeMarkets(): void {
       name: s.name,
       description: s.description,
       color: s.color,
+      // Paper trading (simulation)
       balance: s.startingBalance,
       startingBalance: s.startingBalance,
       totalPnl: 0,
@@ -313,9 +338,21 @@ function initializeMarkets(): void {
       history: [],
       pnlHistory: [],
       currentMarket: null,
+      // Live trading (separate tracking)
+      liveDeployed: 0,
+      livePnl: 0,
+      liveWins: 0,
+      liveLosses: 0,
+      liveHistory: [],
+      liveAllocation: 10,      // Default $10 budget per strategy
+      liveBalance: 0,          // Starts at 0, set to allocation when live mode enabled
+      // Funds tracking
+      lockedFunds: 0,          // Money in bets or awaiting redemption
+      pendingBets: [],         // List of pending bets
       // Control flags
       liveMode: false,         // Start in paper mode
-      halted: false,
+      halted: false,           // Paper trading halt
+      liveHalted: false,       // Live trading halt (separate)
       stopLossThreshold: Math.floor(s.startingBalance * 0.25),   // Stop loss at 25% of initial balance
       logs: [],
     })),
@@ -341,6 +378,7 @@ function saveState(): void {
         halted: m.halted,
         strategies: m.strategies.map(s => ({
           id: s.id,
+          // Paper trading stats
           balance: s.balance,
           totalPnl: s.totalPnl,
           totalMarkets: s.totalMarkets,
@@ -351,10 +389,23 @@ function saveState(): void {
           roi: s.roi,
           history: s.history.slice(0, 50),
           pnlHistory: s.pnlHistory,
+          // Live trading stats (separate)
+          liveDeployed: s.liveDeployed,
+          livePnl: s.livePnl,
+          liveWins: s.liveWins,
+          liveLosses: s.liveLosses,
+          liveHistory: s.liveHistory.slice(0, 50),
+          liveAllocation: s.liveAllocation,
+          liveBalance: s.liveBalance,
+          // Funds tracking
+          lockedFunds: s.lockedFunds,
+          pendingBets: s.pendingBets,
           // Control flags
           liveMode: s.liveMode,
           halted: s.halted,
           haltedReason: s.haltedReason,
+          liveHalted: s.liveHalted,
+          liveHaltedReason: s.liveHaltedReason,
           stopLossThreshold: s.stopLossThreshold,
           logs: s.logs.slice(-50), // Save last 50 logs
         })),
@@ -365,8 +416,37 @@ function saveState(): void {
     };
     
     fs.writeFileSync(STATE_FILE, JSON.stringify(saveData, null, 2));
+    
+    // Also save to SQLite database
+    for (const market of state.markets) {
+      for (const s of market.strategies) {
+        db.saveStrategy({
+          id: s.id,
+          market_key: market.key,
+          name: s.name,
+          balance: s.balance,
+          starting_balance: s.startingBalance,
+          total_pnl: s.totalPnl,
+          total_markets: s.totalMarkets,
+          deployed: s.deployed,
+          wins: s.wins,
+          losses: s.losses,
+          live_mode: s.liveMode,
+          live_allocation: s.liveAllocation,
+          live_balance: s.liveBalance,
+          live_deployed: s.liveDeployed,
+          live_pnl: s.livePnl,
+          live_wins: s.liveWins,
+          live_losses: s.liveLosses,
+          halted: s.halted,
+          halted_reason: s.haltedReason,
+          stop_loss_threshold: s.stopLossThreshold,
+        });
+      }
+    }
   } catch (error) {
     console.error('Failed to save state:', error);
+    db.dbLog.error('system', 'Failed to save state', { error: String(error) });
   }
 }
 
@@ -388,6 +468,7 @@ function loadState(): boolean {
             for (const savedStrategy of savedMarket.strategies) {
               const strategy = market.strategies.find(s => s.id === savedStrategy.id);
               if (strategy) {
+                // Paper trading stats
                 strategy.balance = savedStrategy.balance ?? strategy.startingBalance;
                 strategy.totalPnl = savedStrategy.totalPnl ?? 0;
                 strategy.totalMarkets = savedStrategy.totalMarkets ?? 0;
@@ -398,10 +479,23 @@ function loadState(): boolean {
                 strategy.roi = savedStrategy.roi ?? 0;
                 strategy.history = savedStrategy.history ?? [];
                 strategy.pnlHistory = savedStrategy.pnlHistory ?? [];
+                // Live trading stats (separate)
+                strategy.liveDeployed = savedStrategy.liveDeployed ?? 0;
+                strategy.livePnl = savedStrategy.livePnl ?? 0;
+                strategy.liveWins = savedStrategy.liveWins ?? 0;
+                strategy.liveLosses = savedStrategy.liveLosses ?? 0;
+                strategy.liveHistory = savedStrategy.liveHistory ?? [];
+                strategy.liveAllocation = savedStrategy.liveAllocation ?? 10;
+                strategy.liveBalance = savedStrategy.liveBalance ?? savedStrategy.liveAllocation ?? 10;
+                // Funds tracking
+                strategy.lockedFunds = savedStrategy.lockedFunds ?? 0;
+                strategy.pendingBets = savedStrategy.pendingBets ?? [];
                 // Control flags
                 strategy.liveMode = savedStrategy.liveMode ?? false;
                 strategy.halted = savedStrategy.halted ?? false;
                 strategy.haltedReason = savedStrategy.haltedReason;
+                strategy.liveHalted = savedStrategy.liveHalted ?? false;
+                strategy.liveHaltedReason = savedStrategy.liveHaltedReason;
                 strategy.stopLossThreshold = savedStrategy.stopLossThreshold ?? 25;
                 strategy.logs = savedStrategy.logs ?? [];
               }
@@ -465,15 +559,19 @@ function loadState(): boolean {
 async function fetchWalletBalance(): Promise<void> {
   try {
     const { ethers } = await import('ethers');
-    const provider = new ethers.providers.StaticJsonRpcProvider('https://polygon-rpc.com', 137);
+    const { withRetry } = await import('./rpc.js');
     const USDC_E = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
     const WALLET = '0x923C9c79ADF737A878f6fFb4946D7da889d78E1d';
     const ERC20_ABI = ['function balanceOf(address) view returns (uint256)'];
-    const usdc = new ethers.Contract(USDC_E, ERC20_ABI, provider);
-    const balance = await usdc.balanceOf(WALLET);
+    
+    const balance = await withRetry(async (provider) => {
+      const usdc = new ethers.Contract(USDC_E, ERC20_ABI, provider);
+      return await usdc.balanceOf(WALLET);
+    }, 2);
+    
     state.walletBalance = parseFloat(ethers.utils.formatUnits(balance, 6));
   } catch (error) {
-    console.error('Wallet balance fetch error:', error);
+    // Silent fail - will retry on next fetch
   }
 }
 
@@ -1146,73 +1244,195 @@ async function placeBet(marketState: MarketState, strategy: StrategyState, amoun
   if (!canPlaceBet(marketState, strategy)) return;
   
   const market = strategy.currentMarket!;
+  const price = Math.max(0.45, probability - 0.03);
+  const shares = Math.floor(amount / price);
   
+  // ============ LIVE MODE: Real money from wallet ============
+  if (strategy.liveMode) {
+    // Check live-specific halt (separate from paper halt)
+    if (strategy.liveHalted) {
+      console.log(`   🛑 [${strategy.name}] Live trading halted: ${strategy.liveHaltedReason || 'manual'}`);
+      return;
+    }
+    
+    // Calculate ACTUAL available funds (budget minus what's locked in pending bets)
+    const availableBudget = strategy.liveBalance - strategy.lockedFunds;
+    const availableWallet = state.walletBalance;
+    
+    // Log current state for debugging
+    console.log(`   📊 [${strategy.name}] Budget: $${strategy.liveBalance.toFixed(2)}, Locked: $${strategy.lockedFunds.toFixed(2)}, Available: $${availableBudget.toFixed(2)}, Wallet: $${availableWallet.toFixed(2)}`);
+    
+    const stopLossThreshold = strategy.liveAllocation * 0.10; // 10% of initial allocation
+    
+    // Check if total balance (including locked) has dropped below stop-loss
+    if (strategy.liveBalance < stopLossThreshold) {
+      addStrategyLog(strategy, 'error', `🛑 LIVE HALTED: Budget depleted - $${strategy.liveBalance.toFixed(2)} < 10% of $${strategy.liveAllocation}`);
+      strategy.liveHalted = true;
+      strategy.liveHaltedReason = `Budget < 10% ($${strategy.liveBalance.toFixed(2)}/$${strategy.liveAllocation})`;
+      sendTelegramAlert(`🛑 *LIVE STRATEGY HALTED*\n\n${marketState.key} ${strategy.name}\n\nBudget depleted!\n$${strategy.liveBalance.toFixed(2)} remaining (< 10% of $${strategy.liveAllocation})\n\nStop-loss triggered.`);
+      return;
+    }
+    
+    // Cap bet to available wallet balance AND strategy's AVAILABLE balance (not locked funds)
+    let liveBetAmount = Math.min(amount, availableWallet, availableBudget);
+    
+    if (liveBetAmount < 1) {
+      // Check WHY we can't bet
+      if (strategy.liveBalance < 1) {
+        // Total budget exhausted - HALT LIVE ONLY
+        addStrategyLog(strategy, 'error', `🛑 LIVE HALTED: Live budget exhausted ($${strategy.liveBalance.toFixed(2)} remaining)`);
+        strategy.liveHalted = true;
+        strategy.liveHaltedReason = 'Budget exhausted';
+        sendTelegramAlert(`🛑 *LIVE STRATEGY HALTED*\n\n${marketState.key} ${strategy.name}\n\nBudget exhausted ($${strategy.liveBalance.toFixed(2)} remaining)\n\nStrategy stopped.`);
+      } else if (availableBudget < 1) {
+        // Funds locked in pending bets - skip this round but don't halt
+        addStrategyLog(strategy, 'info', `⏳ Skipping - funds locked in pending bets ($${strategy.lockedFunds.toFixed(2)} pending, ${strategy.pendingBets.length} bets)`);
+        console.log(`   ⏳ [${strategy.name}] Skipping - $${strategy.lockedFunds.toFixed(2)} locked in ${strategy.pendingBets.length} pending bets`);
+        // Don't halt - just skip this round
+      } else if (availableWallet < 1) {
+        addStrategyLog(strategy, 'error', `⚠️ Wallet empty ($${availableWallet.toFixed(2)}) - waiting for redemption`);
+        console.log(`   ⚠️ [${strategy.name}] Wallet empty - waiting for redemptions`);
+        // Don't halt - wallet will refill after redemption
+      }
+      // Don't continue to paper trading - live mode means live only
+      return;
+    } else {
+      addStrategyLog(strategy, 'bet', `🔴 LIVE bet: $${liveBetAmount} @ ${(price * 100).toFixed(0)}¢ (wallet: $${availableWallet.toFixed(2)})`, { amount: liveBetAmount, price });
+      
+      try {
+        // Find the actual Polymarket market
+        addStrategyLog(strategy, 'clob', `Finding ${marketState.asset} ${marketState.timeframe} market on Polymarket...`);
+        const liveMarket = await liveTrading.findMarket(marketState.asset, marketState.timeframe);
+        
+        if (!liveMarket) {
+          addStrategyLog(strategy, 'error', `No active ${marketState.asset} ${marketState.timeframe} market found`);
+          console.log(`   ⚠️ [LIVE] No active ${marketState.asset} ${marketState.timeframe} market found`);
+        } else {
+          addStrategyLog(strategy, 'clob', `Found market: ${liveMarket.title || liveMarket.slug}...`);
+          
+          // Determine direction based on strategy decision
+          const side = market.side || 'Up';
+          const tokenId = side === 'Up' ? liveMarket.upTokenId : liveMarket.downTokenId;
+          
+          // Use ACTUAL market price (not our calculated probability)
+          const marketPrice = side === 'Up' ? liveMarket.upPrice : liveMarket.downPrice;
+          const bidPrice = Math.min(0.95, marketPrice + 0.01); // Bid 1¢ above market for better fill
+          
+          addStrategyLog(strategy, 'clob', `Market price: ${(marketPrice * 100).toFixed(0)}¢, bidding: ${(bidPrice * 100).toFixed(0)}¢`);
+          
+          // Place the real order at market price
+          addStrategyLog(strategy, 'clob', `Sending CLOB order: ${side} $${liveBetAmount} @ ${(bidPrice * 100).toFixed(0)}¢`);
+          const result = await liveTrading.placeOrder(tokenId, side, liveBetAmount, bidPrice);
+          
+          if (result.success) {
+            addStrategyLog(strategy, 'fill', `✅ Order filled! ID: ${result.orderId}, Shares: ${result.shares}`, { orderId: result.orderId, shares: result.shares });
+            console.log(`   💰 [LIVE] ${strategy.name}: $${liveBetAmount} ${side} @ ${(bidPrice * 100).toFixed(0)}¢`);
+            console.log(`      Order ID: ${result.orderId}, Shares: ${result.shares}`);
+            sendTelegramAlert(`💰 *LIVE BET*\n\n${marketState.key} ${strategy.name}\n$${liveBetAmount} on ${side}\nWallet remaining: $${(availableWallet - liveBetAmount).toFixed(2)}\nOrder: ${result.orderId}`);
+            
+            // Track live deployed and deduct from live balance
+            strategy.liveDeployed += liveBetAmount;
+            strategy.liveBalance -= liveBetAmount;
+            
+            // Track in current market state for UI display
+            const actualShares = result.shares || Math.floor(liveBetAmount / bidPrice);
+            market.bets.push({
+              minute: Date.now(),
+              amount: liveBetAmount,
+              executed: true,
+              shares: actualShares,
+              price: bidPrice,
+            });
+            market.costBet += liveBetAmount;
+            market.shares += actualShares;
+            market.avgPrice = market.costBet / market.shares;
+            market.fills++;
+            
+            // Record bet for auto-redemption AND tracking
+            if (liveMarket.conditionId) {
+              recordBet(liveMarket.conditionId, tokenId, liveMarket.slug || liveMarket.title, side);
+              
+              // Track with new bet tracker for complete lifecycle
+              const trackedBet = trackBetPlaced({
+                orderId: result.orderId || `unknown_${Date.now()}`,
+                strategyId: strategy.id,
+                marketKey: marketState.key,
+                marketSlug: liveMarket.slug || liveMarket.title,
+                conditionId: liveMarket.conditionId,
+                tokenId: tokenId,
+                side: side as 'Up' | 'Down',
+                betAmount: liveBetAmount,
+                price: bidPrice,
+                shares: actualShares,
+              });
+              
+              // Mark as filled immediately since we got shares
+              if (result.orderId && actualShares > 0) {
+                trackBetFilled(result.orderId, actualShares, bidPrice);
+              }
+            }
+            
+            // Save live bet to database for tracking
+            const liveBetId = db.saveLiveBet({
+              strategy_id: strategy.id,
+              market_key: marketState.key,
+              market_id: marketState.currentMarket?.id || '',
+              condition_id: liveMarket.conditionId,
+              token_id: tokenId,
+              order_id: result.orderId,
+              side: side as 'Up' | 'Down',
+              amount: liveBetAmount,
+              price: bidPrice,
+              shares: actualShares,
+              status: 'pending',
+            });
+            
+            // Track this bet as pending - funds are now locked
+            strategy.pendingBets.push({
+              conditionId: liveMarket.conditionId || '',
+              tokenId: tokenId,
+              betAmount: liveBetAmount,
+              expectedPayout: actualShares, // Max payout if we win
+              marketResolved: false,
+              won: null,
+              timestamp: Date.now(),
+            });
+            strategy.lockedFunds += liveBetAmount;
+            addStrategyLog(strategy, 'info', `🔒 $${liveBetAmount} locked (total locked: $${strategy.lockedFunds.toFixed(2)})`);
+            
+            db.dbLog.info('live', `Live bet placed: ${side} $${liveBetAmount}`, {
+              betId: liveBetId,
+              orderId: result.orderId,
+              shares: actualShares,
+              price: bidPrice,
+            }, strategy.id, marketState.key);
+          } else {
+            addStrategyLog(strategy, 'error', `❌ Order failed: ${result.error}`, { error: result.error });
+            console.log(`   ❌ [LIVE] Order failed: ${result.error}`);
+            sendTelegramAlert(`❌ *ORDER FAILED*\n\n${marketState.key} ${strategy.name}\n$${liveBetAmount} ${side}\nError: ${result.error}`);
+          }
+        }
+      } catch (error: any) {
+        addStrategyLog(strategy, 'error', `❌ Exception: ${error.message}`, { error: error.message });
+        console.error(`   ❌ [LIVE] Error:`, error.message);
+      }
+    }
+  }
+  
+  // ============ PAPER MODE ONLY ============
+  // Live mode strategies don't run paper simulation - they're live only
+  if (strategy.liveMode) {
+    // Live mode handled above - don't run paper simulation
+    return;
+  }
+  
+  // Paper trading simulation
   if (strategy.balance < amount) {
     amount = Math.floor(strategy.balance);
     if (amount < 1) return;
   }
   
-  const price = Math.max(0.45, probability - 0.03);
-  const shares = Math.floor(amount / price);
-  
-  // For live mode, place REAL orders on Polymarket
-  if (strategy.liveMode) {
-    addStrategyLog(strategy, 'bet', `Placing LIVE bet: $${amount} @ ${(price * 100).toFixed(0)}¢`, { amount, price });
-    
-    try {
-      // Find the actual Polymarket market
-      addStrategyLog(strategy, 'clob', `Finding ${marketState.asset} ${marketState.timeframe} market on Polymarket...`);
-      const liveMarket = await liveTrading.findMarket(marketState.asset, marketState.timeframe);
-      
-      if (!liveMarket) {
-        addStrategyLog(strategy, 'error', `No active ${marketState.asset} ${marketState.timeframe} market found`);
-        console.log(`   ⚠️ [LIVE] No active ${marketState.asset} ${marketState.timeframe} market found`);
-        return;
-      }
-      
-      addStrategyLog(strategy, 'clob', `Found market: ${liveMarket.title || liveMarket.slug}...`);
-      
-      // Determine direction based on strategy decision
-      const side = market.side || 'Up';
-      const tokenId = side === 'Up' ? liveMarket.upTokenId : liveMarket.downTokenId;
-      
-      // Use ACTUAL market price (not our calculated probability)
-      const marketPrice = side === 'Up' ? liveMarket.upPrice : liveMarket.downPrice;
-      const bidPrice = Math.min(0.95, marketPrice + 0.01); // Bid 1¢ above market for better fill
-      
-      addStrategyLog(strategy, 'clob', `Market price: ${(marketPrice * 100).toFixed(0)}¢, bidding: ${(bidPrice * 100).toFixed(0)}¢`);
-      
-      // Recalculate shares with actual price
-      const actualShares = Math.floor(amount / bidPrice);
-      
-      // Place the real order at market price
-      addStrategyLog(strategy, 'clob', `Sending CLOB order: ${side} $${amount} @ ${(bidPrice * 100).toFixed(0)}¢`);
-      const result = await liveTrading.placeOrder(tokenId, side, amount, bidPrice);
-      
-      if (result.success) {
-        addStrategyLog(strategy, 'fill', `✅ Order filled! ID: ${result.orderId}, Shares: ${result.shares}`, { orderId: result.orderId, shares: result.shares });
-        console.log(`   💰 [LIVE] ${strategy.name}: $${amount} ${side} @ ${(price * 100).toFixed(0)}¢`);
-        console.log(`      Order ID: ${result.orderId}, Shares: ${result.shares}`);
-        sendTelegramAlert(`💰 *LIVE BET*\n\n${marketState.key} ${strategy.name}\n$${amount} on ${side}\nOrder: ${result.orderId}`);
-        
-        // Record bet for auto-redemption
-        if (liveMarket.conditionId) {
-          recordBet(liveMarket.conditionId, tokenId, liveMarket.slug || liveMarket.title, side);
-        }
-      } else {
-        addStrategyLog(strategy, 'error', `❌ Order failed: ${result.error}`, { error: result.error });
-        console.log(`   ❌ [LIVE] Order failed: ${result.error}`);
-        sendTelegramAlert(`❌ *ORDER FAILED*\n\n${marketState.key} ${strategy.name}\n$${amount} ${side}\nError: ${result.error}`);
-        return; // Don't deduct balance if order failed
-      }
-    } catch (error: any) {
-      addStrategyLog(strategy, 'error', `❌ Exception: ${error.message}`, { error: error.message });
-      console.error(`   ❌ [LIVE] Error:`, error.message);
-      return;
-    }
-  } else {
-    addStrategyLog(strategy, 'bet', `Paper bet: $${amount} @ ${(price * 100).toFixed(0)}¢ (${shares} shares)`);
-  }
+  addStrategyLog(strategy, 'bet', `📄 Paper bet: $${amount} @ ${(price * 100).toFixed(0)}¢ (${shares} shares)`);
   
   market.bets.push({
     minute: Date.now(),
@@ -1227,6 +1447,7 @@ async function placeBet(marketState: MarketState, strategy: StrategyState, amoun
   market.avgPrice = market.costBet / market.shares;
   market.fills++;
   
+  // Deduct from paper balance (simulation tracking)
   strategy.balance -= amount;
   strategy.deployed += amount;
 }
@@ -1240,6 +1461,17 @@ function startMarket(marketState: MarketState): void {
   const windowMs = marketState.durationMs;
   const alignedStart = Math.floor(now / windowMs) * windowMs;
   const alignedEnd = alignedStart + windowMs;
+  
+  // Check if we're too far into the current cycle (>1 min) - wait for next one
+  const elapsedInCycle = now - alignedStart;
+  const maxEntryTime = 60 * 1000; // 1 minute max to enter
+  
+  if (elapsedInCycle > maxEntryTime) {
+    const waitTime = alignedEnd - now + 5000; // Wait until next cycle + 5s buffer
+    console.log(`   ⏳ [${marketState.key}] Too late to enter (${(elapsedInCycle/1000).toFixed(0)}s in), waiting ${(waitTime/1000).toFixed(0)}s for next cycle...`);
+    setTimeout(() => startMarket(marketState), waitTime);
+    return;
+  }
   
   const marketId = `${marketState.key}-${alignedStart}`;
   
@@ -1346,11 +1578,13 @@ function endMarket(marketState: MarketState): void {
     const pnl = payout - strategyMarket.costBet;
     
     // Log market resolution
+    const modeLabel = strategy.liveMode ? '🔴 LIVE' : '📄 Paper';
     addStrategyLog(strategy, 'resolve', 
-      `Market resolved: ${wentUp ? 'UP' : 'DOWN'} | Bet: ${strategyMarket.side} | ${won ? 'WIN' : 'LOSS'} | P&L: $${pnl.toFixed(2)}`,
-      { wentUp, picked: strategyMarket.side, won, pnl, payout, cost: strategyMarket.costBet }
+      `${modeLabel} resolved: ${wentUp ? 'UP' : 'DOWN'} | Bet: ${strategyMarket.side} | ${won ? 'WIN' : 'LOSS'} | P&L: $${pnl.toFixed(2)}`,
+      { wentUp, picked: strategyMarket.side, won, pnl, payout, cost: strategyMarket.costBet, live: strategy.liveMode }
     );
     
+    // Paper trading stats (always tracked for comparison)
     strategy.totalMarkets++;
     strategy.totalPnl += pnl;
     strategy.balance += payout;
@@ -1361,25 +1595,97 @@ function endMarket(marketState: MarketState): void {
     strategy.winRate = strategy.totalMarkets > 0 ? Math.round((strategy.wins / strategy.totalMarkets) * 100) : 0;
     strategy.roi = strategy.deployed > 0 ? (strategy.totalPnl / strategy.deployed) * 100 : 0;
     
-    strategy.history.unshift({
+    // Paper history
+    const tradeRecord = {
       id: `${marketState.currentMarket.id}-${strategy.id}`,
       time: new Date().toLocaleTimeString(),
       marketId: marketState.currentMarket.id,
-      side: strategyMarket.side || 'Up',
+      side: strategyMarket.side || 'Up' as const,
       shares: strategyMarket.shares,
       cost: strategyMarket.costBet,
       payout,
       pnl,
-      result: won ? 'WIN' : 'LOSS',
+      result: won ? 'WIN' as const : 'LOSS' as const,
       assetOpen: openPrice,
       assetClose: closePrice,
-    });
+    };
+    
+    strategy.history.unshift(tradeRecord);
     strategy.history = strategy.history.slice(0, 50);
+    
+    // Save trade to database
+    db.saveTrade({
+      id: tradeRecord.id,
+      strategy_id: strategy.id,
+      market_key: marketState.key,
+      market_id: tradeRecord.marketId,
+      side: tradeRecord.side,
+      shares: tradeRecord.shares,
+      cost: tradeRecord.cost,
+      payout: tradeRecord.payout,
+      pnl: tradeRecord.pnl,
+      result: tradeRecord.result,
+      asset_open: tradeRecord.assetOpen,
+      asset_close: tradeRecord.assetClose,
+      is_live: strategy.liveMode,
+    });
     
     const cumulative = strategy.pnlHistory.length > 0 
       ? strategy.pnlHistory[strategy.pnlHistory.length - 1].cumulative + pnl 
       : pnl;
     strategy.pnlHistory.push({ market: strategy.totalMarkets, pnl, cumulative });
+    
+    // Live trading stats (only if live mode and actually deployed live funds)
+    if (strategy.liveMode && strategy.liveDeployed > 0) {
+      // Estimate live P&L based on what was deployed
+      const liveBetThisMarket = strategyMarket.costBet; // This was deployed live
+      const livePayout = won ? Math.floor(liveBetThisMarket / strategyMarket.avgPrice) : 0;
+      const liveMarketPnl = livePayout - liveBetThisMarket;
+      
+      // Update P&L tracking
+      strategy.livePnl += liveMarketPnl;
+      if (won) {
+        strategy.liveWins++;
+        // WIN: Mark pending bets as resolved, awaiting redemption
+        // DON'T unlock funds yet - wait for actual redemption
+        for (const pending of strategy.pendingBets) {
+          if (!pending.marketResolved) {
+            pending.marketResolved = true;
+            pending.won = true;
+            pending.expectedPayout = livePayout;
+          }
+        }
+        addStrategyLog(strategy, 'info', `✅ WIN - $${livePayout} awaiting redemption (still locked: $${strategy.lockedFunds.toFixed(2)})`);
+      } else {
+        strategy.liveLosses++;
+        // LOSS: Unlock the bet amount (it's gone, not coming back)
+        // Remove resolved losing bets from pending
+        const losingBets = strategy.pendingBets.filter(b => !b.marketResolved);
+        for (const bet of losingBets) {
+          bet.marketResolved = true;
+          bet.won = false;
+          strategy.lockedFunds = Math.max(0, strategy.lockedFunds - bet.betAmount);
+        }
+        // Clean up resolved losing bets
+        strategy.pendingBets = strategy.pendingBets.filter(b => !(b.marketResolved && b.won === false));
+        addStrategyLog(strategy, 'info', `❌ LOSS - $${liveBetThisMarket.toFixed(2)} lost, unlocked (locked: $${strategy.lockedFunds.toFixed(2)})`);
+      }
+      
+      strategy.liveHistory.unshift({
+        ...tradeRecord,
+        id: `${tradeRecord.id}-live`,
+        pnl: liveMarketPnl,
+        payout: livePayout,
+      });
+      strategy.liveHistory = strategy.liveHistory.slice(0, 50);
+      
+      // Alert on live trade resolution
+      const emoji = won ? '✅' : '❌';
+      const budgetNote = won 
+        ? `Awaiting redemption of $${livePayout}` 
+        : `Budget: $${strategy.liveBalance.toFixed(2)}/$${strategy.liveAllocation}`;
+      sendTelegramAlert(`${emoji} *LIVE TRADE RESOLVED*\n\n${marketState.key} ${strategy.name}\n${wentUp ? 'UP' : 'DOWN'} | ${won ? 'WIN' : 'LOSS'}\nP&L: ${liveMarketPnl >= 0 ? '+' : ''}$${liveMarketPnl.toFixed(2)}\n\n${budgetNote}\nRecord: ${strategy.liveWins}W / ${strategy.liveLosses}L`);
+    }
     
     strategy.currentMarket = null;
   }
@@ -1403,6 +1709,27 @@ function endMarket(marketState: MarketState): void {
       if (result.redeemed > 0) {
         console.log(`   ✅ Redeemed $${result.redeemed.toFixed(2)} to USDC.e`);
         sendTelegramAlert(`💰 *AUTO-REDEEMED*\n$${result.redeemed.toFixed(2)} converted to USDC.e`);
+        
+        // CRITICAL: Clear pending bets for redeemed conditions and update liveBalance
+        for (const redeemed of result.redeemedConditions) {
+          for (const market of state.markets) {
+            for (const strategy of market.strategies) {
+              // Find matching pending bet
+              const pendingIdx = strategy.pendingBets.findIndex(b => b.conditionId === redeemed.conditionId);
+              if (pendingIdx >= 0) {
+                const pending = strategy.pendingBets[pendingIdx];
+                // Redemption complete - add redeemed amount to balance and unlock
+                strategy.liveBalance += redeemed.amount;
+                strategy.lockedFunds = Math.max(0, strategy.lockedFunds - pending.betAmount);
+                // Remove from pending
+                strategy.pendingBets.splice(pendingIdx, 1);
+                addStrategyLog(strategy, 'fill', `✅ Redeemed! +$${redeemed.amount.toFixed(2)} | Available: $${(strategy.liveBalance - strategy.lockedFunds).toFixed(2)}`);
+                console.log(`   💰 [${strategy.name}] Redeemed $${redeemed.amount.toFixed(2)}, unlocked $${pending.betAmount.toFixed(2)}, available: $${(strategy.liveBalance - strategy.lockedFunds).toFixed(2)}`);
+              }
+            }
+          }
+        }
+        saveState();
       }
     }).catch(err => console.error('Redeem error:', err.message));
   }
@@ -1440,6 +1767,8 @@ function broadcastState(): void {
           liveMode: s.liveMode,
           halted: s.halted,
           haltedReason: s.haltedReason,
+          liveHalted: s.liveHalted,
+          liveHaltedReason: s.liveHaltedReason,
           stopLossThreshold: s.stopLossThreshold,
           currentMarket: s.currentMarket ? {
             ...s.currentMarket,
@@ -1566,6 +1895,165 @@ const server = http.createServer(async (req, res) => {
     }));
     return;
   }
+  
+  // Database logs endpoint for debugging
+  if (url?.startsWith('/api/poly/logs')) {
+    const params = new URLSearchParams(url.split('?')[1] || '');
+    const level = params.get('level') as db.LogLevel | null;
+    const category = params.get('category') as db.LogCategory | null;
+    const strategyId = params.get('strategy');
+    const limit = parseInt(params.get('limit') || '100');
+    
+    const logs = db.queryLogs({
+      level: level || undefined,
+      category: category || undefined,
+      strategyId: strategyId || undefined,
+      limit,
+    });
+    
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ logs, count: logs.length }));
+    return;
+  }
+  
+  // Database stats endpoint
+  if (url === '/api/poly/db-stats') {
+    const stats = db.getDbStats();
+    const pendingBets = db.loadPendingLiveBets();
+    const liveBetStats = db.getLiveBetsStats();
+    
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ...stats, pendingBets, liveBetStats }));
+    return;
+  }
+  
+  // Live trades report - recent live bet history
+  if (url?.startsWith('/api/poly/live-trades')) {
+    const params = new URLSearchParams(url.split('?')[1] || '');
+    const limit = parseInt(params.get('limit') || '50');
+    
+    const recentBets = getRecentHistory(limit);
+    const stats = getBetTrackerStats();
+    
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ 
+      trades: recentBets,
+      stats,
+      timestamp: new Date().toISOString(),
+    }));
+    return;
+  }
+  
+  // Complete live report with strategy breakdown
+  if (url === '/api/poly/live-report') {
+    const liveStrategies: any[] = [];
+    
+    for (const market of state.markets) {
+      for (const strategy of market.strategies) {
+        if (strategy.liveMode) {
+          liveStrategies.push({
+            market: market.key,
+            strategy: strategy.name,
+            id: strategy.id,
+            allocation: strategy.liveAllocation,
+            balance: strategy.liveBalance,
+            lockedFunds: strategy.lockedFunds,
+            available: strategy.liveBalance - strategy.lockedFunds,
+            pnl: strategy.livePnl,
+            wins: strategy.liveWins,
+            losses: strategy.liveLosses,
+            winRate: strategy.liveWins + strategy.liveLosses > 0 
+              ? ((strategy.liveWins / (strategy.liveWins + strategy.liveLosses)) * 100).toFixed(1) + '%'
+              : '—',
+            halted: strategy.liveHalted,
+            haltReason: strategy.liveHaltedReason,
+            pendingBets: strategy.pendingBets.length,
+          });
+        }
+      }
+    }
+    
+    const totals = {
+      totalAllocation: liveStrategies.reduce((sum, s) => sum + s.allocation, 0),
+      totalBalance: liveStrategies.reduce((sum, s) => sum + s.balance, 0),
+      totalLocked: liveStrategies.reduce((sum, s) => sum + s.lockedFunds, 0),
+      totalAvailable: liveStrategies.reduce((sum, s) => sum + s.available, 0),
+      totalPnl: liveStrategies.reduce((sum, s) => sum + s.pnl, 0),
+      totalWins: liveStrategies.reduce((sum, s) => sum + s.wins, 0),
+      totalLosses: liveStrategies.reduce((sum, s) => sum + s.losses, 0),
+    };
+    
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      walletBalance: state.walletBalance,
+      strategies: liveStrategies.sort((a, b) => b.pnl - a.pnl),
+      totals,
+      timestamp: new Date().toISOString(),
+    }));
+    return;
+  }
+  
+  // Paper trading report - separate from live
+  if (url === '/api/poly/paper-report') {
+    const paperStrategies: any[] = [];
+    
+    for (const market of state.markets) {
+      for (const strategy of market.strategies) {
+        if (!strategy.liveMode) {
+          paperStrategies.push({
+            market: market.key,
+            strategy: strategy.name,
+            id: strategy.id,
+            startingBalance: strategy.startingBalance,
+            balance: strategy.balance,
+            pnl: strategy.totalPnl,
+            roi: strategy.roi.toFixed(1) + '%',
+            wins: strategy.wins,
+            losses: strategy.losses,
+            winRate: strategy.winRate + '%',
+            halted: strategy.halted,
+            haltReason: strategy.haltedReason,
+            markets: strategy.totalMarkets,
+          });
+        }
+      }
+    }
+    
+    const totals = {
+      totalStarting: paperStrategies.reduce((sum, s) => sum + s.startingBalance, 0),
+      totalBalance: paperStrategies.reduce((sum, s) => sum + s.balance, 0),
+      totalPnl: paperStrategies.reduce((sum, s) => sum + s.pnl, 0),
+      totalWins: paperStrategies.reduce((sum, s) => sum + s.wins, 0),
+      totalLosses: paperStrategies.reduce((sum, s) => sum + s.losses, 0),
+    };
+    
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      strategies: paperStrategies.sort((a, b) => b.pnl - a.pnl),
+      totals,
+      timestamp: new Date().toISOString(),
+    }));
+    return;
+  }
+  
+  // RPC health endpoint
+  if (url === '/api/poly/rpc-health') {
+    import('./rpc.js').then(rpc => {
+      const health = rpc.getRpcHealth();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ 
+        rpcs: Object.entries(health).map(([url, stats]) => ({
+          url: url.substring(0, 50) + (url.length > 50 ? '...' : ''),
+          failures: stats.failures,
+          lastSuccess: new Date(stats.lastSuccess).toISOString(),
+        })).sort((a, b) => a.failures - b.failures)
+      }));
+    }).catch(() => {
+      res.writeHead(500);
+      res.end('RPC module not loaded');
+    });
+    return;
+  }
 
   if (url === '/api/poly/alerts' && req.method === 'POST') {
     // Toggle alerts or update thresholds
@@ -1575,8 +2063,8 @@ const server = http.createServer(async (req, res) => {
       try {
         const data = JSON.parse(body);
         if (typeof data.enabled === 'boolean') alertConfig.enabled = data.enabled;
-        if (typeof data.gainThreshold === 'number') alertConfig.extremeGainThreshold = data.gainThreshold;
-        if (typeof data.lossThreshold === 'number') alertConfig.extremeLossThreshold = data.lossThreshold;
+        if (typeof data.gainThreshold === 'number') alertConfig.gainPercentThreshold = data.gainThreshold;
+        if (typeof data.lossThreshold === 'number') alertConfig.lossPercentThreshold = data.lossThreshold;
         if (typeof data.profitTakeMultiplier === 'number') alertConfig.profitTakeMultiplier = data.profitTakeMultiplier;
         
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -1778,9 +2266,16 @@ wss.on('connection', (ws) => {
         const market = state.markets.find(m => m.key === msg.key);
         const strategy = market?.strategies.find(s => s.id === msg.strategyId);
         if (strategy) {
-          strategy.halted = true;
-          strategy.haltedReason = msg.reason || 'Manual halt';
-          console.log(`🛑 Strategy ${strategy.name} in ${msg.key} HALTED`);
+          // Check if this is for live mode (msg.live) or paper mode
+          if (msg.live) {
+            strategy.liveHalted = true;
+            strategy.liveHaltedReason = msg.reason || 'Manual halt';
+            console.log(`🛑 LIVE Strategy ${strategy.name} in ${msg.key} HALTED`);
+          } else {
+            strategy.halted = true;
+            strategy.haltedReason = msg.reason || 'Manual halt';
+            console.log(`🛑 PAPER Strategy ${strategy.name} in ${msg.key} HALTED`);
+          }
           saveState();
           broadcastState();
         }
@@ -1789,9 +2284,16 @@ wss.on('connection', (ws) => {
         const market = state.markets.find(m => m.key === msg.key);
         const strategy = market?.strategies.find(s => s.id === msg.strategyId);
         if (strategy) {
-          strategy.halted = false;
-          strategy.haltedReason = undefined;
-          console.log(`▶️ Strategy ${strategy.name} in ${msg.key} RESUMED`);
+          // Check if this is for live mode (msg.live) or paper mode
+          if (msg.live) {
+            strategy.liveHalted = false;
+            strategy.liveHaltedReason = undefined;
+            console.log(`▶️ LIVE Strategy ${strategy.name} in ${msg.key} RESUMED`);
+          } else {
+            strategy.halted = false;
+            strategy.haltedReason = undefined;
+            console.log(`▶️ PAPER Strategy ${strategy.name} in ${msg.key} RESUMED`);
+          }
           saveState();
           broadcastState();
         }
@@ -1804,13 +2306,23 @@ wss.on('connection', (ws) => {
           const wasLive = strategy.liveMode;
           strategy.liveMode = msg.live ?? false;
           
-          // If switching to live mode, can set initial funding
-          if (strategy.liveMode && msg.funding) {
-            strategy.balance = msg.funding;
-            strategy.startingBalance = msg.funding;
+          // If switching to live mode, set up live budget
+          if (strategy.liveMode && !wasLive) {
+            const funding = msg.funding || 10; // Default $10 budget
+            strategy.liveAllocation = funding;
+            strategy.liveBalance = funding;
+            strategy.liveDeployed = 0;
+            strategy.livePnl = 0;
+            strategy.liveWins = 0;
+            strategy.liveLosses = 0;
+            strategy.halted = false;
+            strategy.haltedReason = undefined;
+            console.log(`💰 LIVE MODE: ${strategy.name} in ${msg.key} - Budget: $${funding}`);
+            sendTelegramAlert(`💰 *LIVE MODE ENABLED*\n\n${msg.key} ${strategy.name}\nBudget: $${funding}\n\nStrategy will stop if budget drops below $${(funding * 0.1).toFixed(2)} (10%)`);
+          } else if (!strategy.liveMode && wasLive) {
+            console.log(`📄 PAPER MODE: ${strategy.name} in ${msg.key}`);
           }
           
-          console.log(`${strategy.liveMode ? '💰 LIVE' : '📄 PAPER'} ${strategy.name} in ${msg.key}`);
           saveState();
           broadcastState();
         }
@@ -1885,6 +2397,65 @@ ${MARKET_CONFIGS.map(c => `    • ${c.asset} ${c.timeframe}`).join('\n')}
   // Start price updates
   priceTimer = setInterval(fetchPrices, 3000);
   fetchPrices();
+
+  // AGGRESSIVE REDEMPTION: Check every 30 seconds for redeemable winnings
+  if (process.env.PRIVATE_KEY) {
+    setInterval(async () => {
+      try {
+        // Use bet tracker for complete lifecycle tracking
+        const trackerResult = await checkAndRedeemAll(process.env.PRIVATE_KEY!);
+        if (trackerResult.redeemed > 0 || trackerResult.resolved > 0) {
+          console.log(`   📊 [BetTracker] Checked: ${trackerResult.checked}, Resolved: ${trackerResult.resolved}, Redeemed: ${trackerResult.redeemed}`);
+        }
+        
+        // Also run old auto-redeem for any bets not in tracker
+        const result = await redeemAllWinnings(process.env.PRIVATE_KEY!);
+        if (result.redeemed > 0) {
+          console.log(`   ✅ [AUTO-REDEEM] Redeemed $${result.redeemed.toFixed(2)} to USDC.e`);
+          sendTelegramAlert(`💰 *AUTO-REDEEMED*\n$${result.redeemed.toFixed(2)} converted to USDC.e`);
+          
+          // Clear pending bets for redeemed conditions
+          for (const redeemed of result.redeemedConditions) {
+            for (const market of state.markets) {
+              for (const strategy of market.strategies) {
+                const pendingIdx = strategy.pendingBets.findIndex(b => b.conditionId === redeemed.conditionId);
+                if (pendingIdx >= 0) {
+                  const pending = strategy.pendingBets[pendingIdx];
+                  strategy.liveBalance += redeemed.amount;
+                  strategy.lockedFunds = Math.max(0, strategy.lockedFunds - pending.betAmount);
+                  strategy.pendingBets.splice(pendingIdx, 1);
+                  addStrategyLog(strategy, 'fill', `✅ Redeemed! +$${redeemed.amount.toFixed(2)} | Available: $${(strategy.liveBalance - strategy.lockedFunds).toFixed(2)}`);
+                  console.log(`   💰 [${strategy.name}] Redeemed $${redeemed.amount.toFixed(2)}, available: $${(strategy.liveBalance - strategy.lockedFunds).toFixed(2)}`);
+                }
+              }
+            }
+          }
+          saveState();
+          fetchWalletBalance(); // Refresh wallet balance
+        }
+      } catch (err: any) {
+        // Silent fail - will retry in 30s
+      }
+    }, 30000); // Every 30 seconds
+    console.log('   🔄 Auto-redemption enabled (every 30s)');
+  }
+
+  // Log cleanup: run every hour
+  // Paper logs: keep 1 day, Live logs: keep 30 days, System logs: keep 7 days
+  setInterval(() => {
+    try {
+      const cleaned = db.cleanupOldLogs();
+      if (cleaned.paper > 0 || cleaned.live > 0 || cleaned.system > 0) {
+        console.log(`   🧹 Log cleanup: ${cleaned.paper} paper, ${cleaned.live} live, ${cleaned.system} system`);
+      }
+    } catch (err: any) {
+      console.error('Log cleanup error:', err.message);
+    }
+  }, 60 * 60 * 1000); // Every hour
+  
+  // Initial cleanup
+  const initialClean = db.cleanupOldLogs();
+  console.log(`   🧹 Initial log cleanup: ${initialClean.paper} paper, ${initialClean.live} live, ${initialClean.system} system`);
 
   // Start all markets with staggered timing
   let delay = 5000;
