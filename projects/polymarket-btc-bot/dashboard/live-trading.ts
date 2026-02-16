@@ -4,7 +4,7 @@
  */
 
 import { ClobClient, Side } from '@polymarket/clob-client';
-import { Wallet } from 'ethers';
+import * as ethers from 'ethers';
 import dotenv from 'dotenv';
 
 dotenv.config({ path: '../.env' });
@@ -52,11 +52,20 @@ class LiveTradingClient {
     if (!this.privateKey) return false;
 
     try {
-      const signer = new Wallet(this.privateKey);
+      // ethers v5 in ESM: use ethers.providers and ethers.Wallet
+      const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
+      const signer = new ethers.Wallet(this.privateKey, provider);
       
-      // Create temp client to get API credentials
+      // Create temp client to get API credentials (use deriveApiKey, not createOrDeriveApiKey)
       const tempClient = new ClobClient(CLOB_API, CHAIN_ID, signer);
-      const apiCreds = await tempClient.createOrDeriveApiKey();
+      const derived = await tempClient.deriveApiKey();
+      
+      // Map deriveApiKey response to ClobClient expected format
+      const apiCreds = {
+        key: derived.key,
+        secret: derived.secret,
+        passphrase: derived.passphrase,
+      };
       
       // Create authenticated client
       this.client = new ClobClient(
@@ -90,59 +99,72 @@ class LiveTradingClient {
 
   /**
    * Find active crypto up/down market
+   * Markets use slug pattern: {asset}-updown-{timeframe}-{timestamp}
+   * e.g., btc-updown-5m-1771223100
    */
   async findMarket(asset: string, timeframe: string): Promise<LiveMarket | null> {
     try {
-      const response = await fetch(
-        `${GAMMA_API}/events?active=true&closed=false&limit=200`
-      );
-      const events: any[] = await response.json();
-
       const assetLower = asset.toLowerCase();
-      const tfLabel = timeframe === '5min' ? '5' : timeframe === '15min' ? '15' : timeframe;
-
-      for (const event of events) {
-        const slug = (event.slug || '').toLowerCase();
-        const title = (event.title || '').toLowerCase();
-
-        // Match patterns like "eth-5m-updown" or "ETH 5 minute up or down"
-        const hasAsset = slug.includes(assetLower) || title.includes(assetLower);
-        const hasTimeframe = slug.includes(`${tfLabel}m`) || 
-                            title.includes(`${tfLabel} min`) ||
-                            title.includes(`${tfLabel}-min`);
-        const isUpDown = slug.includes('updown') || title.includes('up or down');
-
-        if (hasAsset && hasTimeframe && isUpDown && event.markets?.length > 0) {
-          const market = event.markets[0];
-          
-          // Parse outcomes and token IDs
-          const outcomes = JSON.parse(market.outcomes || '[]');
-          const prices = JSON.parse(market.outcomePrices || '[]');
-          const tokenIds = market.clobTokenIds || [];
-
-          const upIndex = outcomes.findIndex((o: string) => 
-            o.toLowerCase().includes('up') || o.toLowerCase() === 'yes'
-          );
-          const downIndex = outcomes.findIndex((o: string) => 
-            o.toLowerCase().includes('down') || o.toLowerCase() === 'no'
-          );
-
-          if (upIndex >= 0 && downIndex >= 0 && tokenIds[upIndex] && tokenIds[downIndex]) {
-            return {
-              eventId: event.id,
-              slug: event.slug,
-              title: event.title,
-              upTokenId: tokenIds[upIndex],
-              downTokenId: tokenIds[downIndex],
-              upPrice: parseFloat(prices[upIndex] || '0.5'),
-              downPrice: parseFloat(prices[downIndex] || '0.5'),
-              endTime: new Date(event.endDate || Date.now() + 5 * 60 * 1000),
-            };
-          }
+      const tfLabel = timeframe === '5min' ? '5m' : timeframe === '15min' ? '15m' : '5m';
+      
+      // Calculate current 5-minute window timestamp
+      const now = Math.floor(Date.now() / 1000);
+      const windowSeconds = timeframe === '5min' ? 300 : 900; // 5 or 15 minutes
+      const windowTimestamp = now - (now % windowSeconds);
+      
+      // Build the slug
+      const slug = `${assetLower}-updown-${tfLabel}-${windowTimestamp}`;
+      
+      console.log(`   🔍 Looking for market: ${slug}`);
+      
+      const response = await fetch(`${GAMMA_API}/events?slug=${slug}`);
+      const events: any[] = await response.json();
+      
+      if (!events || events.length === 0) {
+        // Try the next window (market might have just started)
+        const nextSlug = `${assetLower}-updown-${tfLabel}-${windowTimestamp + windowSeconds}`;
+        console.log(`   🔍 Trying next window: ${nextSlug}`);
+        
+        const nextResponse = await fetch(`${GAMMA_API}/events?slug=${nextSlug}`);
+        const nextEvents: any[] = await nextResponse.json();
+        
+        if (!nextEvents || nextEvents.length === 0) {
+          return null;
         }
+        events.push(...nextEvents);
       }
-
-      return null;
+      
+      const event = events[0];
+      if (!event?.markets?.length) return null;
+      
+      const market = event.markets[0];
+      
+      // Parse token IDs
+      const tokenIds = JSON.parse(market.clobTokenIds || '[]');
+      const outcomes = JSON.parse(market.outcomes || '[]');
+      const prices = JSON.parse(market.outcomePrices || '[]');
+      
+      const upIndex = outcomes.findIndex((o: string) => o.toLowerCase() === 'up');
+      const downIndex = outcomes.findIndex((o: string) => o.toLowerCase() === 'down');
+      
+      if (upIndex < 0 || downIndex < 0 || !tokenIds[upIndex] || !tokenIds[downIndex]) {
+        console.log(`   ⚠️ Market found but missing token IDs`);
+        return null;
+      }
+      
+      console.log(`   ✅ Found market: ${event.title}`);
+      
+      return {
+        eventId: event.id,
+        slug: event.slug,
+        title: event.title,
+        conditionId: market.conditionId || '',
+        upTokenId: tokenIds[upIndex],
+        downTokenId: tokenIds[downIndex],
+        upPrice: parseFloat(prices[upIndex] || '0.5'),
+        downPrice: parseFloat(prices[downIndex] || '0.5'),
+        endTime: new Date(event.endDate || Date.now() + windowSeconds * 1000),
+      };
     } catch (error: any) {
       console.error(`Failed to find ${asset} ${timeframe} market:`, error.message);
       return null;
@@ -211,9 +233,8 @@ class LiveTradingClient {
     if (!this.privateKey) return 0;
     
     try {
-      const signer = new Wallet(this.privateKey);
-      // This would need a provider to get actual balance
-      // For now return 0 as placeholder
+      const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
+      const signer = new ethers.Wallet(this.privateKey, provider);
       console.log(`   Wallet address: ${signer.address}`);
       return 0;
     } catch {
@@ -227,3 +248,53 @@ export const liveTrading = new LiveTradingClient();
 
 // Export types
 export type { LiveMarket, OrderResult };
+
+// ============ Auto-Redeem Resolved Positions ============
+const CTF_ADDRESS = '0x4D97DCd97eC945f40cF65F87097ACe5EA0476045';
+const USDC_E = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
+const CTF_ABI = [
+  'function redeemPositions(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint256[] indexSets) external',
+  'function balanceOf(address owner, uint256 tokenId) view returns (uint256)',
+  'function getConditionId(address oracle, bytes32 questionId, uint256 outcomeSlotCount) view returns (bytes32)'
+];
+
+export async function redeemWinnings(conditionId: string, tokenIds: string[]): Promise<{ success: boolean; txHash?: string; error?: string }> {
+  try {
+    const { ethers } = await import('ethers');
+    const provider = new ethers.providers.StaticJsonRpcProvider('https://polygon-rpc.com', 137);
+    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
+    
+    const ctf = new ethers.Contract(CTF_ADDRESS, CTF_ABI, wallet);
+    
+    // Check balances first
+    let hasBalance = false;
+    for (const tokenId of tokenIds) {
+      const balance = await ctf.balanceOf(wallet.address, tokenId);
+      if (balance.gt(0)) {
+        hasBalance = true;
+        console.log(`   Found ${ethers.utils.formatUnits(balance, 6)} tokens for ${tokenId.slice(0, 10)}...`);
+      }
+    }
+    
+    if (!hasBalance) {
+      return { success: false, error: 'No tokens to redeem' };
+    }
+    
+    // Redeem - indexSets [1, 2] for both outcomes
+    const tx = await ctf.redeemPositions(
+      USDC_E,
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+      conditionId,
+      [1, 2],
+      { gasLimit: 300000 }
+    );
+    
+    console.log(`   🔄 Redeeming... TX: ${tx.hash}`);
+    await tx.wait(1);
+    
+    return { success: true, txHash: tx.hash };
+  } catch (error: any) {
+    console.error('Redeem error:', error.message);
+    return { success: false, error: error.message };
+  }
+}

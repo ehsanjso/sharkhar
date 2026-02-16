@@ -189,11 +189,11 @@ export const DEFAULT_BET_SCHEDULES: MultiAssetConfig['betSchedules'] = {
 };
 
 export const DEFAULT_BUDGETS: MultiAssetConfig['budgetPerMarket'] = {
-  '5min': 10,   // Lower risk for faster markets
-  '15min': 20,  
-  '1hr': 30,
-  '4hr': 40,
-  '1day': 50,
+  '5min': 25,   // $25 per market
+  '15min': 25,  
+  '1hr': 25,
+  '4hr': 25,
+  '1day': 25,
 };
 
 export function timeframeToDuration(tf: Timeframe): number {

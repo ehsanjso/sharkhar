@@ -5,6 +5,7 @@ import type { MarketState } from './hooks/usePolymarketData';
 function App() {
   const data = usePolymarketData();
   const [view, setView] = useState<'markets' | 'overview' | 'detail'>('markets');
+  const [liveOnly, setLiveOnly] = useState(false);
 
   const selectedStrategy = data.selectedStrategy 
     ? data.strategies.find(s => s.id === data.selectedStrategy) 
@@ -14,7 +15,7 @@ function App() {
   if (!data.selectedMarketKey || view === 'markets') {
     return (
       <div className="min-h-screen bg-gray-950 text-white">
-        <MarketSelector data={data} onSelect={(key) => {
+        <MarketSelector data={data} liveOnly={liveOnly} setLiveOnly={setLiveOnly} onSelect={(key) => {
           data.selectMarket(key);
           setView('overview');
         }} />
@@ -87,6 +88,10 @@ function App() {
           </div>
           <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6">
             <div className="flex items-center gap-1">
+              <span className="text-gray-400 text-xs">💰 Wallet:</span>
+              <span className="text-sm sm:text-lg font-mono text-yellow-400">${data.walletBalance.toFixed(2)}</span>
+            </div>
+            <div className="flex items-center gap-1">
               <span className="text-gray-400 text-xs">Bal:</span>
               <span className="text-sm sm:text-lg font-mono text-green-400">${data.totalBalance.toFixed(0)}</span>
             </div>
@@ -109,7 +114,7 @@ function App() {
           >
             📊 All
           </button>
-          {data.strategies.map(s => (
+          {(liveOnly ? data.strategies.filter(s => s.liveMode) : data.strategies).map(s => (
             <button
               key={s.id}
               onClick={() => { setView('detail'); data.setSelectedStrategy(s.id); }}
@@ -127,7 +132,7 @@ function App() {
 
       <main className="p-2 sm:p-4">
         {view === 'overview' ? (
-          <OverviewView data={data} />
+          <OverviewView data={data} liveOnly={liveOnly} />
         ) : selectedStrategy ? (
           <DetailView strategy={selectedStrategy} market={data.currentMarket} assetPrice={data.btcPrice} />
         ) : null}
@@ -136,9 +141,11 @@ function App() {
   );
 }
 
-function MarketSelector({ data, onSelect }: { 
+function MarketSelector({ data, onSelect, liveOnly, setLiveOnly }: { 
   data: ReturnType<typeof usePolymarketData>; 
   onSelect: (key: string) => void;
+  liveOnly: boolean;
+  setLiveOnly: (v: boolean) => void;
 }) {
   // Group markets by asset
   const marketsByAsset = data.markets.reduce((acc, m) => {
@@ -159,10 +166,17 @@ function MarketSelector({ data, onSelect }: {
     SOL: '◎',
   };
 
-  // Calculate total P&L and balance across all markets
-  const totalPnL = data.markets.reduce((sum, m) => sum + m.totalPnl, 0);
-  const totalBalance = data.markets.reduce((sum, m) => sum + m.totalBalance, 0);
-  const startingBalance = data.markets.length * 16 * 100; // 16 strategies × $100 × markets
+  // Calculate total P&L and balance across all markets (filtered by liveOnly)
+  const filteredStrategies = (m: typeof data.markets[0]) => 
+    liveOnly ? m.strategies.filter(s => s.liveMode) : m.strategies;
+  
+  const totalPnL = data.markets.reduce((sum, m) => 
+    sum + filteredStrategies(m).reduce((s, st) => s + st.totalPnl, 0), 0);
+  const totalBalance = data.markets.reduce((sum, m) => 
+    sum + filteredStrategies(m).reduce((s, st) => s + st.balance, 0), 0);
+  const totalStarting = data.markets.reduce((sum, m) => 
+    sum + filteredStrategies(m).reduce((s, st) => s + st.startingBalance, 0), 0);
+  const startingBalance = totalStarting || data.markets.length * 16 * 100;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -184,6 +198,16 @@ function MarketSelector({ data, onSelect }: {
               }`}
             >
               {data.globalHalt ? 'Resume All' : 'Stop All'}
+            </button>
+            <button
+              onClick={() => setLiveOnly(!liveOnly)}
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all border ${
+                liveOnly 
+                  ? 'border-green-500 bg-green-500/20 text-green-400' 
+                  : 'border-gray-600 text-gray-400 hover:bg-gray-700'
+              }`}
+            >
+              {liveOnly ? '🟢 LIVE Only' : '📊 All Bots'}
             </button>
             <div className="flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full ${data.globalHalt ? 'bg-red-500' : data.live ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'}`} />
@@ -401,7 +425,7 @@ function MarketSelector({ data, onSelect }: {
   );
 }
 
-function OverviewView({ data }: { data: ReturnType<typeof usePolymarketData> }) {
+function OverviewView({ data, liveOnly }: { data: ReturnType<typeof usePolymarketData>; liveOnly: boolean }) {
   const liveBets = data.strategies.flatMap(s => 
     (s.currentMarket?.bets || [])
       .filter(b => b.executed)
@@ -536,7 +560,7 @@ function OverviewView({ data }: { data: ReturnType<typeof usePolymarketData> }) 
 
       {/* Strategy Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-        {data.strategies.map(strategy => (
+        {(liveOnly ? data.strategies.filter(s => s.liveMode) : data.strategies).map(strategy => (
           <StrategyCard 
             key={strategy.id} 
             strategy={strategy} 
@@ -561,7 +585,7 @@ function OverviewView({ data }: { data: ReturnType<typeof usePolymarketData> }) 
               </tr>
             </thead>
             <tbody className="text-xs sm:text-sm">
-              {[...data.strategies].sort((a, b) => b.totalPnl - a.totalPnl).map(s => (
+              {[...(liveOnly ? data.strategies.filter(s => s.liveMode) : data.strategies)].sort((a, b) => b.totalPnl - a.totalPnl).map(s => (
                 <tr key={s.id} className="border-b border-gray-800/50">
                   <td className="py-2 sm:py-3 pr-2">
                     <div className="flex items-center gap-1 sm:gap-2">
@@ -895,6 +919,37 @@ function DetailView({ strategy, market, assetPrice }: {
               <div className="text-gray-500 text-center py-4">No wins yet</div>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Strategy Logs */}
+      <div className="bg-gray-900 rounded-lg p-3 sm:p-4 border border-gray-800">
+        <h3 className="text-sm sm:text-lg font-semibold mb-3 sm:mb-4">📋 CLOB Activity Log</h3>
+        <div className="space-y-1 max-h-64 overflow-y-auto font-mono text-xs">
+          {(!strategy.logs || strategy.logs.length === 0) ? (
+            <div className="text-gray-500 text-center py-4">No activity yet - waiting for bets...</div>
+          ) : (
+            [...strategy.logs].reverse().map((log, i) => (
+              <div key={i} className={`flex gap-2 px-2 py-1 rounded ${
+                log.type === 'error' ? 'bg-red-900/30 text-red-300' :
+                log.type === 'fill' ? 'bg-green-900/30 text-green-300' :
+                log.type === 'clob' ? 'bg-blue-900/30 text-blue-300' :
+                log.type === 'resolve' ? 'bg-purple-900/30 text-purple-300' :
+                log.type === 'bet' ? 'bg-yellow-900/30 text-yellow-300' :
+                'bg-gray-800 text-gray-400'
+              }`}>
+                <span className="text-gray-500 shrink-0">{log.time}</span>
+                <span className="shrink-0">{
+                  log.type === 'error' ? '❌' :
+                  log.type === 'fill' ? '✅' :
+                  log.type === 'clob' ? '📡' :
+                  log.type === 'resolve' ? '📊' :
+                  log.type === 'bet' ? '🎲' : 'ℹ️'
+                }</span>
+                <span className="break-all">{log.message}</span>
+              </div>
+            ))
+          )}
         </div>
       </div>
 

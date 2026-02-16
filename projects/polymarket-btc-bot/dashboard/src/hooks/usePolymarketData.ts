@@ -3,6 +3,13 @@ import { useState, useEffect, useCallback } from 'react';
 export type CryptoAsset = 'BTC' | 'ETH' | 'SOL';
 export type Timeframe = '5min' | '15min';
 
+export interface StrategyLog {
+  time: string;
+  type: 'info' | 'bet' | 'clob' | 'fill' | 'resolve' | 'error';
+  message: string;
+  data?: any;
+}
+
 export interface Strategy {
   id: string;
   name: string;
@@ -27,6 +34,8 @@ export interface Strategy {
   halted: boolean;
   haltedReason?: string;
   stopLossThreshold: number;
+  // Activity logs
+  logs: StrategyLog[];
 }
 
 export interface StrategyMarket {
@@ -80,6 +89,7 @@ export interface PolymarketData {
   connected: boolean;
   live: boolean;
   prices: Record<CryptoAsset, number>;
+  walletBalance: number;
   markets: MarketState[];
   selectedMarketKey: string | null;
   selectedMarket: MarketState | null;
@@ -110,6 +120,7 @@ export function usePolymarketData(): PolymarketData {
   const [connected, setConnected] = useState(false);
   const [live, setLive] = useState(false);
   const [prices, setPrices] = useState<Record<CryptoAsset, number>>({ BTC: 0, ETH: 0, SOL: 0 });
+  const [walletBalance, setWalletBalance] = useState(0);
   const [markets, setMarkets] = useState<MarketState[]>([]);
   const [selectedMarketKey, setSelectedMarketKey] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState('');
@@ -155,6 +166,7 @@ export function usePolymarketData(): PolymarketData {
             setConnected(data.connected);
             setLive(data.live);
             setPrices(data.prices || { BTC: 0, ETH: 0, SOL: 0 });
+            setWalletBalance(data.walletBalance ?? 0);
             setMarkets(data.markets || []);
             setGlobalHalt(data.globalHalt ?? false);
             if (data.selectedMarket) {
@@ -251,6 +263,7 @@ export function usePolymarketData(): PolymarketData {
     connected,
     live,
     prices,
+    walletBalance,
     markets,
     selectedMarketKey,
     selectedMarket,

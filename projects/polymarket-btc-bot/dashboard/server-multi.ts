@@ -5,6 +5,7 @@
  */
 
 import { WebSocket, WebSocketServer } from 'ws';
+import { recordBet, redeemAllWinnings } from './auto-redeem.js';
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
@@ -144,13 +145,12 @@ interface MarketConfig {
   symbol: string; // For Binance
 }
 
+// ACTIVE MARKETS - Only these will run
+// 3 bots: BTC 5min (fast), ETH 15min, SOL 15min (longer plays)
 const MARKET_CONFIGS: MarketConfig[] = [
-  { asset: 'BTC', timeframe: '15min', durationMs: 15 * 60 * 1000, symbol: 'BTCUSDT' },
   { asset: 'BTC', timeframe: '5min', durationMs: 5 * 60 * 1000, symbol: 'BTCUSDT' },
   { asset: 'ETH', timeframe: '15min', durationMs: 15 * 60 * 1000, symbol: 'ETHUSDT' },
-  { asset: 'ETH', timeframe: '5min', durationMs: 5 * 60 * 1000, symbol: 'ETHUSDT' },
   { asset: 'SOL', timeframe: '15min', durationMs: 15 * 60 * 1000, symbol: 'SOLUSDT' },
-  { asset: 'SOL', timeframe: '5min', durationMs: 5 * 60 * 1000, symbol: 'SOLUSDT' },
 ];
 
 // ============ Strategy Definitions ============
@@ -163,27 +163,14 @@ interface StrategyConfig {
 }
 
 const STRATEGIES: StrategyConfig[] = [
-  // MOMENTUM STRATEGIES
-  { id: 'adaptive-kelly', name: 'Adaptive Kelly', description: 'Momentum: Kelly sizing, bets WITH trend', color: '#f43f5e', startingBalance: 100 },
-  { id: 'vol-regime', name: 'Volatility Regime', description: 'Momentum: HIGH vol=ride trend, LOW vol=wait', color: '#ec4899', startingBalance: 100 },
-  { id: 'rsi-divergence', name: 'RSI Divergence', description: 'Momentum: hunts divergences, follows momentum', color: '#d946ef', startingBalance: 100 },
-  { id: 'market-arb', name: 'Market Arbitrage', description: 'Momentum: bets when our prob differs >10%', color: '#a855f7', startingBalance: 100 },
-  { id: 'ensemble', name: 'Ensemble Consensus', description: 'Momentum: combines 4 signals, bets when 3+ agree', color: '#8b5cf6', startingBalance: 100 },
-  // ANTI-MOMENTUM STRATEGIES
-  { id: 'fade', name: 'Fade the Move', description: 'Anti-momentum: bets AGAINST >0.12% moves', color: '#ef4444', startingBalance: 100 },
-  { id: 'stoikov', name: 'Stoikov Spread', description: 'Anti-momentum: academic market-making', color: '#f97316', startingBalance: 100 },
-  { id: 'bayesian', name: 'Bayesian Updater', description: 'Anti-momentum: bets when >65% confident', color: '#3b82f6', startingBalance: 100 },
-  { id: 'time-decay', name: 'Time-Decay Reversal', description: 'Anti-momentum: fades late extremes', color: '#f59e0b', startingBalance: 100 },
-  { id: 'breakout', name: 'Breakout Confirmation', description: 'Confirmed momentum: trends >70% retained', color: '#22c55e', startingBalance: 100 },
-  // V1 SURVIVORS
-  { id: 'kelly', name: 'Kelly Fractional', description: 'V1 survivor: 25% Kelly sizing', color: '#10b981', startingBalance: 100 },
-  { id: 'regime', name: 'Regime Detection', description: 'V1 WINNER: adapts to trending vs choppy', color: '#6366f1', startingBalance: 100 },
-  { id: 'evm', name: 'EV Maximizer', description: 'V1 survivor: only bets when EV is positive', color: '#14b8a6', startingBalance: 100 },
-  // CONTROL STRATEGIES
-  { id: 'conservative', name: 'Ultra Conservative', description: 'Control: waits until late, tiny bets', color: '#64748b', startingBalance: 100 },
-  { id: 'random', name: 'Random Baseline', description: 'Control: 50/50 coin flip, $10 bet', color: '#71717a', startingBalance: 100 },
-  // ORIGINAL V1
-  { id: 'scaled-betting', name: 'Scaled Betting', description: 'Original V1: timed bets at 1,4,7,10 min', color: '#0ea5e9', startingBalance: 100 },
+  // SELECTED STRATEGIES (7 total)
+  { id: 'vol-regime', name: 'Volatility Regime', description: 'Momentum: HIGH vol=ride trend, LOW vol=wait', color: '#ec4899', startingBalance: 12 },
+  { id: 'rsi-divergence', name: 'RSI Divergence', description: 'Momentum: hunts divergences, follows momentum', color: '#d946ef', startingBalance: 12 },
+  { id: 'ensemble', name: 'Ensemble Consensus', description: 'Momentum: combines 4 signals, bets when 3+ agree', color: '#8b5cf6', startingBalance: 12 },
+  { id: 'stoikov', name: 'Stoikov Spread', description: 'Anti-momentum: academic market-making', color: '#f97316', startingBalance: 12 },
+  { id: 'breakout', name: 'Breakout Confirmation', description: 'Confirmed momentum: trends >70% retained', color: '#22c55e', startingBalance: 12 },
+  { id: 'regime', name: 'Regime Detection', description: 'V1 WINNER: adapts to trending vs choppy', color: '#6366f1', startingBalance: 12 },
+  { id: 'scaled-betting', name: 'Scaled Betting', description: 'Original V1: timed bets at 1,4,7,10 min', color: '#0ea5e9', startingBalance: 12 },
 ];
 
 // ============ Types ============
@@ -211,6 +198,13 @@ interface StrategyMarket {
   decidedAt?: number;
 }
 
+interface StrategyLog {
+  time: string;
+  type: 'info' | 'bet' | 'clob' | 'fill' | 'resolve' | 'error';
+  message: string;
+  data?: any;
+}
+
 interface StrategyState {
   id: string;
   name: string;
@@ -236,6 +230,8 @@ interface StrategyState {
   haltedReason?: string;   // why halted (manual, stop-loss, etc)
   stopLossThreshold: number; // halt when balance drops below this (default 25)
   profitTaken?: boolean;   // true = initial stake "withdrawn" after hitting multiplier
+  // Per-strategy logs
+  logs: StrategyLog[];
 }
 
 interface CurrentMarket {
@@ -270,6 +266,7 @@ interface BotState {
   markets: MarketState[];
   selectedMarket: string | null;
   globalHalt: boolean;     // true = ALL markets stopped
+  walletBalance: number;   // On-chain USDC.e balance
 }
 
 // ============ State ============
@@ -280,6 +277,7 @@ let state: BotState = {
   markets: [],
   selectedMarket: null,
   globalHalt: false,
+  walletBalance: 0,
 };
 
 let clients: Set<WebSocket> = new Set();
@@ -318,7 +316,8 @@ function initializeMarkets(): void {
       // Control flags
       liveMode: false,         // Start in paper mode
       halted: false,
-      stopLossThreshold: 25,   // Default stop loss at $25
+      stopLossThreshold: Math.floor(s.startingBalance * 0.25),   // Stop loss at 25% of initial balance
+      logs: [],
     })),
     totalPnl: 0,
     totalBalance: STRATEGIES.length * 100,
@@ -357,6 +356,7 @@ function saveState(): void {
           halted: s.halted,
           haltedReason: s.haltedReason,
           stopLossThreshold: s.stopLossThreshold,
+          logs: s.logs.slice(-50), // Save last 50 logs
         })),
         totalPnl: m.totalPnl,
         totalBalance: m.totalBalance,
@@ -403,6 +403,7 @@ function loadState(): boolean {
                 strategy.halted = savedStrategy.halted ?? false;
                 strategy.haltedReason = savedStrategy.haltedReason;
                 strategy.stopLossThreshold = savedStrategy.stopLossThreshold ?? 25;
+                strategy.logs = savedStrategy.logs ?? [];
               }
             }
             market.totalPnl = savedMarket.totalPnl ?? 0;
@@ -460,12 +461,31 @@ function loadState(): boolean {
   return false;
 }
 
+// ============ Wallet Balance ============
+async function fetchWalletBalance(): Promise<void> {
+  try {
+    const { ethers } = await import('ethers');
+    const provider = new ethers.providers.StaticJsonRpcProvider('https://polygon-rpc.com', 137);
+    const USDC_E = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
+    const WALLET = '0x923C9c79ADF737A878f6fFb4946D7da889d78E1d';
+    const ERC20_ABI = ['function balanceOf(address) view returns (uint256)'];
+    const usdc = new ethers.Contract(USDC_E, ERC20_ABI, provider);
+    const balance = await usdc.balanceOf(WALLET);
+    state.walletBalance = parseFloat(ethers.utils.formatUnits(balance, 6));
+  } catch (error) {
+    console.error('Wallet balance fetch error:', error);
+  }
+}
+
 // ============ Price Fetching ============
 async function fetchPrices(): Promise<void> {
   try {
     const symbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT'];
     const response = await fetch(`https://api.binance.com/api/v3/ticker/price?symbols=${JSON.stringify(symbols)}`);
     const data = await response.json() as { symbol: string; price: string }[];
+    
+    // Also fetch wallet balance
+    fetchWalletBalance();
     
     for (const item of data) {
       const price = parseFloat(item.price);
@@ -1106,6 +1126,21 @@ function canPlaceBet(marketState: MarketState, strategy: StrategyState): boolean
   return true;
 }
 
+// Helper to add log entry to a strategy (keeps last 100 logs)
+function addStrategyLog(strategy: StrategyState, type: StrategyLog['type'], message: string, data?: any): void {
+  const log: StrategyLog = {
+    time: new Date().toLocaleTimeString(),
+    type,
+    message,
+    data,
+  };
+  strategy.logs.push(log);
+  // Keep only last 100 logs
+  if (strategy.logs.length > 100) {
+    strategy.logs = strategy.logs.slice(-100);
+  }
+}
+
 async function placeBet(marketState: MarketState, strategy: StrategyState, amount: number, probability: number): Promise<void> {
   // Check if we can place bet
   if (!canPlaceBet(marketState, strategy)) return;
@@ -1122,35 +1157,61 @@ async function placeBet(marketState: MarketState, strategy: StrategyState, amoun
   
   // For live mode, place REAL orders on Polymarket
   if (strategy.liveMode) {
+    addStrategyLog(strategy, 'bet', `Placing LIVE bet: $${amount} @ ${(price * 100).toFixed(0)}¢`, { amount, price });
+    
     try {
       // Find the actual Polymarket market
+      addStrategyLog(strategy, 'clob', `Finding ${marketState.asset} ${marketState.timeframe} market on Polymarket...`);
       const liveMarket = await liveTrading.findMarket(marketState.asset, marketState.timeframe);
       
       if (!liveMarket) {
+        addStrategyLog(strategy, 'error', `No active ${marketState.asset} ${marketState.timeframe} market found`);
         console.log(`   ⚠️ [LIVE] No active ${marketState.asset} ${marketState.timeframe} market found`);
         return;
       }
+      
+      addStrategyLog(strategy, 'clob', `Found market: ${liveMarket.title || liveMarket.slug}...`);
       
       // Determine direction based on strategy decision
       const side = market.side || 'Up';
       const tokenId = side === 'Up' ? liveMarket.upTokenId : liveMarket.downTokenId;
       
-      // Place the real order
-      const result = await liveTrading.placeOrder(tokenId, side, amount, price);
+      // Use ACTUAL market price (not our calculated probability)
+      const marketPrice = side === 'Up' ? liveMarket.upPrice : liveMarket.downPrice;
+      const bidPrice = Math.min(0.95, marketPrice + 0.01); // Bid 1¢ above market for better fill
+      
+      addStrategyLog(strategy, 'clob', `Market price: ${(marketPrice * 100).toFixed(0)}¢, bidding: ${(bidPrice * 100).toFixed(0)}¢`);
+      
+      // Recalculate shares with actual price
+      const actualShares = Math.floor(amount / bidPrice);
+      
+      // Place the real order at market price
+      addStrategyLog(strategy, 'clob', `Sending CLOB order: ${side} $${amount} @ ${(bidPrice * 100).toFixed(0)}¢`);
+      const result = await liveTrading.placeOrder(tokenId, side, amount, bidPrice);
       
       if (result.success) {
+        addStrategyLog(strategy, 'fill', `✅ Order filled! ID: ${result.orderId}, Shares: ${result.shares}`, { orderId: result.orderId, shares: result.shares });
         console.log(`   💰 [LIVE] ${strategy.name}: $${amount} ${side} @ ${(price * 100).toFixed(0)}¢`);
         console.log(`      Order ID: ${result.orderId}, Shares: ${result.shares}`);
         sendTelegramAlert(`💰 *LIVE BET*\n\n${marketState.key} ${strategy.name}\n$${amount} on ${side}\nOrder: ${result.orderId}`);
+        
+        // Record bet for auto-redemption
+        if (liveMarket.conditionId) {
+          recordBet(liveMarket.conditionId, tokenId, liveMarket.slug || liveMarket.title, side);
+        }
       } else {
+        addStrategyLog(strategy, 'error', `❌ Order failed: ${result.error}`, { error: result.error });
         console.log(`   ❌ [LIVE] Order failed: ${result.error}`);
         sendTelegramAlert(`❌ *ORDER FAILED*\n\n${marketState.key} ${strategy.name}\n$${amount} ${side}\nError: ${result.error}`);
         return; // Don't deduct balance if order failed
       }
     } catch (error: any) {
+      addStrategyLog(strategy, 'error', `❌ Exception: ${error.message}`, { error: error.message });
       console.error(`   ❌ [LIVE] Error:`, error.message);
       return;
     }
+  } else {
+    addStrategyLog(strategy, 'bet', `Paper bet: $${amount} @ ${(price * 100).toFixed(0)}¢ (${shares} shares)`);
   }
   
   market.bets.push({
@@ -1174,15 +1235,23 @@ async function placeBet(marketState: MarketState, strategy: StrategyState, amoun
 function startMarket(marketState: MarketState): void {
   const now = Date.now();
   const duration = getDurationMinutes(marketState.timeframe);
-  const marketId = `${marketState.key}-${now}`;
+  
+  // Align to Polymarket's actual market windows (5min = :00, :05, :10, etc.)
+  const windowMs = marketState.durationMs;
+  const alignedStart = Math.floor(now / windowMs) * windowMs;
+  const alignedEnd = alignedStart + windowMs;
+  
+  const marketId = `${marketState.key}-${alignedStart}`;
   
   marketState.currentMarket = {
     id: marketId,
-    title: `${marketState.asset} ${duration}min - ${new Date().toLocaleTimeString()}`,
-    startTime: now,
-    endTime: now + marketState.durationMs,
+    title: `${marketState.asset} ${duration}min - ${new Date(alignedStart).toLocaleTimeString()}`,
+    startTime: alignedStart,
+    endTime: alignedEnd,
     openPrice: marketState.currentPrice,
   };
+  
+  console.log(`   ⏰ Aligned to Polymarket window: ${new Date(alignedStart).toLocaleTimeString()} - ${new Date(alignedEnd).toLocaleTimeString()}`);
   
   // Initialize strategy markets
   for (const strategy of marketState.strategies) {
@@ -1276,6 +1345,12 @@ function endMarket(marketState: MarketState): void {
     const payout = won ? strategyMarket.shares : 0;
     const pnl = payout - strategyMarket.costBet;
     
+    // Log market resolution
+    addStrategyLog(strategy, 'resolve', 
+      `Market resolved: ${wentUp ? 'UP' : 'DOWN'} | Bet: ${strategyMarket.side} | ${won ? 'WIN' : 'LOSS'} | P&L: $${pnl.toFixed(2)}`,
+      { wentUp, picked: strategyMarket.side, won, pnl, payout, cost: strategyMarket.costBet }
+    );
+    
     strategy.totalMarkets++;
     strategy.totalPnl += pnl;
     strategy.balance += payout;
@@ -1321,6 +1396,17 @@ function endMarket(marketState: MarketState): void {
   // Check for extreme P&L swings and auto profit-taking
   checkAlerts();
   
+  // Auto-redeem any winning positions to USDC.e
+  if (process.env.PRIVATE_KEY) {
+    console.log(`   🔄 Checking for redeemable winnings...`);
+    redeemAllWinnings(process.env.PRIVATE_KEY).then(result => {
+      if (result.redeemed > 0) {
+        console.log(`   ✅ Redeemed $${result.redeemed.toFixed(2)} to USDC.e`);
+        sendTelegramAlert(`💰 *AUTO-REDEEMED*\n$${result.redeemed.toFixed(2)} converted to USDC.e`);
+      }
+    }).catch(err => console.error('Redeem error:', err.message));
+  }
+  
   // Start next market after delay (30s for 15min, 15s for 5min)
   const delay = marketState.timeframe === '5min' ? 15000 : 30000;
   setTimeout(() => startMarket(marketState), delay);
@@ -1334,6 +1420,7 @@ function broadcastState(): void {
       connected: state.connected,
       live: state.live,
       prices: state.prices,
+      walletBalance: state.walletBalance,
       selectedMarket: state.selectedMarket,
       globalHalt: state.globalHalt,
       markets: state.markets.map(m => ({
@@ -1471,8 +1558,8 @@ const server = http.createServer(async (req, res) => {
       globalHalt: state.globalHalt,
       totalPnl,
       totalBalance,
-      startingBalance: 9600,
-      roi: ((totalBalance - 9600) / 9600 * 100).toFixed(1) + '%',
+      startingBalance: 4800,
+      roi: ((totalBalance - 4800) / 4800 * 100).toFixed(1) + '%',
       withdrawnFunds: alertConfig.withdrawnFunds,
       markets: marketSummary.sort((a, b) => b.pnl - a.pnl),
       alertsEnabled: alertConfig.enabled,
@@ -1536,10 +1623,13 @@ const server = http.createServer(async (req, res) => {
         if (data.funding && data.live) {
           strategy.balance = data.funding;
           strategy.startingBalance = data.funding;
+          strategy.stopLossThreshold = Math.floor(data.funding * 0.25);  // 25% of new funding
           strategy.totalPnl = 0;
           strategy.deployed = 0;
           strategy.wins = 0;
           strategy.losses = 0;
+          strategy.halted = false;  // Reset halt status
+          strategy.haltedReason = undefined;
         }
         
         saveState();
@@ -1776,8 +1866,8 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`
 ╔════════════════════════════════════════════════════════════╗
 ║  🤖 MULTI-MARKET POLYMARKET BOT                            ║
-║  BTC, ETH, SOL × 5min, 15min = 6 Markets                   ║
-║  16 Strategies × $100 Each × 6 Markets = $9,600 Total      ║
+║  BTC 5min + ETH 15min + SOL 15min = 3 Markets              ║
+║  7 Strategies × $25 Each × 3 Markets = $525 Total          ║
 ╚════════════════════════════════════════════════════════════╝
 
   Dashboard: http://192.168.0.217:${PORT}

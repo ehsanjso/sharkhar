@@ -1,0 +1,298 @@
+[
+  {
+    "conditionId": "0xa0d8cf278a3dbc193f6341bfd34febf730c33d26b9f0849a3f31a9dcb2c8ba7c",
+    "tokenId": "70752050551455090662791650789488074239711496503593022052944752022385005309174",
+    "marketSlug": "btc-updown-5m-1771237200",
+    "side": "Down",
+    "timestamp": 1771237309599,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x4a676864065754eb81355a2257f0b8730815926f64dac892042454afe8ec3412",
+    "tokenId": "20678846404874280081850478394726409396348099623164539519913147618043706529169",
+    "marketSlug": "btc-updown-5m-1771237500",
+    "side": "Down",
+    "timestamp": 1771237604448,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x28bb0023f387fb5fa7908b468eb1e74b25d8cd1d9d27f73c6da85623cfcc4162",
+    "tokenId": "41290779693562019270750784184438896776445079939172437952207726978525716232543",
+    "marketSlug": "btc-updown-5m-1771237800",
+    "side": "Up",
+    "timestamp": 1771238054480,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0xe366d83e3a235a8972d88c6d1d9f67b707e36bc1b91812bea6240c018b5f8ff5",
+    "tokenId": "80257604326647116186638626479464331230799773246717551762422009452890553214318",
+    "marketSlug": "btc-updown-5m-1771239900",
+    "side": "Down",
+    "timestamp": 1771240164661,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x9d97674a9a089a5017b8a7c80fdd98178c4db0ea5c1b49402c978926fb9bc107",
+    "tokenId": "72472227687694361872779774149292011150048561575082991830520398016358615952969",
+    "marketSlug": "btc-updown-5m-1771240200",
+    "side": "Down",
+    "timestamp": 1771240304711,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x9d2cc923dbcd22abbaf1e6bea92d56cf3ed06172e2f220094d5a8f58a76e9870",
+    "tokenId": "57886748207814692618021330026527296443346097515389938089402472831790116747066",
+    "marketSlug": "btc-updown-5m-1771240500",
+    "side": "Up",
+    "timestamp": 1771240704739,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x8cce941688472ffe9fbce87b19b9a58f9ef0e3185ec90bee0c7267574c20332d",
+    "tokenId": "57767615204855338129703521715957876480297838436398594308760106435972285806800",
+    "marketSlug": "btc-updown-5m-1771240800",
+    "side": "Down",
+    "timestamp": 1771240904761,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x9511e5e12d9aeb0d65d34cac7fb47df4dd2eb57d857383751a8519cb8c7dbb8f",
+    "tokenId": "61030760189903959340451494930663302679770823516350943131853913353730672560641",
+    "marketSlug": "btc-updown-5m-1771241100",
+    "side": "Up",
+    "timestamp": 1771241245090,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0xdd179684aab07b5c63de7745246435e55bc79e09ddd265eeed54c82e701dc8b0",
+    "tokenId": "96529755444681416472484326723251561583809618510930489798136605456171049224551",
+    "marketSlug": "btc-updown-5m-1771242000",
+    "side": "Down",
+    "timestamp": 1771242204831,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x6345b42a8b0ce4cae0b0e4c9161a71710dd5006dd314c876432a9d6ede2f2288",
+    "tokenId": "78530931004251318229872260819480599534155833345872747184283494400110167648191",
+    "marketSlug": "btc-updown-5m-1771242600",
+    "side": "Up",
+    "timestamp": 1771242819875,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x5a446095b72b0db66e9ad90fb64ecefc3f9ac80df9f2eab2f311f5db2857597e",
+    "tokenId": "84036227908962940310126073573318448423320743020490342586154791267253921156301",
+    "marketSlug": "btc-updown-5m-1771242900",
+    "side": "Down",
+    "timestamp": 1771243014887,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x6c401b0ad12e904b262b018053421b5e56af358aee6d9fe19f53bc803cad8cf3",
+    "tokenId": "107857063702825562167024295095717810440600193110836258575798743061756928819202",
+    "marketSlug": "btc-updown-5m-1771243200",
+    "side": "Up",
+    "timestamp": 1771243459922,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0xb335c938da2d5023712becc181b0227fe1ef3faa7a2d5b2a617c6fd23ba6f828",
+    "tokenId": "53124106059550407960381205576740689381901151692657971706318077070204873361578",
+    "marketSlug": "btc-updown-5m-1771243800",
+    "side": "Down",
+    "timestamp": 1771244004975,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x4ececfc790d9f70b43dbd15e8ec2fc9a7f02843f769dcedece566945ba0011d5",
+    "tokenId": "77105468254164368934620732963721834309652592219745315441629440345710619797421",
+    "marketSlug": "btc-updown-5m-1771244100",
+    "side": "Down",
+    "timestamp": 1771244305025,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0xaf988ba63b3e1788f5c304de411d3ec24d80869dc5456d3a5c0813c64d6f03c6",
+    "tokenId": "103094332073715085825902168086964973957740353697131506775679911279457878735521",
+    "marketSlug": "btc-updown-5m-1771244400",
+    "side": "Up",
+    "timestamp": 1771244615056,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x3a5cca3d1035af729263938d8667b887d17680ca6aef553ce57d9b2d61c7cf59",
+    "tokenId": "26144340287160660929750934509389447813709094474743357022698667830607658748485",
+    "marketSlug": "btc-updown-5m-1771244700",
+    "side": "Up",
+    "timestamp": 1771244785062,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x6f53b2b45ddaa64f959d71136e16ef2993a1e19242291c45d2c70d9fcc4031fa",
+    "tokenId": "68006001811534563959271838417573543168489727307731776830463708648017371923516",
+    "marketSlug": "btc-updown-5m-1771245000",
+    "side": "Down",
+    "timestamp": 1771245105089,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x23ba9568dea52f9568e411c902fee0d4cca10bb37bda07c088d04a0f7590cc0c",
+    "tokenId": "44823544487228093036750103471403718337666294152715461275786181226903452412659",
+    "marketSlug": "btc-updown-5m-1771245300",
+    "side": "Down",
+    "timestamp": 1771245405108,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x23ba9568dea52f9568e411c902fee0d4cca10bb37bda07c088d04a0f7590cc0c",
+    "tokenId": "49673229089632523083831491653387110849913299375754188114523562942576544100052",
+    "marketSlug": "btc-updown-5m-1771245300",
+    "side": "Up",
+    "timestamp": 1771245595098,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0xb5922b429e35fabfe4bcd32466dfa4f9fa10c7e6f777746733eec99634ec54d5",
+    "tokenId": "36044294954356717460178698991121986571161126653921223221706494362473792124066",
+    "marketSlug": "btc-updown-5m-1771245600",
+    "side": "Down",
+    "timestamp": 1771245705119,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x51517aafff94b16fc4d561febf42a6e333b9e331923e78bd94978c6222f2d178",
+    "tokenId": "1035331687993200790366616150804798334840967716848080377310984760395930264189",
+    "marketSlug": "btc-updown-5m-1771245900",
+    "side": "Up",
+    "timestamp": 1771246165197,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x23fcb7c739ea14de624ac2237c79092cdbd7640c0723155e607818293664c956",
+    "tokenId": "20754176211310961528751842721825514769286223043212924717270424086469071753954",
+    "marketSlug": "btc-updown-5m-1771246200",
+    "side": "Up",
+    "timestamp": 1771246285164,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0xa8934e00f39fc83e718765ecb52a7e6190ec9e5331338eb6c4a2328c556e55be",
+    "tokenId": "54089688722490515472875885819124621348907413220513542713079450656999606291577",
+    "marketSlug": "btc-updown-5m-1771246500",
+    "side": "Up",
+    "timestamp": 1771246605157,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0xa7aa519e9c5a24610faa79d06384bc2f39df4e4863bef53fabe8ca6b815d16bd",
+    "tokenId": "67742833199092576411114483954836575046163412485236931327110275958448943865840",
+    "marketSlug": "btc-updown-5m-1771246800",
+    "side": "Up",
+    "timestamp": 1771246945215,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x4882bbf7febf712293ac15a6a7d4e9b655bf010484126b0f0687a3a2c4f6a626",
+    "tokenId": "5264897805392918664977505353382233155070822684613123209709818719414176998276",
+    "marketSlug": "btc-updown-5m-1771247100",
+    "side": "Down",
+    "timestamp": 1771247275212,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x24a5ee139f8f2495ffb65f0ace3f89f2f5c1e4cf1d4c694cf4fca859b6e0bbea",
+    "tokenId": "77705435942296810310240344230404077649232401086869395114770233542432860922545",
+    "marketSlug": "btc-updown-5m-1771247400",
+    "side": "Up",
+    "timestamp": 1771247505237,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x20771022495ba41b971b73d0b72cac9c01efe18c5f677b61455337035c9ed7df",
+    "tokenId": "62024434563498598061622319721211593639584662025450873209536167001536353357113",
+    "marketSlug": "btc-updown-5m-1771247700",
+    "side": "Up",
+    "timestamp": 1771247905339,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x506a7747651c0bad4147ad75690ad36b6074b7481333ba8b5069285fa6c4e97a",
+    "tokenId": "39573806469954910826475885606777819098734158620297636769631468509907238521254",
+    "marketSlug": "btc-updown-5m-1771248000",
+    "side": "Down",
+    "timestamp": 1771248105330,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0xe24cf91eb58fc1ff8f04824eff6c6a1e2b6e02cefdbe1b3fb0ae1ff3bdfefbd2",
+    "tokenId": "61596363921335844106931331682963416516946635245688342903242336156034121606321",
+    "marketSlug": "btc-updown-5m-1771248300",
+    "side": "Down",
+    "timestamp": 1771248380334,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x2e3a52eb7b57aba1151bf39858ef78a4db6ae41875591f2f4d893d98eec5022b",
+    "tokenId": "38994061705362247385239053980930188472914195537608594014070875649027088806200",
+    "marketSlug": "btc-updown-5m-1771248600",
+    "side": "Up",
+    "timestamp": 1771248680383,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0xd9b4ecc5589b8524b7c1a2da92ddaf4116c912e3c1f5ae54abbc05ee58b9ee5a",
+    "tokenId": "767177063917258508531035268440043698967189851271154309537993109412542569395",
+    "marketSlug": "btc-updown-5m-1771248900",
+    "side": "Up",
+    "timestamp": 1771248980428,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x2aae4f2bfb329f23c4bf159e51d63f00dab628a049b0b016f529054efdb20a55",
+    "tokenId": "61389490052363105952980171003554758500470085139713480254186817857196609277679",
+    "marketSlug": "btc-updown-5m-1771249200",
+    "side": "Up",
+    "timestamp": 1771249300444,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x2bdd1309705506eaa48c4973e497eb40fad54ced994c8c11151259b7d6aaed84",
+    "tokenId": "45135448829505795070918906956944211279100224320589371627815878942196876410303",
+    "marketSlug": "btc-updown-5m-1771249500",
+    "side": "Up",
+    "timestamp": 1771249605476,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x2bdd1309705506eaa48c4973e497eb40fad54ced994c8c11151259b7d6aaed84",
+    "tokenId": "84373474971997633265874698444885397048714996338393421654946470316666029262489",
+    "marketSlug": "btc-updown-5m-1771249500",
+    "side": "Down",
+    "timestamp": 1771249710487,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0xf80bb8677b7ccddb2a24822eba2c632ad0a077d791e8b0123fd84485d8097541",
+    "tokenId": "28238768522625088392849020434772466095790807917229991118653795152908090177001",
+    "marketSlug": "btc-updown-5m-1771249800",
+    "side": "Down",
+    "timestamp": 1771249900527,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x10534177b804c3a5bdad22f7ba208a2f908bf40fee49d8e1b9b5e98c334e5410",
+    "tokenId": "15928904594826107121543926880366073978663663351779487253203332100023923014932",
+    "marketSlug": "btc-updown-5m-1771250100",
+    "side": "Up",
+    "timestamp": 1771250200533,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x334d834daef4954f051c869968f614fa145681c61708799be83bf4013e1a2095",
+    "tokenId": "24350443428848848690120595402502027531336052121929947505932031101257883358371",
+    "marketSlug": "btc-updown-5m-1771250400",
+    "side": "Down",
+    "timestamp": 1771250500623,
+    "redeemed": false
+  }
+]
