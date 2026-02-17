@@ -886,17 +886,17 @@
             {
               "time": "12:09:50 a.m.",
               "type": "clob",
-              "message": "Market price: 50\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 50ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:09:50 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Down $11.964316690793684 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Down $11.964316690793684 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:09:50 a.m.",
               "type": "error",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009d\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u008c Order failed: no match",
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Order failed: no match",
               "data": {
                 "error": "no match"
               }
@@ -904,7 +904,7 @@
             {
               "time": "12:09:55 a.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE bet: $11.964316690793684 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (wallet: $76.34)",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE bet: $11.964316690793684 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (wallet: $76.34)",
               "data": {
                 "amount": 11.964316690793684,
                 "price": 0.51
@@ -923,17 +923,17 @@
             {
               "time": "12:09:55 a.m.",
               "type": "clob",
-              "message": "Market price: 50\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 50ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:09:55 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Down $11.964316690793684 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Down $11.964316690793684 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:09:55 a.m.",
               "type": "error",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009d\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u008c Order failed: no match",
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Order failed: no match",
               "data": {
                 "error": "no match"
               }
@@ -941,7 +941,7 @@
             {
               "time": "12:28:20 a.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE bet: $11.964316690793684 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (wallet: $76.60)",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE bet: $11.964316690793684 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (wallet: $76.60)",
               "data": {
                 "amount": 11.964316690793684,
                 "price": 0.51
@@ -960,17 +960,17 @@
             {
               "time": "12:28:20 a.m.",
               "type": "clob",
-              "message": "Market price: 60\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 61\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 60ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 61ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:28:20 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Up $11.964316690793684 @ 61\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Up $11.964316690793684 @ 61ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:28:21 a.m.",
               "type": "fill",
-              "message": "[LIVE] PLACE+FILL Up @ $0.61 x 19 shares ($11.59) [market-177...] \u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0080\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094 immediate fill!",
+              "message": "[LIVE] PLACE+FILL Up @ $0.61 x 19 shares ($11.59) [market-177...] ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ immediate fill!",
               "data": {
                 "orderId": "market-1771306101651",
                 "shares": 19,
@@ -981,12 +981,12 @@
             {
               "time": "12:28:21 a.m.",
               "type": "info",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0092 $11.59 locked (total locked: $11.59)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ $11.59 locked (total locked: $11.59)"
             },
             {
               "time": "12:30:00 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE resolved: UP | Bet: Up | WIN | P&L: $7.41",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE resolved: UP | Bet: Up | WIN | P&L: $7.41",
               "data": {
                 "wentUp": true,
                 "picked": "Up",
@@ -1000,22 +1000,22 @@
             {
               "time": "12:30:00 a.m.",
               "type": "info",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0088 Prediction: WIN - awaiting chain confirmation (locked: $11.59)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Prediction: WIN - awaiting chain confirmation (locked: $11.59)"
             },
             {
               "time": "12:31:00 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009d\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u008c CHAIN CONFIRMED LOSS: $11.59 lost"
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ CHAIN CONFIRMED LOSS: $11.59 lost"
             },
             {
               "time": "12:31:00 a.m.",
               "type": "error",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009a\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a0\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00af\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b8\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u008f Prediction mismatch! Predicted WIN, actual LOSS"
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ ÃÂÃÂÃÂÃÂ¯ÃÂÃÂÃÂÃÂ¸ÃÂÃÂÃÂÃÂ Prediction mismatch! Predicted WIN, actual LOSS"
             },
             {
               "time": "12:31:01 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE CONFIRMED: Up | WIN | Cost=$11.59 Payout=$19.00 | P&L=$+7.41",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE CONFIRMED: Up | WIN | Cost=$11.59 Payout=$19.00 | P&L=$+7.41",
               "data": {
                 "outcome": "Up",
                 "won": true,
@@ -1027,7 +1027,7 @@
             {
               "time": "12:36:20 a.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE bet: $7.096516690793683 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (wallet: $66.90)",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE bet: $7.096516690793683 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (wallet: $66.90)",
               "data": {
                 "amount": 7.096516690793683,
                 "price": 0.51
@@ -1046,17 +1046,17 @@
             {
               "time": "12:36:20 a.m.",
               "type": "clob",
-              "message": "Market price: 41\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 42\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 41ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 42ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:36:20 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Down $7.096516690793683 @ 42\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Down $7.096516690793683 @ 42ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:36:20 a.m.",
               "type": "fill",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 BET Down @ $0.42 x 16 shares = $6.72 | Locked: $6.72",
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ BET Down @ $0.42 x 16 shares = $6.72 | Locked: $6.72",
               "data": {
                 "orderId": "0x71b4e20a698142453c16d64e889368745e0b7c7f01dca316a041258f536ef1f4",
                 "shares": 16,
@@ -1067,7 +1067,7 @@
             {
               "time": "12:40:00 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE resolved: UP | Bet: Down | LOSS | P&L: $-6.72",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE resolved: UP | Bet: Down | LOSS | P&L: $-6.72",
               "data": {
                 "wentUp": true,
                 "picked": "Down",
@@ -1081,12 +1081,12 @@
             {
               "time": "12:40:00 a.m.",
               "type": "info",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0089 Prediction: LOSS - awaiting chain confirmation (locked: $6.72)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Prediction: LOSS - awaiting chain confirmation (locked: $6.72)"
             },
             {
               "time": "12:40:45 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE CONFIRMED: Up | LOSS | Cost=$6.72 Payout=$0.00 | P&L=$-6.72",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE CONFIRMED: Up | LOSS | Cost=$6.72 Payout=$0.00 | P&L=$-6.72",
               "data": {
                 "outcome": "Up",
                 "won": false,
@@ -1098,12 +1098,12 @@
             {
               "time": "12:41:07 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 WIN Down | Bet: $6.72 \u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0086\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0092 Payout: $4.56 | Profit: $-2.16 | Total P&L: +$104.79"
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ WIN Down | Bet: $6.72 ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Payout: $4.56 | Profit: $-2.16 | Total P&L: +$104.79"
             },
             {
               "time": "12:41:40 a.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE bet: $6.187287164639838 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (wallet: $59.81)",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE bet: $6.187287164639838 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (wallet: $59.81)",
               "data": {
                 "amount": 6.187287164639838,
                 "price": 0.51
@@ -1122,17 +1122,17 @@
             {
               "time": "12:41:40 a.m.",
               "type": "clob",
-              "message": "Market price: 54\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 55\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 54ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 55ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:41:40 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Up $6.187287164639838 @ 55\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Up $6.187287164639838 @ 55ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:41:40 a.m.",
               "type": "fill",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 BET Up @ $0.55 x 11 shares = $6.05 | Locked: $6.05",
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ BET Up @ $0.55 x 11 shares = $6.05 | Locked: $6.05",
               "data": {
                 "orderId": "market-1771306900967",
                 "shares": 11,
@@ -1143,7 +1143,7 @@
             {
               "time": "12:45:00 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE resolved: UP | Bet: Up | WIN | P&L: $4.95",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE resolved: UP | Bet: Up | WIN | P&L: $4.95",
               "data": {
                 "wentUp": true,
                 "picked": "Up",
@@ -1157,12 +1157,12 @@
             {
               "time": "12:45:00 a.m.",
               "type": "info",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0088 Prediction: WIN - awaiting chain confirmation (locked: $6.05)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Prediction: WIN - awaiting chain confirmation (locked: $6.05)"
             },
             {
               "time": "12:46:00 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE CONFIRMED: Up | WIN | Cost=$6.05 Payout=$11.00 | P&L=$+4.95",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE CONFIRMED: Up | WIN | Cost=$6.05 Payout=$11.00 | P&L=$+4.95",
               "data": {
                 "outcome": "Up",
                 "won": true,
@@ -1174,12 +1174,12 @@
             {
               "time": "12:46:11 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 WIN Up | Bet: $6.05 \u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0086\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0092 Payout: $2.36 | Profit: $-3.69 | Total P&L: +$101.10"
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ WIN Up | Bet: $6.05 ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Payout: $2.36 | Profit: $-3.69 | Total P&L: +$101.10"
             },
             {
               "time": "12:46:40 a.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE bet: $4.6370026892552225 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (wallet: $54.26)",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE bet: $4.6370026892552225 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (wallet: $54.26)",
               "data": {
                 "amount": 4.6370026892552225,
                 "price": 0.51
@@ -1198,17 +1198,17 @@
             {
               "time": "12:46:40 a.m.",
               "type": "clob",
-              "message": "Market price: 50\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 50ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:46:40 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Down $4.6370026892552225 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Down $4.6370026892552225 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:46:40 a.m.",
               "type": "fill",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 BET Down @ $0.51 x 9 shares = $4.59 | Locked: $4.59",
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ BET Down @ $0.51 x 9 shares = $4.59 | Locked: $4.59",
               "data": {
                 "orderId": "0x4e2c974084a1e452b4f51f7db3d32fa7f9a9e0dfd4e1fdf4a0873ea82fde6a18",
                 "shares": 9,
@@ -1219,7 +1219,7 @@
             {
               "time": "12:50:57 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 WIN Down | Bet: $4.59 \u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0086\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0092 Payout: $3.73 | Profit: $-0.86 | Total P&L: +$100.24"
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ WIN Down | Bet: $4.59 ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Payout: $3.73 | Profit: $-0.86 | Total P&L: +$100.24"
             }
           ]
         },
@@ -1381,7 +1381,7 @@
             {
               "time": "4:27:21 a.m.",
               "type": "bet",
-              "message": "Paper bet: $12 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (24 shares)"
+              "message": "Paper bet: $12 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (24 shares)"
             },
             {
               "time": "4:30:01 a.m.",
@@ -1399,12 +1399,12 @@
             {
               "time": "2:07:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $12 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (24 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $12 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (24 shares)"
             },
             {
               "time": "2:10:00 p.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper resolved: UP | Bet: Up | WIN | P&L: $12.00",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper resolved: UP | Bet: Up | WIN | P&L: $12.00",
               "data": {
                 "wentUp": true,
                 "picked": "Up",
@@ -1418,12 +1418,12 @@
             {
               "time": "2:12:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $12 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (24 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $12 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (24 shares)"
             },
             {
               "time": "2:15:00 p.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper resolved: UP | Bet: Up | WIN | P&L: $12.00",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper resolved: UP | Bet: Up | WIN | P&L: $12.00",
               "data": {
                 "wentUp": true,
                 "picked": "Up",
@@ -1437,17 +1437,17 @@
             {
               "time": "2:17:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $12 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (24 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $12 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (24 shares)"
             },
             {
               "time": "2:22:15 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $12 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (24 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $12 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (24 shares)"
             },
             {
               "time": "2:25:00 p.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper resolved: UP | Bet: Up | WIN | P&L: $12.00",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper resolved: UP | Bet: Up | WIN | P&L: $12.00",
               "data": {
                 "wentUp": true,
                 "picked": "Up",
@@ -1461,17 +1461,17 @@
             {
               "time": "2:27:05 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $12 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (24 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $12 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (24 shares)"
             },
             {
               "time": "2:37:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $12 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (24 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $12 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (24 shares)"
             },
             {
               "time": "2:40:00 p.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper resolved: UP | Bet: Up | WIN | P&L: $12.00",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper resolved: UP | Bet: Up | WIN | P&L: $12.00",
               "data": {
                 "wentUp": true,
                 "picked": "Up",
@@ -1485,17 +1485,17 @@
             {
               "time": "2:42:00 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $12 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (24 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $12 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (24 shares)"
             },
             {
               "time": "2:47:05 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $12 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (24 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $12 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (24 shares)"
             },
             {
               "time": "2:50:00 p.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper resolved: DOWN | Bet: Up | LOSS | P&L: $-12.00",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper resolved: DOWN | Bet: Up | LOSS | P&L: $-12.00",
               "data": {
                 "wentUp": false,
                 "picked": "Up",
@@ -1509,12 +1509,12 @@
             {
               "time": "3:22:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $12 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (24 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $12 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (24 shares)"
             },
             {
               "time": "3:25:35 p.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper resolved: UP | Bet: Up | WIN | P&L: $12.00",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper resolved: UP | Bet: Up | WIN | P&L: $12.00",
               "data": {
                 "wentUp": true,
                 "picked": "Up",
@@ -1528,17 +1528,17 @@
             {
               "time": "3:27:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $12 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (24 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $12 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (24 shares)"
             },
             {
               "time": "3:32:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $12 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (24 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $12 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (24 shares)"
             },
             {
               "time": "3:35:35 p.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper resolved: UP | Bet: Down | LOSS | P&L: $-12.00",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper resolved: UP | Bet: Down | LOSS | P&L: $-12.00",
               "data": {
                 "wentUp": true,
                 "picked": "Down",
@@ -2187,7 +2187,7 @@
           ],
           "liveAllocation": 19.776,
           "liveBalance": 19.776,
-          "lockedFunds": 5.61,
+          "lockedFunds": 0,
           "pendingBets": [],
           "liveMode": true,
           "halted": true,
@@ -2208,17 +2208,17 @@
             {
               "time": "12:01:40 a.m.",
               "type": "clob",
-              "message": "Market price: 50\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 50ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:01:40 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Down $8.306240241617836 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Down $8.306240241617836 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:01:40 a.m.",
               "type": "fill",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 Order filled! ID: 0x943bd460c1340f5dac6e0e48ce3d82f1d950c7a002115ded7d046d86a0ed8880, Shares: 16",
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Order filled! ID: 0x943bd460c1340f5dac6e0e48ce3d82f1d950c7a002115ded7d046d86a0ed8880, Shares: 16",
               "data": {
                 "orderId": "0x943bd460c1340f5dac6e0e48ce3d82f1d950c7a002115ded7d046d86a0ed8880",
                 "shares": 16
@@ -2227,22 +2227,22 @@
             {
               "time": "12:01:40 a.m.",
               "type": "info",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0092 $8.306240241617836 locked (total locked: $8.31)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ $8.306240241617836 locked (total locked: $8.31)"
             },
             {
               "time": "12:07:20 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 CHAIN CONFIRMED WIN! +$5.42 (P&L: $-2.89)"
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ CHAIN CONFIRMED WIN! +$5.42 (P&L: $-2.89)"
             },
             {
               "time": "12:07:20 a.m.",
               "type": "error",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009a\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a0\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00af\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b8\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u008f Prediction mismatch! Predicted LOSS, actual WIN"
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ ÃÂÃÂÃÂÃÂ¯ÃÂÃÂÃÂÃÂ¸ÃÂÃÂÃÂÃÂ Prediction mismatch! Predicted LOSS, actual WIN"
             },
             {
               "time": "12:21:00 a.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE bet: $7.091971840138345 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (wallet: $76.34)",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE bet: $7.091971840138345 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (wallet: $76.34)",
               "data": {
                 "amount": 7.091971840138345,
                 "price": 0.52
@@ -2261,17 +2261,17 @@
             {
               "time": "12:21:00 a.m.",
               "type": "clob",
-              "message": "Market price: 50\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 50ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:21:00 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Down $7.091971840138345 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Down $7.091971840138345 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:21:01 a.m.",
               "type": "fill",
-              "message": "[LIVE] PLACE+FILL Down @ $0.51 x 13 shares ($6.63) [market-177...] \u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0080\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094 immediate fill!",
+              "message": "[LIVE] PLACE+FILL Down @ $0.51 x 13 shares ($6.63) [market-177...] ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ immediate fill!",
               "data": {
                 "orderId": "market-1771305661254",
                 "shares": 13,
@@ -2282,17 +2282,17 @@
             {
               "time": "12:21:01 a.m.",
               "type": "info",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0092 $6.63 locked (total locked: $6.63)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ $6.63 locked (total locked: $6.63)"
             },
             {
               "time": "12:26:47 a.m.",
               "type": "fill",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 Redeemed! +$12.86 | Available: $23.11"
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Redeemed! +$12.86 | Available: $23.11"
             },
             {
               "time": "12:36:00 a.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE bet: $9.706849840138347 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (wallet: $76.60)",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE bet: $9.706849840138347 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (wallet: $76.60)",
               "data": {
                 "amount": 9.706849840138347,
                 "price": 0.52
@@ -2311,17 +2311,17 @@
             {
               "time": "12:36:00 a.m.",
               "type": "clob",
-              "message": "Market price: 41\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 42\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 41ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 42ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:36:00 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Down $9.706849840138347 @ 42\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Down $9.706849840138347 @ 42ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:36:00 a.m.",
               "type": "fill",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 BET Down @ $0.42 x 23 shares = $9.66 | Locked: $9.66",
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ BET Down @ $0.42 x 23 shares = $9.66 | Locked: $9.66",
               "data": {
                 "orderId": "0x78f5ea20c6b47764107c10e3bf8f71764f6c1044953c8eaf45319b2d01f35273",
                 "shares": 23,
@@ -2332,7 +2332,7 @@
             {
               "time": "12:40:00 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE resolved: UP | Bet: Down | LOSS | P&L: $-9.66",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE resolved: UP | Bet: Down | LOSS | P&L: $-9.66",
               "data": {
                 "wentUp": true,
                 "picked": "Down",
@@ -2346,12 +2346,12 @@
             {
               "time": "12:40:00 a.m.",
               "type": "info",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0089 Prediction: LOSS - awaiting chain confirmation (locked: $9.66)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Prediction: LOSS - awaiting chain confirmation (locked: $9.66)"
             },
             {
               "time": "12:40:45 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE CONFIRMED: Up | LOSS | Cost=$9.66 Payout=$0.00 | P&L=$-9.66",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE CONFIRMED: Up | LOSS | Cost=$9.66 Payout=$0.00 | P&L=$-9.66",
               "data": {
                 "outcome": "Up",
                 "won": false,
@@ -2363,12 +2363,12 @@
             {
               "time": "12:41:07 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 WIN Down | Bet: $9.66 \u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0086\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0092 Payout: $6.55 | Profit: $-3.11 | Total P&L: +$2.22"
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ WIN Down | Bet: $9.66 ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Payout: $6.55 | Profit: $-3.11 | Total P&L: +$2.22"
             },
             {
               "time": "12:42:40 a.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE bet: $8.399832396292192 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (wallet: $52.21)",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE bet: $8.399832396292192 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (wallet: $52.21)",
               "data": {
                 "amount": 8.399832396292192,
                 "price": 0.52
@@ -2387,17 +2387,17 @@
             {
               "time": "12:42:40 a.m.",
               "type": "clob",
-              "message": "Market price: 54\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 55\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 54ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 55ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:42:40 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Up $8.399832396292192 @ 55\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Up $8.399832396292192 @ 55ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:42:40 a.m.",
               "type": "fill",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 BET Up @ $0.55 x 15 shares = $8.25 | Locked: $8.25",
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ BET Up @ $0.55 x 15 shares = $8.25 | Locked: $8.25",
               "data": {
                 "orderId": "0x3ecba8ba5b5f7f5549008fa459afa3dc1afb4e3e713b682c9a2535053c99087e",
                 "shares": 15,
@@ -2408,7 +2408,7 @@
             {
               "time": "12:45:00 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE resolved: UP | Bet: Up | WIN | P&L: $6.75",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE resolved: UP | Bet: Up | WIN | P&L: $6.75",
               "data": {
                 "wentUp": true,
                 "picked": "Up",
@@ -2422,12 +2422,12 @@
             {
               "time": "12:45:00 a.m.",
               "type": "info",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0088 Prediction: WIN - awaiting chain confirmation (locked: $8.25)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Prediction: WIN - awaiting chain confirmation (locked: $8.25)"
             },
             {
               "time": "12:46:00 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE CONFIRMED: Up | WIN | Cost=$8.25 Payout=$15.00 | P&L=$+6.75",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE CONFIRMED: Up | WIN | Cost=$8.25 Payout=$15.00 | P&L=$+6.75",
               "data": {
                 "outcome": "Up",
                 "won": true,
@@ -2439,12 +2439,12 @@
             {
               "time": "12:46:11 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 WIN Up | Bet: $8.25 \u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0086\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0092 Payout: $3.22 | Profit: $-5.03 | Total P&L: $-2.81"
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ WIN Up | Bet: $8.25 ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Payout: $3.22 | Profit: $-5.03 | Total P&L: $-2.81"
             },
             {
               "time": "12:46:15 a.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE bet: $6.285808111676808 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (wallet: $60.54)",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE bet: $6.285808111676808 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (wallet: $60.54)",
               "data": {
                 "amount": 6.285808111676808,
                 "price": 0.52
@@ -2463,17 +2463,17 @@
             {
               "time": "12:46:15 a.m.",
               "type": "clob",
-              "message": "Market price: 50\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 50ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:46:15 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Down $6.285808111676808 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Down $6.285808111676808 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:46:16 a.m.",
               "type": "fill",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 BET Down @ $0.51 x 12 shares = $6.12 | Locked: $6.12",
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ BET Down @ $0.51 x 12 shares = $6.12 | Locked: $6.12",
               "data": {
                 "orderId": "0x8a1ecb9c2b8d352a339d9cbcdd38c742b35fc25304089980d1286092b8836355",
                 "shares": 12,
@@ -2484,12 +2484,12 @@
             {
               "time": "12:50:57 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 WIN Down | Bet: $6.12 \u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0086\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0092 Payout: $4.97 | Profit: $-1.15 | Total P&L: $-3.96"
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ WIN Down | Bet: $6.12 ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Payout: $4.97 | Profit: $-1.15 | Total P&L: $-3.96"
             },
             {
               "time": "12:51:00 a.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE bet: $5.802970831676808 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (wallet: $49.63)",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE bet: $5.802970831676808 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (wallet: $49.63)",
               "data": {
                 "amount": 5.802970831676808,
                 "price": 0.52
@@ -2508,17 +2508,17 @@
             {
               "time": "12:51:00 a.m.",
               "type": "clob",
-              "message": "Market price: 50\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 50ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:51:00 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Down $5.802970831676808 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Down $5.802970831676808 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:51:00 a.m.",
               "type": "fill",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 BET Down @ $0.51 x 11 shares = $5.61 | Locked: $5.61",
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ BET Down @ $0.51 x 11 shares = $5.61 | Locked: $5.61",
               "data": {
                 "orderId": "0x705aa15a9f33a29195303fc492da07251d4a1d0407cd397e417523eb22d6be4b",
                 "shares": 11,
@@ -2529,7 +2529,7 @@
             {
               "time": "12:55:55 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u00a2\u00c3\u0082\u00c2\u009c\u00c3\u0082\u00c2\u0085 WIN Down | Bet: $5.61 \u00c3\u0083\u00c2\u00a2\u00c3\u0082\u00c2\u0086\u00c3\u0082\u00c2\u0092 Payout: $13.94 | Profit: +$8.33 | Total P&L: +$46.34"
+              "message": "ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ WIN Down | Bet: $5.61 ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Payout: $13.94 | Profit: +$8.33 | Total P&L: +$46.34"
             }
           ]
         },
@@ -2619,7 +2619,7 @@
             {
               "time": "4:26:21 a.m.",
               "type": "bet",
-              "message": "Paper bet: $9 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (18 shares)"
+              "message": "Paper bet: $9 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (18 shares)"
             },
             {
               "time": "4:30:01 a.m.",
@@ -2637,27 +2637,27 @@
             {
               "time": "4:31:21 a.m.",
               "type": "bet",
-              "message": "Paper bet: $9 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (18 shares)"
+              "message": "Paper bet: $9 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (18 shares)"
             },
             {
               "time": "4:32:21 a.m.",
               "type": "bet",
-              "message": "Paper bet: $9 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (18 shares)"
+              "message": "Paper bet: $9 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (18 shares)"
             },
             {
               "time": "2:06:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $9 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (18 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $9 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (18 shares)"
             },
             {
               "time": "2:07:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $9 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (18 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $9 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (18 shares)"
             },
             {
               "time": "2:10:00 p.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper resolved: UP | Bet: Up | WIN | P&L: $18.00",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper resolved: UP | Bet: Up | WIN | P&L: $18.00",
               "data": {
                 "wentUp": true,
                 "picked": "Up",
@@ -2671,22 +2671,22 @@
             {
               "time": "2:11:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $9 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (18 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $9 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (18 shares)"
             },
             {
               "time": "2:12:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $9 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (18 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $9 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (18 shares)"
             },
             {
               "time": "2:13:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $9 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (18 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $9 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (18 shares)"
             },
             {
               "time": "2:15:00 p.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper resolved: UP | Bet: Up | WIN | P&L: $27.00",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper resolved: UP | Bet: Up | WIN | P&L: $27.00",
               "data": {
                 "wentUp": true,
                 "picked": "Up",
@@ -2700,32 +2700,32 @@
             {
               "time": "2:16:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $9 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (18 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $9 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (18 shares)"
             },
             {
               "time": "2:17:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $9 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (18 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $9 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (18 shares)"
             },
             {
               "time": "2:21:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $9 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (18 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $9 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (18 shares)"
             },
             {
               "time": "2:22:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $9 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (18 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $9 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (18 shares)"
             },
             {
               "time": "2:23:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $9 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (18 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $9 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (18 shares)"
             },
             {
               "time": "2:25:00 p.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper resolved: UP | Bet: Down | LOSS | P&L: $-27.00",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper resolved: UP | Bet: Down | LOSS | P&L: $-27.00",
               "data": {
                 "wentUp": true,
                 "picked": "Down",
@@ -2739,12 +2739,12 @@
             {
               "time": "2:26:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $9 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (18 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $9 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (18 shares)"
             },
             {
               "time": "2:27:20 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $9 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (18 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $9 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (18 shares)"
             }
           ]
         },
@@ -2935,7 +2935,7 @@
             {
               "time": "12:09:50 a.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE bet: $6.3 @ 55\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (wallet: $76.34)",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE bet: $6.3 @ 55ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (wallet: $76.34)",
               "data": {
                 "amount": 6.3,
                 "price": 0.5499999999999999
@@ -2954,12 +2954,12 @@
             {
               "time": "12:09:50 a.m.",
               "type": "clob",
-              "message": "Market price: 50\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 50ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:09:50 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Down $6.3 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Down $6.3 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:09:50 a.m.",
@@ -2969,17 +2969,17 @@
             {
               "time": "12:09:50 a.m.",
               "type": "clob",
-              "message": "Market price: 50\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 50ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:09:50 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Down $6.3 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Down $6.3 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:09:50 a.m.",
               "type": "error",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009d\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u008c Order failed: no match",
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Order failed: no match",
               "data": {
                 "error": "no match"
               }
@@ -2987,7 +2987,7 @@
             {
               "time": "12:09:50 a.m.",
               "type": "error",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009d\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u008c Order failed: no match",
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Order failed: no match",
               "data": {
                 "error": "no match"
               }
@@ -2995,7 +2995,7 @@
             {
               "time": "12:09:55 a.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE bet: $6.3 @ 55\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (wallet: $76.34)",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE bet: $6.3 @ 55ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (wallet: $76.34)",
               "data": {
                 "amount": 6.3,
                 "price": 0.5499999999999999
@@ -3009,7 +3009,7 @@
             {
               "time": "12:09:55 a.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE bet: $6.3 @ 55\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (wallet: $76.34)",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE bet: $6.3 @ 55ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (wallet: $76.34)",
               "data": {
                 "amount": 6.3,
                 "price": 0.5499999999999999
@@ -3028,12 +3028,12 @@
             {
               "time": "12:09:55 a.m.",
               "type": "clob",
-              "message": "Market price: 50\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 50ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:09:55 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Down $6.3 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Down $6.3 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:09:55 a.m.",
@@ -3043,17 +3043,17 @@
             {
               "time": "12:09:55 a.m.",
               "type": "clob",
-              "message": "Market price: 50\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 50ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:09:55 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Down $6.3 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Down $6.3 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:09:55 a.m.",
               "type": "error",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009d\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u008c Order failed: no match",
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Order failed: no match",
               "data": {
                 "error": "no match"
               }
@@ -3061,7 +3061,7 @@
             {
               "time": "12:09:55 a.m.",
               "type": "error",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009d\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u008c Order failed: no match",
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Order failed: no match",
               "data": {
                 "error": "no match"
               }
@@ -3069,7 +3069,7 @@
             {
               "time": "12:23:40 a.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE bet: $6.3 @ 55\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (wallet: $76.34)",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE bet: $6.3 @ 55ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (wallet: $76.34)",
               "data": {
                 "amount": 6.3,
                 "price": 0.5499999999999999
@@ -3083,7 +3083,7 @@
             {
               "time": "12:23:40 a.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE bet: $6.3 @ 55\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (wallet: $76.34)",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE bet: $6.3 @ 55ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (wallet: $76.34)",
               "data": {
                 "amount": 6.3,
                 "price": 0.5499999999999999
@@ -3102,12 +3102,12 @@
             {
               "time": "12:23:40 a.m.",
               "type": "clob",
-              "message": "Market price: 50\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 50ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:23:40 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Down $6.3 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Down $6.3 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:23:40 a.m.",
@@ -3117,17 +3117,17 @@
             {
               "time": "12:23:40 a.m.",
               "type": "clob",
-              "message": "Market price: 50\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 50ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:23:40 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Down $6.3 @ 51\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Down $6.3 @ 51ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:23:40 a.m.",
               "type": "fill",
-              "message": "[LIVE] PLACE+FILL Down @ $0.51 x 12 shares ($6.12) [0xbc4c8cf5...] \u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0080\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094 immediate fill!",
+              "message": "[LIVE] PLACE+FILL Down @ $0.51 x 12 shares ($6.12) [0xbc4c8cf5...] ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ immediate fill!",
               "data": {
                 "orderId": "0xbc4c8cf5a9bfcbafb0f884dd5e5d5e68fbd61aa8902ce9bd1103c67d23dc609e",
                 "shares": 12,
@@ -3138,12 +3138,12 @@
             {
               "time": "12:23:40 a.m.",
               "type": "info",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0092 $6.12 locked (total locked: $6.12)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ $6.12 locked (total locked: $6.12)"
             },
             {
               "time": "12:23:40 a.m.",
               "type": "fill",
-              "message": "[LIVE] PLACE+FILL Down @ $0.51 x 12 shares ($6.12) [0x2f83e7f1...] \u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0080\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094 immediate fill!",
+              "message": "[LIVE] PLACE+FILL Down @ $0.51 x 12 shares ($6.12) [0x2f83e7f1...] ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ immediate fill!",
               "data": {
                 "orderId": "0x2f83e7f1c2ff3bbef7a2bcf07e990fd990b2a1879d0e3195b315bb3837c54ebc",
                 "shares": 12,
@@ -3154,27 +3154,27 @@
             {
               "time": "12:23:40 a.m.",
               "type": "info",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0092 $6.12 locked (total locked: $12.24)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ $6.12 locked (total locked: $12.24)"
             },
             {
               "time": "12:26:47 a.m.",
               "type": "fill",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 Redeemed! +$12.86 | Available: $9.50"
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Redeemed! +$12.86 | Available: $9.50"
             },
             {
               "time": "12:26:51 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 CHAIN CONFIRMED WIN! +$2.49 (P&L: $-3.63)"
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ CHAIN CONFIRMED WIN! +$2.49 (P&L: $-3.63)"
             },
             {
               "time": "12:26:51 a.m.",
               "type": "error",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009a\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a0\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00af\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b8\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u008f Prediction mismatch! Predicted LOSS, actual WIN"
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ ÃÂÃÂÃÂÃÂ¯ÃÂÃÂÃÂÃÂ¸ÃÂÃÂÃÂÃÂ Prediction mismatch! Predicted LOSS, actual WIN"
             },
             {
               "time": "12:42:20 a.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE bet: $7.603738258064515 @ 55\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (wallet: $59.81)",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE bet: $7.603738258064515 @ 55ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (wallet: $59.81)",
               "data": {
                 "amount": 7.603738258064515,
                 "price": 0.5499999999999999
@@ -3193,17 +3193,17 @@
             {
               "time": "12:42:20 a.m.",
               "type": "clob",
-              "message": "Market price: 54\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2, bidding: 55\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Market price: 54ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢, bidding: 55ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:42:20 a.m.",
               "type": "clob",
-              "message": "Sending CLOB order: Up $7.603738258064515 @ 55\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2"
+              "message": "Sending CLOB order: Up $7.603738258064515 @ 55ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢"
             },
             {
               "time": "12:42:20 a.m.",
               "type": "fill",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 BET Up @ $0.55 x 13 shares = $7.15 | Locked: $7.15",
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ BET Up @ $0.55 x 13 shares = $7.15 | Locked: $7.15",
               "data": {
                 "orderId": "0xdd2b50cfad75c7ad02fb25741744b835aff04f779afba97b1f0836e4d2536d7b",
                 "shares": 13,
@@ -3214,7 +3214,7 @@
             {
               "time": "12:45:00 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE resolved: UP | Bet: Up | WIN | P&L: $5.85",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE resolved: UP | Bet: Up | WIN | P&L: $5.85",
               "data": {
                 "wentUp": true,
                 "picked": "Up",
@@ -3228,12 +3228,12 @@
             {
               "time": "12:45:00 a.m.",
               "type": "info",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0088 Prediction: WIN - awaiting chain confirmation (locked: $7.15)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Prediction: WIN - awaiting chain confirmation (locked: $7.15)"
             },
             {
               "time": "12:46:00 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0094\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00b4 LIVE CONFIRMED: Up | WIN | Cost=$7.15 Payout=$13.00 | P&L=$+5.85",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ´ LIVE CONFIRMED: Up | WIN | Cost=$7.15 Payout=$13.00 | P&L=$+5.85",
               "data": {
                 "outcome": "Up",
                 "won": true,
@@ -3245,7 +3245,7 @@
             {
               "time": "12:46:11 a.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009c\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0085 WIN Up | Bet: $7.15 \u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0086\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0092 Payout: $2.79 | Profit: $-4.36 | Total P&L: $-7.99"
+              "message": "ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ WIN Up | Bet: $7.15 ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Payout: $2.79 | Profit: $-4.36 | Total P&L: $-7.99"
             }
           ]
         },
@@ -3312,12 +3312,12 @@
             {
               "time": "4:36:51 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "4:37:41 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "4:40:01 a.m.",
@@ -3335,22 +3335,22 @@
             {
               "time": "4:47:07 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "4:47:42 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "4:48:42 a.m.",
               "type": "bet",
-              "message": "Paper bet: $8 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (15 shares)"
+              "message": "Paper bet: $8 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (15 shares)"
             },
             {
               "time": "5:01:54 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "5:05:04 a.m.",
@@ -3368,12 +3368,12 @@
             {
               "time": "5:22:04 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "5:22:44 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "5:25:04 a.m.",
@@ -3391,17 +3391,17 @@
             {
               "time": "5:33:34 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "5:33:34 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "5:33:44 a.m.",
               "type": "bet",
-              "message": "Paper bet: $8 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (15 shares)"
+              "message": "Paper bet: $8 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (15 shares)"
             },
             {
               "time": "5:35:04 a.m.",
@@ -3419,17 +3419,17 @@
             {
               "time": "6:09:29 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "6:09:29 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "6:09:29 a.m.",
               "type": "bet",
-              "message": "Paper bet: $8 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (15 shares)"
+              "message": "Paper bet: $8 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (15 shares)"
             },
             {
               "time": "6:10:04 a.m.",
@@ -3447,17 +3447,17 @@
             {
               "time": "6:11:44 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "6:12:44 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "6:13:44 a.m.",
               "type": "bet",
-              "message": "Paper bet: $8 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (15 shares)"
+              "message": "Paper bet: $8 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (15 shares)"
             },
             {
               "time": "6:15:04 a.m.",
@@ -3475,17 +3475,17 @@
             {
               "time": "6:18:09 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "6:18:09 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "6:18:44 a.m.",
               "type": "bet",
-              "message": "Paper bet: $8 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (15 shares)"
+              "message": "Paper bet: $8 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (15 shares)"
             },
             {
               "time": "6:20:04 a.m.",
@@ -3503,17 +3503,17 @@
             {
               "time": "6:21:49 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "6:22:44 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "6:23:44 a.m.",
               "type": "bet",
-              "message": "Paper bet: $8 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (15 shares)"
+              "message": "Paper bet: $8 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (15 shares)"
             },
             {
               "time": "6:25:04 a.m.",
@@ -3531,17 +3531,17 @@
             {
               "time": "6:27:09 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "6:27:44 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "6:28:44 a.m.",
               "type": "bet",
-              "message": "Paper bet: $8 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (15 shares)"
+              "message": "Paper bet: $8 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (15 shares)"
             },
             {
               "time": "6:30:04 a.m.",
@@ -3559,17 +3559,17 @@
             {
               "time": "6:31:59 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "6:32:44 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "6:33:44 a.m.",
               "type": "bet",
-              "message": "Paper bet: $8 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (15 shares)"
+              "message": "Paper bet: $8 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (15 shares)"
             },
             {
               "time": "6:35:04 a.m.",
@@ -3587,17 +3587,17 @@
             {
               "time": "6:42:44 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "6:42:44 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "6:43:44 a.m.",
               "type": "bet",
-              "message": "Paper bet: $8 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (15 shares)"
+              "message": "Paper bet: $8 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (15 shares)"
             },
             {
               "time": "6:45:04 a.m.",
@@ -3615,12 +3615,12 @@
             {
               "time": "6:53:29 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "6:53:29 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "6:55:04 a.m.",
@@ -3638,17 +3638,17 @@
             {
               "time": "2:08:25 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "2:08:25 p.m.",
               "type": "bet",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper bet: $10 @ 52\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (19 shares)"
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper bet: $10 @ 52ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (19 shares)"
             },
             {
               "time": "2:10:00 p.m.",
               "type": "resolve",
-              "message": "\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b0\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u009f\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0093\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0084 Paper resolved: UP | Bet: Down | LOSS | P&L: $-20.00",
+              "message": "ÃÂÃÂÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Paper resolved: UP | Bet: Down | LOSS | P&L: $-20.00",
               "data": {
                 "wentUp": true,
                 "picked": "Down",
@@ -3691,7 +3691,7 @@
             {
               "time": "7:28:24 a.m.",
               "type": "bet",
-              "message": "Paper bet: $10 @ 60\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (16 shares)"
+              "message": "Paper bet: $10 @ 60ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (16 shares)"
             },
             {
               "time": "7:30:04 a.m.",
@@ -3794,7 +3794,7 @@
             {
               "time": "4:26:11 a.m.",
               "type": "bet",
-              "message": "Paper bet: $12 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (24 shares)"
+              "message": "Paper bet: $12 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (24 shares)"
             },
             {
               "time": "4:30:01 a.m.",
@@ -4037,7 +4037,7 @@
             {
               "time": "4:26:16 a.m.",
               "type": "bet",
-              "message": "Paper bet: $12 @ 49\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a2 (24 shares)"
+              "message": "Paper bet: $12 @ 49ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ (24 shares)"
             },
             {
               "time": "4:30:01 a.m.",
@@ -4199,5 +4199,5 @@
       "totalBalance": 96
     }
   ],
-  "savedAt": 1771307846436
+  "savedAt": 1771308112327
 }

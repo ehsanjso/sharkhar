@@ -1432,11 +1432,11 @@ async function placeBet(marketState: MarketState, strategy: StrategyState, amoun
             market.avgPrice = market.costBet / market.shares;
             market.fills++;
             
-            // Record bet for auto-redemption AND tracking
+            // Track bet for redemption (BetTracker only - auto-redeem disabled)
             if (liveMarket.conditionId) {
-              recordBet(liveMarket.conditionId, tokenId, liveMarket.slug || liveMarket.title, side);
+              // NOTE: recordBet() removed - was causing race condition with BetTracker
               
-              // Track with new bet tracker for complete lifecycle (use ACTUAL values)
+              // Track with BetTracker for complete lifecycle (use ACTUAL values)
               const trackedBet = trackBetPlaced({
                 orderId: result.orderId || `unknown_${Date.now()}`,
                 strategyId: strategy.id,
@@ -2807,37 +2807,12 @@ ${MARKET_CONFIGS.map(c => `    • ${c.asset} ${c.timeframe}`).join('\n')}
           }
         }
         
-        // Also run old auto-redeem for any bets not in tracker
-        const result = await redeemAllWinnings(process.env.PRIVATE_KEY!);
-        if (result.redeemed > 0) {
-          console.log(`   ✅ [AUTO-REDEEM] Redeemed $${result.redeemed.toFixed(2)} to USDC.e`);
-          
-          // Clear pending bets for redeemed conditions
-          let totalRedeemed = 0;
-          for (const redeemed of result.redeemedConditions) {
-            for (const market of state.markets) {
-              for (const strategy of market.strategies) {
-                const pendingIdx = strategy.pendingBets.findIndex(b => b.conditionId === redeemed.conditionId);
-                if (pendingIdx >= 0) {
-                  const pending = strategy.pendingBets[pendingIdx];
-                  const profit = redeemed.amount - pending.betAmount;
-                  strategy.liveBalance += redeemed.amount;
-                  strategy.lockedFunds = Math.max(0, strategy.lockedFunds - pending.betAmount);
-                  strategy.pendingBets.splice(pendingIdx, 1);
-                  totalRedeemed += redeemed.amount;
-                  const profitSign = profit >= 0 ? '+' : '';
-                  addStrategyLog(strategy, 'fill', `💰 Redeemed $${redeemed.amount.toFixed(2)} (${profitSign}$${profit.toFixed(2)} profit) | Balance: $${strategy.liveBalance.toFixed(2)}`);
-                  console.log(`   💰 [${strategy.name}] Redeemed $${redeemed.amount.toFixed(2)} (${profitSign}$${profit.toFixed(2)})`);
-                }
-              }
-            }
-          }
-          if (totalRedeemed > 0) {
-            sendTelegramAlert(`💰 *REDEEMED*\n$${totalRedeemed.toFixed(2)} converted to USDC.e`);
-          }
-          saveState();
-          fetchWalletBalance(); // Refresh wallet balance
-        }
+        // DISABLED: auto-redeem was racing with BetTracker causing corrupted tracking
+        // BetTracker (above) is now the ONLY redemption system
+        // Old code removed to prevent race conditions
+        
+        // Just refresh wallet balance periodically
+        fetchWalletBalance();
       } catch (err: any) {
         // Silent fail - will retry in 30s
       }
