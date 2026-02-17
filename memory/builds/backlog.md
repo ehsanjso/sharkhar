@@ -63,13 +63,27 @@ Priority queue of tasks for automated sessions. Pick from top.
 
 ## 🟡 Medium Priority
 
-### 4. Auto-Compaction Cron Job
+### 4. Auto-Compaction Cron Job — IN PROGRESS
 **Goal:** Automatically summarize old daily memory files
+**Status:** Scaffolding complete (Feb 16 Session 1)
+**Next:** Session 2 - Implement Haiku summarization
+
 **Spec:**
 - Run weekly (Sunday night)
 - Summarize memory/*.md files older than 7 days
 - Append key learnings to MEMORY.md
 - Archive or delete summarized files
+
+**Session 1 done:**
+- [x] Created `scripts/memory-compact.sh` with structure
+- [x] Created `memory/archive/` directory
+- [x] Dry-run works (10 files would be processed)
+
+**Session 2 TODO:**
+- [ ] Implement Haiku summarization via clawdbot
+- [ ] Append summaries to MEMORY.md
+- [ ] Add cron job
+- [ ] Test on real files
 
 ---
 

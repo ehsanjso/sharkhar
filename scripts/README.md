@@ -218,6 +218,27 @@ is set up. Searches all memory/*.md files plus MEMORY.md.
 - `--files-only` — Only show matching filenames
 - `--json` — JSON output for scripts
 
+### memory-compact.sh
+Automatically summarize and archive old daily memory files. Uses Haiku for
+cost-efficient summarization, then archives processed files.
+
+```bash
+./memory-compact.sh              # Process files >7 days old
+./memory-compact.sh --dry-run    # Preview without changes
+./memory-compact.sh --days 14    # Process files >14 days old
+```
+
+**What it does:**
+1. Finds daily memory files older than threshold
+2. Summarizes each using Haiku (LLM)
+3. Appends summaries to MEMORY.md under "## Weekly Archive"
+4. Moves processed files to `memory/archive/`
+
+**Designed for weekly cron:** Sunday 11 PM
+```bash
+0 23 * * 0 cd ~/clawd && ./scripts/memory-compact.sh
+```
+
 ### memory-stats.sh
 Quick overview of memory folder health and maintenance status. Shows file counts,
 folder sizes, archival recommendations, and tracks when MEMORY.md was last updated.
