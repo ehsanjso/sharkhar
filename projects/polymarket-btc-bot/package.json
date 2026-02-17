@@ -27,11 +27,13 @@
   "license": "MIT",
   "dependencies": {
     "@polymarket/clob-client": "^4.4.0",
+    "better-sqlite3": "^12.6.2",
     "dotenv": "^16.4.5",
     "ethers": "^5.8.0",
     "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.19.11",
     "@types/ws": "^8.18.1",
     "tsx": "^4.21.0",

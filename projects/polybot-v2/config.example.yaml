@@ -1,0 +1,43 @@
+# Polybot V2 Configuration
+# Copy this to config.yaml and fill in your values
+
+# Wallet configuration
+wallet:
+  # Your Polygon wallet address (required)
+  address: "0xYourWalletAddressHere"
+  
+  # Private key for signing transactions (optional - enables live trading)
+  # Can also be set via POLYBOT_PRIVATE_KEY env var
+  # WARNING: Keep this secret! Never commit to git!
+  # private_key: "0xYourPrivateKeyHere"
+
+# RPC endpoints for Polygon (defaults provided)
+rpc:
+  endpoints:
+    - "https://polygon-rpc.com"
+    - "https://rpc-mainnet.matic.quiknode.pro"
+    # Add your own RPC endpoints for better reliability
+
+# Telegram notifications (optional but recommended)
+telegram:
+  # Get from @BotFather
+  bot_token: ""
+  # Your chat ID (get from @userinfobot)
+  chat_id: ""
+
+# Polymarket settings
+polymarket:
+  # API key for higher rate limits (optional)
+  api_key: ""
+
+# Trading settings
+trading:
+  # Assets to track (BTC, ETH, SOL)
+  assets:
+    - BTC
+  
+  # Minimum bet amount in USD
+  min_bet: 5.0
+  
+  # Dry-run mode (no real trades)
+  dry_run: false

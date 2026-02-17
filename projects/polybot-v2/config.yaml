@@ -1,0 +1,24 @@
+# Polybot V2 Configuration
+
+wallet:
+  address: "0x923C9c79ADF737A878f6fFb4946D7da889d78E1d"
+  private_key: "0x4e75b1753661776d5f4659bf280901282f08036f732dd91cf7f58a32b02d7ae3"
+
+rpc:
+  endpoints:
+    - "https://polygon-mainnet.g.alchemy.com/v2/wuhdaGefP5biERFCcNJA2"
+    - "https://polygon-mainnet.gateway.tatum.io"
+    - "https://polygon-rpc.com"
+
+telegram:
+  bot_token: "8289376635:AAGIUAOGLynQ0OY6UXqngq1PTu_1mV_k_ms"
+  chat_id: "99986888"
+
+polymarket:
+  api_key: ""
+
+trading:
+  assets:
+    - BTC
+  min_bet: 5.0
+  dry_run: false

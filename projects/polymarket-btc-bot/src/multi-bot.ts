@@ -14,6 +14,7 @@ import { MultiPriceTracker, getPriceTracker } from './multi-price-tracker';
 import { getNewsService, NewsResearchService, ResearchReport } from './news-research';
 import { discoverAllMarkets, DiscoveredMarket, watchForNewMarkets } from './market-discovery';
 import { shouldEnterMarket, checkProfitability, logProfitabilityCheck, PROFITABILITY_DEFAULTS } from './profitability';
+import * as db from '../dashboard/database';
 import {
   CryptoAsset,
   Timeframe,
@@ -103,6 +104,8 @@ export class MultiAssetBot {
     
     this.priceTracker = getPriceTracker(this.config.assets);
     this.newsService = getNewsService(process.env.TAVILY_API_KEY);
+    
+    console.log('📊 Using consolidated database: polymarket.db');
   }
 
   async start(): Promise<void> {
@@ -562,7 +565,7 @@ export class MultiAssetBot {
     console.log(`  💸 ${market.asset}: $${bet.amount.toFixed(2)} on ${session.side} @ ${(price*100).toFixed(0)}%`);
 
     if (this.config.dryRun) {
-      // Simulate
+      // Simulate - paper trade
       const shares = price > 0 ? bet.amount / price : 0;
       bet.executed = true;
       bet.shares = shares;
@@ -572,10 +575,29 @@ export class MultiAssetBot {
       session.totalInvested += bet.amount;
       session.totalShares += shares;
       
+      // Log to consolidated database as paper trade
+      const tradeId = `${market.marketId}-${bet.strategyId || 'default'}-${Date.now()}`;
+      db.saveTrade({
+        id: tradeId,
+        strategy_id: bet.strategyId || 'default',
+        market_key: `${market.asset}-${market.timeframe}`,
+        market_id: market.marketId,
+        side: session.side === 'UP' ? 'Up' : 'Down',
+        shares,
+        cost: bet.amount,
+        payout: 0,
+        pnl: 0,
+        result: null,
+        asset_open: market.openPrice,
+        asset_close: 0,
+        is_live: false,
+      });
+      bet.tradeId = tradeId as any;
+      
       console.log(`  ✅ [DRY RUN] ${shares.toFixed(1)} shares`);
     } else {
       try {
-        // Real order
+        // Real order - live trade
         const result = await this.polymarket.placeMakerOrder(tokenId, price, bet.amount);
         
         if (result.success) {
@@ -588,7 +610,22 @@ export class MultiAssetBot {
           session.totalInvested += bet.amount;
           session.totalShares += result.shares || 0;
           
-          console.log(`  ✅ Order placed: ${result.shares} shares`);
+          // Log to consolidated database as live bet
+          const betId = db.saveLiveBet({
+            strategy_id: bet.strategyId || 'default',
+            market_key: `${market.asset}-${market.timeframe}`,
+            market_id: market.marketId,
+            token_id: tokenId,
+            order_id: result.orderId,
+            side: session.side === 'UP' ? 'Up' : 'Down',
+            amount: bet.amount,
+            price: result.price || price,
+            shares: result.shares || 0,
+            status: 'pending',
+          });
+          bet.tradeId = betId;
+          
+          console.log(`  ✅ Order placed: ${result.shares} shares [DB: ${betId}]`);
         } else {
           console.error(`  ❌ Order failed: ${result.error}`);
           // Mark as executed to prevent infinite retries
@@ -626,6 +663,30 @@ export class MultiAssetBot {
     session.result = session.side === null ? 'LOSS' : (won ? 'WIN' : 'LOSS');
     session.payout = won ? session.totalShares : 0;
     session.profit = session.payout - session.totalInvested;
+    
+    // Resolve all trades in database
+    for (const bet of session.bets) {
+      if (bet.tradeId && bet.executed) {
+        try {
+          const payout = won ? (bet.shares || 0) : 0;  // $1 per share for wins
+          const result = won ? 'WIN' : 'LOSS';
+          
+          if (this.config.dryRun) {
+            // Paper trade - no live bet record to update
+            db.log('info', 'paper', `Trade resolved: ${result}`, {
+              tradeId: bet.tradeId,
+              payout,
+              closePrice,
+            }, bet.strategyId, `${market.asset}-${market.timeframe}`, true);
+          } else {
+            // Live bet - update status
+            db.resolveLiveBet(bet.tradeId as number, result, payout);
+          }
+        } catch (error: any) {
+          console.error(`  ⚠️ Failed to resolve trade ${bet.tradeId}: ${error.message}`);
+        }
+      }
+    }
 
     // Update stats
     this.updateStats(session);
@@ -749,6 +810,28 @@ Payout: $${session.payout.toFixed(2)} | P&L: ${session.profit >= 0 ? '+' : ''}$$
     if (this.cleanupInterval) clearInterval(this.cleanupInterval);
     this.priceTracker.disconnect();
     this.printStats();
+    this.printDBStats();
     console.log('\n👋 Bot stopped');
+  }
+  
+  /**
+   * Print stats from consolidated database (source of truth)
+   */
+  printDBStats(): void {
+    const stats = db.getLiveBetsStats();
+    const resolved = stats.wins + stats.losses;
+    const winRate = resolved > 0 ? (stats.wins / resolved * 100).toFixed(1) : '0.0';
+    const totalProfit = stats.totalPayout - stats.totalBet;
+    
+    console.log(`
+╔═══════════════════════════════════════════════════════════╗
+║            📊 DATABASE STATS (Source of Truth)            ║
+╠═══════════════════════════════════════════════════════════╣
+║  Total Bets:    ${String(stats.total).padEnd(10)} Pending: ${stats.pending}
+║  Win Rate:      ${winRate}% (${stats.wins}W / ${stats.losses}L)
+║  Total Bet:     $${stats.totalBet.toFixed(2)}
+║  Total Payout:  $${stats.totalPayout.toFixed(2)}
+║  Total Profit:  ${totalProfit >= 0 ? '+' : ''}$${totalProfit.toFixed(2)}
+╚═══════════════════════════════════════════════════════════╝`);
   }
 }

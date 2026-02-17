@@ -62,6 +62,8 @@ export interface BetRecord {
   shares?: number;
   price?: number;
   timestamp?: Date;
+  tradeId?: number;  // Database trade ID for resolution
+  strategyId?: string;  // Strategy that placed this bet
 }
 
 export interface MultiAssetConfig {

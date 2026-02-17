@@ -22,7 +22,7 @@ const STATE_FILE = './data/multi-market-state.json';
 const OLD_STATE_FILE = './data/multi-strategy-state.json';
 
 // ============ Paper Trading Toggle ============
-const PAPER_TRADING_ENABLED = false;  // Set to false to disable all paper trading
+const PAPER_TRADING_ENABLED = false;  // DISABLED - Live trading only
 
 // ============ Multi-Phase Order Execution ============
 const USE_MULTI_PHASE_ORDERS = true;  // Use 3-phase order execution for better fill rates
@@ -117,29 +117,35 @@ function checkAlerts(): void {
       // Cooldown per strategy
       if (now - lastState.lastAlertTime < alertConfig.alertCooldownMs) continue;
       
-      const pnlChange = strategy.totalPnl - lastState.lastPnl;
-      const baseAmount = Math.max(strategy.startingBalance, 1); // Avoid division by zero
+      // Use live metrics for live mode, paper metrics otherwise
+      const currentPnl = strategy.liveMode ? strategy.livePnl : strategy.totalPnl;
+      const currentBalance = strategy.liveMode ? strategy.liveBalance : strategy.balance;
+      const baseAmount = strategy.liveMode 
+        ? Math.max(strategy.liveAllocation, 1) 
+        : Math.max(strategy.startingBalance, 1);
+      
+      const pnlChange = currentPnl - lastState.lastPnl;
       const changePercent = (pnlChange / baseAmount) * 100;
       
       // Check for significant gain
       if (changePercent >= alertConfig.gainPercentThreshold) {
-        sendTelegramAlert(`🚀 *${market.key} ${strategy.name}*\n\n+${changePercent.toFixed(0)}% gain!\nP&L: $${lastState.lastPnl.toFixed(0)} → $${strategy.totalPnl.toFixed(0)}\nBalance: $${strategy.balance.toFixed(0)}`);
-        alertConfig.strategyState[key] = { lastPnl: strategy.totalPnl, lastAlertTime: now };
+        sendTelegramAlert(`🚀 *${market.key} ${strategy.name}*\n\n+${changePercent.toFixed(0)}% gain!\nP&L: $${lastState.lastPnl.toFixed(0)} → $${currentPnl.toFixed(0)}\nBalance: $${currentBalance.toFixed(0)}`);
+        alertConfig.strategyState[key] = { lastPnl: currentPnl, lastAlertTime: now };
       }
       
       // Check for significant loss
       if (changePercent <= -alertConfig.lossPercentThreshold) {
-        sendTelegramAlert(`💀 *${market.key} ${strategy.name}*\n\n${changePercent.toFixed(0)}% loss!\nP&L: $${lastState.lastPnl.toFixed(0)} → $${strategy.totalPnl.toFixed(0)}\nBalance: $${strategy.balance.toFixed(0)}\n\nUse \`poly pause\` to halt.`);
-        alertConfig.strategyState[key] = { lastPnl: strategy.totalPnl, lastAlertTime: now };
+        sendTelegramAlert(`💀 *${market.key} ${strategy.name}*\n\n${changePercent.toFixed(0)}% loss!\nP&L: $${lastState.lastPnl.toFixed(0)} → $${currentPnl.toFixed(0)}\nBalance: $${currentBalance.toFixed(0)}\n\nUse \`poly pause\` to halt.`);
+        alertConfig.strategyState[key] = { lastPnl: currentPnl, lastAlertTime: now };
       }
       
       // Initialize tracking if first time
       if (!alertConfig.strategyState[key]) {
-        alertConfig.strategyState[key] = { lastPnl: strategy.totalPnl, lastAlertTime: 0 };
+        alertConfig.strategyState[key] = { lastPnl: currentPnl, lastAlertTime: 0 };
       }
       
-      // Auto profit-taking check
-      const multiplier = strategy.balance / strategy.startingBalance;
+      // Auto profit-taking check (use appropriate balance)
+      const multiplier = currentBalance / baseAmount;
       if (multiplier >= alertConfig.profitTakeMultiplier && !strategy.profitTaken) {
         strategy.profitTaken = true;
         const withdrawn = strategy.startingBalance;
@@ -162,11 +168,9 @@ interface MarketConfig {
 }
 
 // ACTIVE MARKETS - Only these will run
-// 3 bots: BTC 5min (fast), ETH 15min, SOL 15min (longer plays)
+// BTC 5min only (per user request)
 const MARKET_CONFIGS: MarketConfig[] = [
   { asset: 'BTC', timeframe: '5min', durationMs: 5 * 60 * 1000, symbol: 'BTCUSDT' },
-  { asset: 'ETH', timeframe: '15min', durationMs: 15 * 60 * 1000, symbol: 'ETHUSDT' },
-  { asset: 'SOL', timeframe: '15min', durationMs: 15 * 60 * 1000, symbol: 'SOLUSDT' },
 ];
 
 // ============ Strategy Definitions ============
@@ -176,17 +180,16 @@ interface StrategyConfig {
   description: string;
   color: string;
   startingBalance: number;
+  liveMode?: boolean;
+  liveAllocation?: number;
 }
 
 const STRATEGIES: StrategyConfig[] = [
-  // SELECTED STRATEGIES (7 total)
-  { id: 'vol-regime', name: 'Volatility Regime', description: 'Momentum: HIGH vol=ride trend, LOW vol=wait', color: '#ec4899', startingBalance: 12 },
-  { id: 'rsi-divergence', name: 'RSI Divergence', description: 'Momentum: hunts divergences, follows momentum', color: '#d946ef', startingBalance: 12 },
-  { id: 'ensemble', name: 'Ensemble Consensus', description: 'Momentum: combines 4 signals, bets when 3+ agree', color: '#8b5cf6', startingBalance: 12 },
-  { id: 'stoikov', name: 'Stoikov Spread', description: 'Anti-momentum: academic market-making', color: '#f97316', startingBalance: 12 },
-  { id: 'breakout', name: 'Breakout Confirmation', description: 'Confirmed momentum: trends >70% retained', color: '#22c55e', startingBalance: 12 },
-  { id: 'regime', name: 'Regime Detection', description: 'V1 WINNER: adapts to trending vs choppy', color: '#6366f1', startingBalance: 12 },
-  { id: 'scaled-betting', name: 'Scaled Betting', description: 'Original V1: timed bets at 1,4,7,10 min', color: '#0ea5e9', startingBalance: 12 },
+  // LIVE: Ensemble gets $20 budget
+  { id: 'ensemble', name: 'Ensemble Consensus', description: 'Momentum: combines 4 signals, bets when 3+ agree', color: '#8b5cf6', startingBalance: 18.10, liveMode: true, liveAllocation: 18.10 },
+  // SIGNALS ONLY (no budget)
+  { id: 'regime', name: 'Regime Detection', description: 'V1 WINNER: adapts to trending vs choppy', color: '#6366f1', startingBalance: 0, liveMode: false, liveAllocation: 0 },
+  { id: 'breakout', name: 'Breakout Confirmation', description: 'Confirmed momentum: trends >70% retained', color: '#22c55e', startingBalance: 0, liveMode: false, liveAllocation: 0 },
 ];
 
 // ============ Types ============
@@ -362,13 +365,13 @@ function initializeMarkets(): void {
       liveWins: 0,
       liveLosses: 0,
       liveHistory: [],
-      liveAllocation: 10,      // Default $10 budget per strategy
-      liveBalance: 0,          // Starts at 0, set to allocation when live mode enabled
+      liveAllocation: s.liveAllocation ?? 0,  // From config
+      liveBalance: s.liveAllocation ?? 0,     // Start with allocation
       // Funds tracking
       lockedFunds: 0,          // Money in bets or awaiting redemption
       pendingBets: [],         // List of pending bets
       // Control flags
-      liveMode: false,         // Start in paper mode
+      liveMode: s.liveMode ?? false,          // From config
       halted: false,           // Paper trading halt
       liveHalted: false,       // Live trading halt (separate)
       stopLossThreshold: Math.floor(s.startingBalance * 0.25),   // Stop loss at 25% of initial balance
@@ -433,9 +436,10 @@ function saveState(): void {
       savedAt: Date.now(),
     };
     
-    fs.writeFileSync(STATE_FILE, JSON.stringify(saveData, null, 2));
+    // REMOVED: JSON file writes - SQLite database is now single source of truth
+    // fs.writeFileSync(STATE_FILE, JSON.stringify(saveData, null, 2));
     
-    // Also save to SQLite database
+    // Save to SQLite database (single source of truth)
     for (const market of state.markets) {
       for (const s of market.strategies) {
         db.saveStrategy({
@@ -499,8 +503,14 @@ function loadStateFromDatabase(): boolean {
           strategy.roi = dbStrat.roi ?? 0;
           
           // Live trading stats
-          strategy.liveMode = dbStrat.live_mode === 1;
-          strategy.liveAllocation = dbStrat.live_allocation ?? 10;
+          // Config takes priority for liveMode and initial liveAllocation
+          const configStrategy = STRATEGIES.find(cs => cs.id === strategy.id);
+          strategy.liveMode = configStrategy?.liveMode ?? (dbStrat.live_mode === 1);
+          // Use config allocation if DB has default/zero, otherwise keep DB value (wallet sync updates it)
+          const configAllocation = configStrategy?.liveAllocation ?? 0;
+          strategy.liveAllocation = (dbStrat.live_allocation && dbStrat.live_allocation > 0) 
+            ? dbStrat.live_allocation 
+            : configAllocation;
           strategy.liveBalance = dbStrat.live_balance ?? strategy.liveAllocation;
           strategy.liveDeployed = dbStrat.live_deployed ?? 0;
           strategy.livePnl = dbStrat.live_pnl ?? 0;
@@ -674,6 +684,42 @@ async function fetchWalletBalance(): Promise<void> {
     state.walletBalance = parseFloat(ethers.utils.formatUnits(balance, 6));
   } catch (error) {
     // Silent fail - will retry on next fetch
+  }
+}
+
+// Sync ensemble's live_balance with actual on-chain wallet balance
+async function syncBalanceWithChain(): Promise<void> {
+  try {
+    const { ethers } = await import('ethers');
+    const { withRetry } = await import('./rpc.js');
+    const USDC_E = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
+    const WALLET = '0x923C9c79ADF737A878f6fFb4946D7da889d78E1d';
+    const ERC20_ABI = ['function balanceOf(address) view returns (uint256)'];
+    
+    const balance = await withRetry(async (provider) => {
+      const usdc = new ethers.Contract(USDC_E, ERC20_ABI, provider);
+      return await usdc.balanceOf(WALLET);
+    }, 2);
+    
+    const actualBalance = parseFloat(ethers.utils.formatUnits(balance, 6));
+    state.walletBalance = actualBalance;
+    
+    // Find ensemble strategy and sync its live_balance
+    for (const market of state.markets) {
+      const ensemble = market.strategies.find(s => s.id === 'ensemble');
+      if (ensemble && ensemble.liveMode) {
+        const oldBalance = ensemble.liveBalance;
+        // Only sync if difference is > $0.50 to avoid micro-adjustments
+        if (Math.abs(actualBalance - oldBalance) > 0.5) {
+          console.log(`   🔄 [Sync] Ensemble balance: $${oldBalance.toFixed(2)} → $${actualBalance.toFixed(2)} (chain)`);
+          ensemble.liveBalance = actualBalance;
+          ensemble.liveAllocation = actualBalance; // Update allocation too
+          saveState();
+        }
+      }
+    }
+  } catch (error) {
+    console.log(`   ⚠️ [Sync] Failed to sync balance:`, (error as Error).message?.substring(0, 50));
   }
 }
 
@@ -1619,6 +1665,9 @@ async function placeBet(marketState: MarketState, strategy: StrategyState, amoun
 
 // ============ Market Management ============
 async function startMarket(marketState: MarketState): Promise<void> {
+  // Sync balance with chain at start of each market window
+  await syncBalanceWithChain();
+  
   const now = Date.now();
   const duration = getDurationMinutes(marketState.timeframe);
   
@@ -2796,8 +2845,8 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`
 ╔════════════════════════════════════════════════════════════╗
 ║  🤖 MULTI-MARKET POLYMARKET BOT                            ║
-║  BTC 5min + ETH 15min + SOL 15min = 3 Markets              ║
-║  7 Strategies × $25 Each × 3 Markets = $525 Total          ║
+║  BTC 5min ONLY (Live Trading)                              ║
+║  3 Strategies (Ensemble=$20, Regime+Breakout=signals only) ║
 ╚════════════════════════════════════════════════════════════╝
 
   Dashboard: http://192.168.0.217:${PORT}
