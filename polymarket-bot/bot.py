@@ -80,10 +80,37 @@ def run_bet(args):
 
 def run_status(args):
     """Show portfolio status."""
+    summary = get_portfolio_summary()
+    pending = get_pending_bets()
+    
+    if args.json:
+        output = {
+            "mode": "live" if args.mode == "live" else "paper",
+            "summary": summary,
+            "pending_bets": [
+                {
+                    "id": bet.id,
+                    "market_id": bet.market_id,
+                    "market_question": bet.market_question,
+                    "outcome": bet.outcome,
+                    "side": bet.side,
+                    "amount": bet.amount,
+                    "price": bet.price,
+                    "shares": bet.shares,
+                    "placed_at": bet.placed_at,
+                    "notes": bet.notes or None,
+                }
+                for bet in pending
+            ] if args.verbose else None,
+        }
+        # Remove None values for cleaner output
+        output = {k: v for k, v in output.items() if v is not None}
+        print(json.dumps(output, indent=2, default=str))
+        return
+    
     print_portfolio()
     
     if args.verbose:
-        pending = get_pending_bets()
         if pending:
             print("\n📋 DETAILED PENDING BETS:")
             for bet in pending:
@@ -310,7 +337,8 @@ Examples:
     
     # Status command
     status_parser = subparsers.add_parser('status', help='Show portfolio status')
-    status_parser.add_argument('-v', '--verbose', action='store_true')
+    status_parser.add_argument('-v', '--verbose', action='store_true', help='Show detailed pending bets')
+    status_parser.add_argument('--json', action='store_true', help='Output as JSON (for integrations)')
     status_parser.set_defaults(func=run_status)
     
     # Resolve command
