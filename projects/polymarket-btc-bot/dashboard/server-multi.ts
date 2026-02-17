@@ -1718,18 +1718,19 @@ async function pollForResolution(pending: PendingResolution): Promise<void> {
         const payout = won ? stratData.shares : 0;
         const pnl = payout - stratData.costBet;
         
-        // Log final result
+        // Log final result - console only for live mode (chain confirmation will log to dashboard)
         const modeLabel = stratData.liveMode ? '🔴 LIVE' : '📄 Paper';
         console.log(`   ${modeLabel} ${strategy.name}: ${won ? 'WIN' : 'LOSS'} | Cost=$${stratData.costBet.toFixed(2)} Payout=$${payout.toFixed(2)} | P&L=$${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}`);
-        addStrategyLog(strategy, 'resolve', 
-          `${modeLabel} CONFIRMED: ${outcome} | ${won ? 'WIN' : 'LOSS'} | Cost=$${stratData.costBet.toFixed(2)} Payout=$${payout.toFixed(2)} | P&L=$${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}`,
-          { outcome, won, pnl, payout, cost: stratData.costBet }
-        );
         
-        // Send telegram alert with actual result
-        if (stratData.liveMode) {
-          sendTelegramAlert(`${won ? '✅' : '❌'} *RESOLVED: ${outcome}*\n\n${pending.marketKey} ${strategy.name}\nBet: ${stratData.side} | Result: ${won ? 'WIN' : 'LOSS'}\nCost: $${stratData.costBet.toFixed(2)}\nPayout: $${payout.toFixed(2)}\nP&L: $${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}`);
+        // Only add to dashboard log for paper mode - live mode waits for chain confirmation
+        if (!stratData.liveMode) {
+          addStrategyLog(strategy, 'resolve', 
+            `${modeLabel} CONFIRMED: ${outcome} | ${won ? 'WIN' : 'LOSS'} | Cost=$${stratData.costBet.toFixed(2)} Payout=$${payout.toFixed(2)} | P&L=$${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}`,
+            { outcome, won, pnl, payout, cost: stratData.costBet }
+          );
         }
+        
+        // Skip telegram alert - chain confirmation will send it
       }
       
       // Remove from pending
@@ -1832,12 +1833,17 @@ async function endMarket(marketState: MarketState): Promise<void> {
     const payout = won ? strategyMarket.shares : 0;
     const pnl = payout - strategyMarket.costBet;
     
-    // Log market resolution
+    // Log market resolution - only for paper mode (live waits for chain confirmation)
     const modeLabel = strategy.liveMode ? '🔴 LIVE' : '📄 Paper';
-    addStrategyLog(strategy, 'resolve', 
-      `${modeLabel} resolved: ${wentUp ? 'UP' : 'DOWN'} | Bet: ${strategyMarket.side} | ${won ? 'WIN' : 'LOSS'} | P&L: $${pnl.toFixed(2)}`,
-      { wentUp, picked: strategyMarket.side, won, pnl, payout, cost: strategyMarket.costBet, live: strategy.liveMode }
-    );
+    if (!strategy.liveMode) {
+      addStrategyLog(strategy, 'resolve', 
+        `${modeLabel} resolved: ${wentUp ? 'UP' : 'DOWN'} | Bet: ${strategyMarket.side} | ${won ? 'WIN' : 'LOSS'} | P&L: $${pnl.toFixed(2)}`,
+        { wentUp, picked: strategyMarket.side, won, pnl, payout, cost: strategyMarket.costBet, live: strategy.liveMode }
+      );
+    } else {
+      // For live mode, just log to console - dashboard will show chain-confirmed result
+      console.log(`   📊 [${strategy.name}] Price resolved: ${wentUp ? 'UP' : 'DOWN'} | Bet: ${strategyMarket.side} | Predicted: ${won ? 'WIN' : 'LOSS'} (awaiting chain)`);
+    }
     
     // Paper trading stats (always tracked for comparison)
     strategy.totalMarkets++;
@@ -1909,9 +1915,8 @@ async function endMarket(marketState: MarketState): Promise<void> {
         }
       }
       
-      // Log prediction but note it's awaiting chain confirmation
-      const predictionEmoji = won ? '📈' : '📉';
-      addStrategyLog(strategy, 'info', `${predictionEmoji} Prediction: ${won ? 'WIN' : 'LOSS'} - awaiting chain confirmation (locked: $${strategy.lockedFunds.toFixed(2)})`);
+      // Log prediction to console only - dashboard will show chain-confirmed result
+      console.log(`   ${won ? '📈' : '📉'} [${strategy.name}] Prediction: ${won ? 'WIN' : 'LOSS'} (chain will confirm)`);
       
       // DON'T update liveWins/liveLosses/livePnl here - wait for chain confirmation
       // DON'T unlock funds - wait for chain confirmation
