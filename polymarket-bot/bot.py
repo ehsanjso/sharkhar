@@ -10,7 +10,8 @@ from datetime import datetime, timezone
 
 from portfolio import (
     load_portfolio, save_portfolio, place_bet, get_portfolio_summary,
-    print_portfolio, reset_portfolio, get_pending_bets, add_to_history
+    print_portfolio, reset_portfolio, get_pending_bets, add_to_history,
+    set_trading_mode, TradingMode
 )
 from strategy import generate_signals, print_signals
 from resolver import check_and_resolve_pending_bets, get_resolution_summary
@@ -259,11 +260,12 @@ def run_report(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Polymarket Paper Trading Bot",
+        description="Polymarket Trading Bot (Paper & Live)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  polybot status                     # Show portfolio
+  polybot status                     # Show paper portfolio
+  polybot status --mode live         # Show live portfolio
   polybot scan --sort edge           # Find opportunities
   polybot signals                    # Get trading signals
   polybot bet <id> Yes YES 5.00 0.85 # Place a bet
@@ -272,6 +274,10 @@ Examples:
   polybot report                     # Performance report
         """
     )
+    
+    # Global mode argument
+    parser.add_argument('--mode', choices=['paper', 'live'], default='paper',
+                        help='Trading mode: paper (simulated) or live (real money)')
     
     subparsers = parser.add_subparsers(dest='command', required=True)
     
@@ -331,6 +337,14 @@ Examples:
     report_parser.set_defaults(func=run_report)
     
     args = parser.parse_args()
+    
+    # Set trading mode before running command
+    mode = TradingMode.PAPER if args.mode == 'paper' else TradingMode.LIVE
+    set_trading_mode(mode)
+    
+    if args.mode == 'live':
+        print(f"⚠️  LIVE MODE - Real money trading!")
+    
     args.func(args)
 
 if __name__ == "__main__":
