@@ -173,7 +173,7 @@
     "marketSlug": "btc-updown-5m-1771303800",
     "side": "Down",
     "timestamp": 1771303875811,
-    "redeemed": false
+    "redeemed": true
   },
   {
     "conditionId": "0x9a0b1c38d64412e276b74c8d6850d284ba038375e0e94084c3fa348ce85868ca",
@@ -216,6 +216,14 @@
     "marketSlug": "btc-updown-5m-1771307100",
     "side": "Down",
     "timestamp": 1771307176005,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0xb0c4fe9686250ddb389786c13a0faac7083d7b2add8168d7a4a273f33c069a7f",
+    "tokenId": "68332748103531621271259097384164393265115150903254709688088507682932607146287",
+    "marketSlug": "btc-updown-5m-1771307400",
+    "side": "Down",
+    "timestamp": 1771307460886,
     "redeemed": false
   }
 ]

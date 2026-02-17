@@ -1456,20 +1456,8 @@ async function placeBet(marketState: MarketState, strategy: StrategyState, amoun
               }
             }
             
-            // Save live bet to database for tracking (use ACTUAL values)
-            const liveBetId = db.saveLiveBet({
-              strategy_id: strategy.id,
-              market_key: marketState.key,
-              market_id: marketState.currentMarket?.id || '',
-              condition_id: liveMarket.conditionId,
-              token_id: tokenId,
-              order_id: result.orderId,
-              side: side as 'Up' | 'Down',
-              amount: actualCost,  // ACTUAL cost
-              price: actualPrice,
-              shares: actualShares,
-              status: 'pending',
-            });
+            // NOTE: db.saveLiveBet is already called inside trackBetPlaced() above
+            // DO NOT call it again here - that was causing duplicate bets!
             
             // Track this bet as pending - funds are now locked (use ACTUAL cost)
             strategy.pendingBets.push({
