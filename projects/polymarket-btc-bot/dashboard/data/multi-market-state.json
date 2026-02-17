@@ -7,15 +7,28 @@
       "strategies": [
         {
           "id": "vol-regime",
-          "balance": 1232,
-          "totalPnl": 559.692772,
-          "totalMarkets": 18,
+          "balance": 1251,
+          "totalPnl": 567.102772,
+          "totalMarkets": 19,
           "deployed": 0,
-          "wins": 13,
+          "wins": 14,
           "losses": 1,
-          "winRate": 72,
+          "winRate": 74,
           "roi": 0,
           "history": [
+            {
+              "id": "BTC-5min-1771305900000-vol-regime",
+              "time": "12:30:00 a.m.",
+              "marketId": "BTC-5min-1771305900000",
+              "side": "Up",
+              "shares": 19,
+              "cost": 11.59,
+              "payout": 19,
+              "pnl": 7.41,
+              "result": "WIN",
+              "assetOpen": 67968.64,
+              "assetClose": 68032.432
+            },
             {
               "id": "BTC-5min-1771300500000-vol-regime",
               "time": "11:00:35 p.m.",
@@ -341,13 +354,45 @@
               "market": 18,
               "pnl": 28,
               "cumulative": 613.692772
+            },
+            {
+              "market": 19,
+              "pnl": 7.41,
+              "cumulative": 621.102772
             }
           ],
-          "liveDeployed": 681.533868,
-          "livePnl": 118.54748831141353,
+          "liveDeployed": 693.123868,
+          "livePnl": 106.95748831141353,
           "liveWins": 3,
-          "liveLosses": 0,
+          "liveLosses": 1,
           "liveHistory": [
+            {
+              "id": "chain-0xca79120e53-1771306260822",
+              "time": "12:31:00 a.m.",
+              "timestamp": 1771306260822,
+              "marketId": "0xca79120e538e5448600f53188b60d3282d94b28f890a85d66798ad93ee2c7575",
+              "side": "Up",
+              "shares": 0,
+              "cost": 11.59,
+              "payout": 0,
+              "pnl": -11.59,
+              "result": "LOSS",
+              "assetOpen": 0,
+              "assetClose": 0
+            },
+            {
+              "id": "BTC-5min-1771305900000-vol-regime-live",
+              "time": "12:30:00 a.m.",
+              "marketId": "BTC-5min-1771305900000",
+              "side": "Up",
+              "shares": 19,
+              "cost": 11.59,
+              "payout": 19,
+              "pnl": 7.41,
+              "result": "WIN",
+              "assetOpen": 67968.64,
+              "assetClose": 68032.432
+            },
             {
               "id": "chain-0x42ec0ee702-1771304171084",
               "time": "11:56:11 p.m.",
@@ -715,7 +760,7 @@
             }
           ],
           "liveAllocation": 30,
-          "liveBalance": 28.48646831141353,
+          "liveBalance": 16.896468311413532,
           "lockedFunds": 0,
           "pendingBets": [],
           "liveMode": true,
@@ -724,87 +769,6 @@
           "liveHalted": false,
           "stopLossThreshold": 6,
           "logs": [
-            {
-              "time": "10:56:40 p.m.",
-              "type": "fill",
-              "message": "✅ Order filled! ID: 0x9b2925c07c09203e6b35561efc32d7d83627e3ea7e6bcbbd67266cc491b5eab3, Shares: 58",
-              "data": {
-                "orderId": "0x9b2925c07c09203e6b35561efc32d7d83627e3ea7e6bcbbd67266cc491b5eab3",
-                "shares": 58
-              }
-            },
-            {
-              "time": "10:56:40 p.m.",
-              "type": "info",
-              "message": "🔒 $30 locked (total locked: $30.00)"
-            },
-            {
-              "time": "11:00:35 p.m.",
-              "type": "resolve",
-              "message": "🔴 LIVE resolved: DOWN | Bet: Down | WIN | P&L: $28.00",
-              "data": {
-                "wentUp": false,
-                "picked": "Down",
-                "won": true,
-                "pnl": 28,
-                "payout": 58,
-                "cost": 30,
-                "live": true
-              }
-            },
-            {
-              "time": "11:00:35 p.m.",
-              "type": "info",
-              "message": "📈 Prediction: WIN - awaiting chain confirmation (locked: $30.00)"
-            },
-            {
-              "time": "11:05:29 p.m.",
-              "type": "fill",
-              "message": "✅ Redeemed! +$35.55 | Available: $35.55"
-            },
-            {
-              "time": "11:11:40 p.m.",
-              "type": "bet",
-              "message": "🔴 LIVE bet: $12.6 @ 51¢ (wallet: $62.80)",
-              "data": {
-                "amount": 12.6,
-                "price": 0.51
-              }
-            },
-            {
-              "time": "11:11:40 p.m.",
-              "type": "clob",
-              "message": "Finding BTC 5min market on Polymarket..."
-            },
-            {
-              "time": "11:11:40 p.m.",
-              "type": "clob",
-              "message": "Found market: Bitcoin Up or Down - February 16, 11:10PM-11:15PM ET..."
-            },
-            {
-              "time": "11:11:40 p.m.",
-              "type": "clob",
-              "message": "Market price: 51¢, bidding: 52¢"
-            },
-            {
-              "time": "11:11:40 p.m.",
-              "type": "clob",
-              "message": "Sending CLOB order: Up $12.6 @ 52¢"
-            },
-            {
-              "time": "11:11:40 p.m.",
-              "type": "fill",
-              "message": "✅ Order filled! ID: 0xcb6df63154f0dc2b942de069cd998069649e695eab131ac0ca08f6840a9b0d57, Shares: 24",
-              "data": {
-                "orderId": "0xcb6df63154f0dc2b942de069cd998069649e695eab131ac0ca08f6840a9b0d57",
-                "shares": 24
-              }
-            },
-            {
-              "time": "11:11:40 p.m.",
-              "type": "info",
-              "message": "🔒 $12.6 locked (total locked: $12.60)"
-            },
             {
               "time": "11:16:36 p.m.",
               "type": "resolve",
@@ -1030,6 +994,92 @@
               "message": "❌ Order failed: no match",
               "data": {
                 "error": "no match"
+              }
+            },
+            {
+              "time": "12:28:20 a.m.",
+              "type": "bet",
+              "message": "🔴 LIVE bet: $11.964316690793684 @ 51¢ (wallet: $76.60)",
+              "data": {
+                "amount": 11.964316690793684,
+                "price": 0.51
+              }
+            },
+            {
+              "time": "12:28:20 a.m.",
+              "type": "clob",
+              "message": "Finding BTC 5min market on Polymarket..."
+            },
+            {
+              "time": "12:28:20 a.m.",
+              "type": "clob",
+              "message": "Found market: Bitcoin Up or Down - February 17, 12:25AM-12:30AM ET..."
+            },
+            {
+              "time": "12:28:20 a.m.",
+              "type": "clob",
+              "message": "Market price: 60¢, bidding: 61¢"
+            },
+            {
+              "time": "12:28:20 a.m.",
+              "type": "clob",
+              "message": "Sending CLOB order: Up $11.964316690793684 @ 61¢"
+            },
+            {
+              "time": "12:28:21 a.m.",
+              "type": "fill",
+              "message": "[LIVE] PLACE+FILL Up @ $0.61 x 19 shares ($11.59) [market-177...] — immediate fill!",
+              "data": {
+                "orderId": "market-1771306101651",
+                "shares": 19,
+                "price": 0.61,
+                "cost": 11.59
+              }
+            },
+            {
+              "time": "12:28:21 a.m.",
+              "type": "info",
+              "message": "🔒 $11.59 locked (total locked: $11.59)"
+            },
+            {
+              "time": "12:30:00 a.m.",
+              "type": "resolve",
+              "message": "🔴 LIVE resolved: UP | Bet: Up | WIN | P&L: $7.41",
+              "data": {
+                "wentUp": true,
+                "picked": "Up",
+                "won": true,
+                "pnl": 7.41,
+                "payout": 19,
+                "cost": 11.59,
+                "live": true
+              }
+            },
+            {
+              "time": "12:30:00 a.m.",
+              "type": "info",
+              "message": "📈 Prediction: WIN - awaiting chain confirmation (locked: $11.59)"
+            },
+            {
+              "time": "12:31:00 a.m.",
+              "type": "resolve",
+              "message": "❌ CHAIN CONFIRMED LOSS: $11.59 lost"
+            },
+            {
+              "time": "12:31:00 a.m.",
+              "type": "error",
+              "message": "⚠️ Prediction mismatch! Predicted WIN, actual LOSS"
+            },
+            {
+              "time": "12:31:01 a.m.",
+              "type": "resolve",
+              "message": "🔴 LIVE CONFIRMED: Up | WIN | Cost=$11.59 Payout=$19.00 | P&L=$+7.41",
+              "data": {
+                "outcome": "Up",
+                "won": true,
+                "pnl": 7.41,
+                "payout": 19,
+                "cost": 11.59
               }
             }
           ]
@@ -3301,8 +3351,8 @@
           ]
         }
       ],
-      "totalPnl": 902.088992,
-      "totalBalance": 1995
+      "totalPnl": 909.4989919999999,
+      "totalBalance": 2014
     },
     {
       "key": "ETH-15min",
@@ -3791,5 +3841,5 @@
       "totalBalance": 96
     }
   ],
-  "savedAt": 1771306011153
+  "savedAt": 1771306350948
 }

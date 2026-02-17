@@ -185,5 +185,13 @@
     "lastAttempt": 1771305963070,
     "attemptCount": 1,
     "lastError": "missing revert data in call exception; Transaction reverted without a reason string [ See: https://l"
+  },
+  {
+    "conditionId": "0xca79120e538e5448600f53188b60d3282d94b28f890a85d66798ad93ee2c7575",
+    "tokenId": "26343800401542939613444317373706224128175586239600951902361627082332762794513",
+    "marketSlug": "btc-updown-5m-1771305900",
+    "side": "Up",
+    "timestamp": 1771306101653,
+    "redeemed": false
   }
 ]

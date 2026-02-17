@@ -1407,12 +1407,13 @@ async function placeBet(marketState: MarketState, strategy: StrategyState, amoun
             const actualPrice = result.price || bidPrice;
             const actualCost = actualShares * actualPrice; // What we ACTUALLY paid
             
-            // Single clear fill log line (like: [LIVE] PLACE+FILL DOWN @ $0.52 x 42 shares ($21.84) [0x8e64...] — immediate fill!)
+            // Single clear fill log line
             const shortOrderId = result.orderId ? `[${result.orderId.substring(0, 10)}...]` : '';
-            const fillLogLine = `[LIVE] PLACE+FILL ${side} @ $${actualPrice.toFixed(2)} x ${actualShares.toFixed(0)} shares ($${actualCost.toFixed(2)}) ${shortOrderId} — immediate fill!`;
-            console.log(`   ✅ ${fillLogLine}`);
+            const newLockedTotal = strategy.lockedFunds + actualCost;
+            const fillLogLine = `✅ BET ${side} @ $${actualPrice.toFixed(2)} x ${actualShares.toFixed(0)} shares = $${actualCost.toFixed(2)} | Locked: $${newLockedTotal.toFixed(2)}`;
+            console.log(`   ${fillLogLine} ${shortOrderId}`);
             addStrategyLog(strategy, 'fill', fillLogLine, { orderId: result.orderId, shares: actualShares, price: actualPrice, cost: actualCost });
-            sendTelegramAlert(`✅ *PLACE+FILL*\n\n${marketState.key} ${strategy.name}\n${side} @ $${actualPrice.toFixed(2)} x ${actualShares.toFixed(0)} shares\nCost: $${actualCost.toFixed(2)}\nWallet: $${(availableWallet - actualCost).toFixed(2)}`);
+            sendTelegramAlert(`✅ *BET PLACED*\n\n${marketState.key} ${strategy.name}\n${side} @ $${actualPrice.toFixed(2)} x ${actualShares.toFixed(0)} shares\nCost: $${actualCost.toFixed(2)}\nLocked: $${newLockedTotal.toFixed(2)}`);
             
             // Track live deployed and deduct from live balance using ACTUAL cost
             strategy.liveDeployed += actualCost;
@@ -1486,7 +1487,6 @@ async function placeBet(marketState: MarketState, strategy: StrategyState, amoun
               amount: actualCost,  // ACTUAL cost
             });
             strategy.lockedFunds += actualCost;
-            addStrategyLog(strategy, 'info', `🔒 $${actualCost.toFixed(2)} locked (total locked: $${strategy.lockedFunds.toFixed(2)})`);
             
             db.dbLog.info('live', `Live bet placed: ${side} ${actualShares.toFixed(2)} shares @ ${(actualPrice * 100).toFixed(1)}¢ = $${actualCost.toFixed(2)}`, {
               betId: liveBetId,
@@ -2763,6 +2763,7 @@ ${MARKET_CONFIGS.map(c => `    • ${c.asset} ${c.timeframe}`).join('\n')}
               if (pendingIdx >= 0) {
                 const pending = strategy.pendingBets[pendingIdx];
                 const wasCorrectPrediction = pending.predictedWon === confirmed.won;
+                const betSide = (pending as any).side || 'Unknown';
                 
                 if (confirmed.won) {
                   // Chain confirms WIN
@@ -2770,15 +2771,16 @@ ${MARKET_CONFIGS.map(c => `    • ${c.asset} ${c.timeframe}`).join('\n')}
                   strategy.liveBalance += confirmed.payout;
                   strategy.lockedFunds = Math.max(0, strategy.lockedFunds - pending.betAmount);
                   strategy.livePnl += confirmed.pnl;
-                  addStrategyLog(strategy, 'resolve', `✅ CHAIN CONFIRMED WIN! +$${confirmed.payout.toFixed(2)} (P&L: $${confirmed.pnl.toFixed(2)})`);
-                  console.log(`   ✅ [${strategy.name}] Chain confirmed WIN: +$${confirmed.payout.toFixed(2)}`);
+                  const pnlSign = confirmed.pnl >= 0 ? '+' : '';
+                  addStrategyLog(strategy, 'resolve', `✅ WIN ${betSide} | Bet: $${pending.betAmount.toFixed(2)} → Payout: $${confirmed.payout.toFixed(2)} | Profit: ${pnlSign}$${confirmed.pnl.toFixed(2)} | Total P&L: ${strategy.livePnl >= 0 ? '+' : ''}$${strategy.livePnl.toFixed(2)}`);
+                  console.log(`   ✅ [${strategy.name}] WIN ${betSide}: $${pending.betAmount.toFixed(2)} → $${confirmed.payout.toFixed(2)} (${pnlSign}$${confirmed.pnl.toFixed(2)})`);
                 } else {
                   // Chain confirms LOSS
                   strategy.liveLosses++;
                   strategy.lockedFunds = Math.max(0, strategy.lockedFunds - pending.betAmount);
                   strategy.livePnl += confirmed.pnl;
-                  addStrategyLog(strategy, 'resolve', `❌ CHAIN CONFIRMED LOSS: $${pending.betAmount.toFixed(2)} lost`);
-                  console.log(`   ❌ [${strategy.name}] Chain confirmed LOSS: $${pending.betAmount.toFixed(2)}`);
+                  addStrategyLog(strategy, 'resolve', `❌ LOSS ${betSide} | Bet: $${pending.betAmount.toFixed(2)} lost | Total P&L: ${strategy.livePnl >= 0 ? '+' : ''}$${strategy.livePnl.toFixed(2)}`);
+                  console.log(`   ❌ [${strategy.name}] LOSS ${betSide}: -$${pending.betAmount.toFixed(2)}`);
                 }
                 
                 // Add to liveHistory for dashboard display
@@ -2788,7 +2790,7 @@ ${MARKET_CONFIGS.map(c => `    • ${c.asset} ${c.timeframe}`).join('\n')}
                   time: new Date().toLocaleTimeString(),
                   timestamp: Date.now(),
                   marketId: confirmed.conditionId,
-                  side: (pending as any).side || 'Unknown',
+                  side: betSide,
                   shares: confirmed.payout,
                   cost: pending.betAmount,
                   payout: confirmed.payout,
@@ -2799,10 +2801,9 @@ ${MARKET_CONFIGS.map(c => `    • ${c.asset} ${c.timeframe}`).join('\n')}
                 });
                 strategy.liveHistory = strategy.liveHistory.slice(0, 50);
                 
-                // Log if prediction was wrong
+                // Log prediction accuracy to console only (not to dashboard log - too noisy)
                 if (!wasCorrectPrediction && pending.predictedWon !== null) {
-                  console.log(`   ⚠️ [${strategy.name}] Prediction was WRONG! Predicted ${pending.predictedWon ? 'WIN' : 'LOSS'}, chain says ${confirmed.won ? 'WIN' : 'LOSS'}`);
-                  addStrategyLog(strategy, 'error', `⚠️ Prediction mismatch! Predicted ${pending.predictedWon ? 'WIN' : 'LOSS'}, actual ${confirmed.won ? 'WIN' : 'LOSS'}`);
+                  console.log(`   📊 [${strategy.name}] Signal predicted ${pending.predictedWon ? 'WIN' : 'LOSS'}, actual ${confirmed.won ? 'WIN' : 'LOSS'}`);
                 }
                 
                 // Remove from pending
@@ -2817,23 +2818,29 @@ ${MARKET_CONFIGS.map(c => `    • ${c.asset} ${c.timeframe}`).join('\n')}
         const result = await redeemAllWinnings(process.env.PRIVATE_KEY!);
         if (result.redeemed > 0) {
           console.log(`   ✅ [AUTO-REDEEM] Redeemed $${result.redeemed.toFixed(2)} to USDC.e`);
-          sendTelegramAlert(`💰 *AUTO-REDEEMED*\n$${result.redeemed.toFixed(2)} converted to USDC.e`);
           
           // Clear pending bets for redeemed conditions
+          let totalRedeemed = 0;
           for (const redeemed of result.redeemedConditions) {
             for (const market of state.markets) {
               for (const strategy of market.strategies) {
                 const pendingIdx = strategy.pendingBets.findIndex(b => b.conditionId === redeemed.conditionId);
                 if (pendingIdx >= 0) {
                   const pending = strategy.pendingBets[pendingIdx];
+                  const profit = redeemed.amount - pending.betAmount;
                   strategy.liveBalance += redeemed.amount;
                   strategy.lockedFunds = Math.max(0, strategy.lockedFunds - pending.betAmount);
                   strategy.pendingBets.splice(pendingIdx, 1);
-                  addStrategyLog(strategy, 'fill', `✅ Redeemed! +$${redeemed.amount.toFixed(2)} | Available: $${(strategy.liveBalance - strategy.lockedFunds).toFixed(2)}`);
-                  console.log(`   💰 [${strategy.name}] Redeemed $${redeemed.amount.toFixed(2)}, available: $${(strategy.liveBalance - strategy.lockedFunds).toFixed(2)}`);
+                  totalRedeemed += redeemed.amount;
+                  const profitSign = profit >= 0 ? '+' : '';
+                  addStrategyLog(strategy, 'fill', `💰 Redeemed $${redeemed.amount.toFixed(2)} (${profitSign}$${profit.toFixed(2)} profit) | Balance: $${strategy.liveBalance.toFixed(2)}`);
+                  console.log(`   💰 [${strategy.name}] Redeemed $${redeemed.amount.toFixed(2)} (${profitSign}$${profit.toFixed(2)})`);
                 }
               }
             }
+          }
+          if (totalRedeemed > 0) {
+            sendTelegramAlert(`💰 *REDEEMED*\n$${totalRedeemed.toFixed(2)} converted to USDC.e`);
           }
           saveState();
           fetchWalletBalance(); // Refresh wallet balance
