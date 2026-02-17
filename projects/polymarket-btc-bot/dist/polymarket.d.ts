@@ -14,6 +14,7 @@ export declare class PolymarketClient {
         bids: any[];
         asks: any[];
     }>;
+    getConditionId(marketId: string): Promise<string | null>;
     findActiveBTCMarket(): Promise<BTCMarket | null>;
 }
 //# sourceMappingURL=polymarket.d.ts.map

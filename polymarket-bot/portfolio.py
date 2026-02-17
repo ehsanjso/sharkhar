@@ -192,7 +192,7 @@ def place_bet(
         "shares": shares,
     })
     
-    return True, f"✅ Placed ${amount:.2f} on {outcome} {side} @ {price:.2%}. Shares: {shares:.2f}"
+    return True, f"[WIN] Placed ${amount:.2f} on {outcome} {side} @ {price:.2%}. Shares: {shares:.2f}"
 
 def resolve_bet(bet_id: str, won: bool, market_outcome: str = "") -> tuple[bool, str]:
     """
@@ -290,10 +290,10 @@ def print_portfolio():
     summary = get_portfolio_summary()
     pending = get_pending_bets()
     
-    pnl_emoji = "📈" if summary['pnl'] >= 0 else "📉"
+    pnl_emoji = "[UP]" if summary['pnl'] >= 0 else "[DOWN]"
     
     print(f"\n{'='*60}")
-    print(f"💰 POLYMARKET PAPER TRADING PORTFOLIO")
+    print(f"[PORTFOLIO] POLYMARKET PAPER TRADING PORTFOLIO")
     print(f"{'='*60}")
     print(f"  Cash:           ${summary['cash']:.2f}")
     print(f"  Total Value:    ${summary['total_value']:.2f}")
@@ -301,24 +301,36 @@ def print_portfolio():
     print(f"  Starting:       ${summary['starting_cash']:.2f}")
     print(f"{'='*60}")
     print(f"  Total Bets:     {summary['total_bets']}")
-    print(f"  Wins:           {summary['wins']} ✅")
-    print(f"  Losses:         {summary['losses']} ❌")
-    print(f"  Pending:        {summary['pending']} ⏳")
+    print(f"  Wins:           {summary['wins']} [WIN]")
+    print(f"  Losses:         {summary['losses']} [LOSS]")
+    print(f"  Pending:        {summary['pending']} [PENDING]")
     print(f"  Win Rate:       {summary['win_rate']*100:.1f}%")
     print(f"{'='*60}")
     
     if pending:
-        print(f"\n📋 PENDING BETS ({len(pending)}):")
+        print(f"\n[LIST] PENDING BETS ({len(pending)}):")
         for bet in pending:
             q = bet.market_question[:40] + "..." if len(bet.market_question) > 40 else bet.market_question
-            print(f"  • {bet.outcome} {bet.side} @ {bet.price:.2%}")
+            print(f"  - {bet.outcome} {bet.side} @ {bet.price:.2%}")
             print(f"    {q}")
             print(f"    Amount: ${bet.amount:.2f} | Shares: {bet.shares:.2f}")
             print()
 
-def reset_portfolio(starting_cash: float = 50.0):
-    """Reset portfolio to initial state."""
+def reset_portfolio(starting_cash: float = 50.0, preserve_pending: bool = True):
+    """Reset portfolio to initial state.
+    
+    Args:
+        starting_cash: New starting cash amount
+        preserve_pending: If True, keep unresolved bets and adjust cash accordingly
+    """
     ensure_data_dir()
+    
+    # Load existing pending bets if we want to preserve them
+    pending_bets = []
+    pending_invested = 0.0
+    if preserve_pending:
+        pending_bets = get_pending_bets()
+        pending_invested = sum(b.amount for b in pending_bets)
     
     # Archive old data
     now = datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')
@@ -327,17 +339,41 @@ def reset_portfolio(starting_cash: float = 50.0):
             archive = DATA_DIR / f"archive_{now}_{f.name}"
             f.rename(archive)
     
-    # Create fresh portfolio
+    # Calculate available cash (starting cash minus what's locked in pending bets)
+    available_cash = starting_cash - pending_invested
+    if available_cash < 0:
+        available_cash = 0
+        print(f"[WARNING] Pending bets (${pending_invested:.2f}) exceed starting cash. Available cash set to $0.")
+    
+    # Create portfolio with pending bets accounted for
     portfolio = Portfolio(
-        cash=starting_cash,
+        cash=available_cash,
         starting_cash=starting_cash,
         created_at=datetime.now(timezone.utc).isoformat(),
         last_updated=datetime.now(timezone.utc).isoformat(),
+        total_bets=len(pending_bets),
+        total_pending=len(pending_bets),
     )
     save_portfolio(portfolio)
-    save_bets([])
     
-    print(f"Portfolio reset with ${starting_cash:.2f}")
+    # Save pending bets (or empty list if not preserving)
+    save_bets(pending_bets)
+    
+    # Log reset to history
+    add_to_history({
+        "type": "PORTFOLIO_RESET",
+        "starting_cash": starting_cash,
+        "preserved_bets": len(pending_bets),
+        "locked_in_bets": pending_invested,
+        "available_cash": available_cash,
+    })
+    
+    if pending_bets:
+        print(f"Portfolio reset with ${starting_cash:.2f}")
+        print(f"  [PRESERVED] {len(pending_bets)} pending bets (${pending_invested:.2f} locked)")
+        print(f"  [AVAILABLE] ${available_cash:.2f} cash")
+    else:
+        print(f"Portfolio reset with ${starting_cash:.2f}")
 
 if __name__ == "__main__":
     import argparse

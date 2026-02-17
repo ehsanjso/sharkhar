@@ -111,6 +111,18 @@ export class PolymarketClient {
     return response.json();
   }
 
+  async getConditionId(marketId: string): Promise<string | null> {
+    try {
+      const response = await fetch(`${this.config.gammaApi}/markets/${marketId}`);
+      if (!response.ok) return null;
+      const market = await response.json() as { conditionId?: string };
+      return market.conditionId || null;
+    } catch (error) {
+      console.error('Error fetching condition ID:', error);
+      return null;
+    }
+  }
+
   async findActiveBTCMarket(): Promise<BTCMarket | null> {
     try {
       // Search for active BTC 15-minute markets

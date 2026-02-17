@@ -1,6 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePolymarketData } from './hooks/usePolymarketData';
 import type { MarketState } from './hooks/usePolymarketData';
+
+// Countdown component for next market
+function NextMarketCountdown({ timeframe }: { timeframe: string }) {
+  const [secondsLeft, setSecondsLeft] = useState(0);
+  
+  useEffect(() => {
+    const calculateSecondsLeft = () => {
+      const now = new Date();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+      const intervalMinutes = timeframe === '5min' ? 5 : 15;
+      
+      // Find next interval start
+      const minutesIntoInterval = minutes % intervalMinutes;
+      const minutesUntilNext = intervalMinutes - minutesIntoInterval;
+      const totalSecondsLeft = (minutesUntilNext * 60) - seconds;
+      
+      return totalSecondsLeft > 0 ? totalSecondsLeft : intervalMinutes * 60;
+    };
+    
+    setSecondsLeft(calculateSecondsLeft());
+    
+    const timer = setInterval(() => {
+      setSecondsLeft(calculateSecondsLeft());
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, [timeframe]);
+  
+  const minutes = Math.floor(secondsLeft / 60);
+  const seconds = secondsLeft % 60;
+  
+  return (
+    <span className={`text-xs sm:text-sm font-mono ${secondsLeft <= 30 ? 'text-yellow-400 animate-pulse' : 'text-gray-300'}`}>
+      {minutes}:{seconds.toString().padStart(2, '0')}
+    </span>
+  );
+}
 
 function App() {
   const data = usePolymarketData();
@@ -106,26 +144,31 @@ function App() {
               <span className="text-gray-400 text-xs sm:text-sm">{data.selectedMarket?.asset}</span>
               <span className="text-sm sm:text-lg font-mono">${data.btcPrice.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
             </div>
-            {data.currentMarket && (
+            {data.currentMarket ? (
               <>
                 <div className="flex items-center gap-1 shrink-0">
-                  <span className={`text-xs sm:text-base font-mono ${data.currentMarket.changePercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {data.currentMarket.changePercent >= 0 ? '+' : ''}{data.currentMarket.changePercent.toFixed(2)}%
+                  <span className={`text-xs sm:text-base font-mono ${(data.currentMarket.changePercent ?? 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {(data.currentMarket.changePercent ?? 0) >= 0 ? '+' : ''}{(data.currentMarket.changePercent ?? 0).toFixed(2)}%
                   </span>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <span className="text-xs sm:text-sm font-mono text-gray-300">
-                    {data.currentMarket.elapsed.toFixed(0)}/{data.selectedMarket?.timeframe === '5min' ? '5' : '15'}m
+                    {(data.currentMarket.elapsed ?? 0).toFixed(0)}/{data.selectedMarket?.timeframe === '5min' ? '5' : '15'}m
                   </span>
                 </div>
               </>
+            ) : (
+              <div className="flex items-center gap-1 shrink-0 bg-gray-800 px-2 py-1 rounded">
+                <span className="text-xs text-gray-400">⏳ Next:</span>
+                <NextMarketCountdown timeframe={data.selectedMarket?.timeframe || '5min'} />
+              </div>
             )}
           </div>
           <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6">
             {tradingMode === 'live' && (
               <div className="flex items-center gap-1">
                 <span className="text-gray-400 text-xs">💰 Wallet:</span>
-                <span className="text-sm sm:text-lg font-mono text-yellow-400">${data.walletBalance.toFixed(2)}</span>
+                <span className="text-sm sm:text-lg font-mono text-yellow-400">${(data.walletBalance ?? 0).toFixed(2)}</span>
               </div>
             )}
             <div className="flex items-center gap-1">
@@ -173,7 +216,7 @@ function App() {
         {view === 'overview' ? (
           <OverviewView data={data} tradingMode={tradingMode} filteredStrategies={filteredStrategies} />
         ) : selectedStrategy ? (
-          <DetailView strategy={selectedStrategy} market={data.currentMarket} assetPrice={data.btcPrice} />
+          <DetailView strategy={selectedStrategy} market={data.currentMarket} assetPrice={data.btcPrice} marketKey={data.selectedMarketKey} tradingMode={tradingMode} />
         ) : null}
       </main>
     </div>
@@ -277,7 +320,7 @@ function MarketSelector({ data, onSelect }: {
             </div>
             <div className="bg-gray-800 rounded-lg p-3 text-center">
               <div className="text-gray-400 text-xs uppercase mb-1">💰 Wallet</div>
-              <div className="text-xl font-mono text-yellow-400">${data.walletBalance.toFixed(2)}</div>
+              <div className="text-xl font-mono text-yellow-400">${(data.walletBalance ?? 0).toFixed(2)}</div>
             </div>
             <div className="bg-gray-800 rounded-lg p-3 text-center">
               <div className="text-gray-400 text-xs uppercase mb-1">Active Bids</div>
@@ -418,7 +461,7 @@ function MarketSelector({ data, onSelect }: {
                                     <div className="text-gray-500 text-xs">Status</div>
                                     <div className={market.halted ? 'text-red-400' : market.currentMarket ? 'text-green-400' : 'text-gray-500'}>
                                       {market.halted ? 'Halted' : market.currentMarket ? 
-                                        `${market.currentMarket.elapsed.toFixed(1)}m` : 
+                                        `${(market.currentMarket.elapsed ?? 0).toFixed(1)}m` : 
                                         'Waiting'
                                       }
                                     </div>
@@ -427,9 +470,9 @@ function MarketSelector({ data, onSelect }: {
                                 {market.currentMarket && !market.halted && (
                                   <div className="mt-3 pt-3 border-t border-gray-800">
                                     <div className="flex items-center justify-between text-xs">
-                                      <span className="text-gray-400">Current: ${market.currentMarket.openPrice.toFixed(0)}</span>
-                                      <span className={market.currentMarket.changePercent >= 0 ? 'text-green-400' : 'text-red-400'}>
-                                        {market.currentMarket.changePercent >= 0 ? '↑' : '↓'} {Math.abs(market.currentMarket.changePercent).toFixed(3)}%
+                                      <span className="text-gray-400">Current: ${(market.currentMarket.openPrice ?? 0).toFixed(0)}</span>
+                                      <span className={(market.currentMarket.changePercent ?? 0) >= 0 ? 'text-green-400' : 'text-red-400'}>
+                                        {(market.currentMarket.changePercent ?? 0) >= 0 ? '↑' : '↓'} {Math.abs(market.currentMarket.changePercent ?? 0).toFixed(3)}%
                                       </span>
                                     </div>
                                     <div className="mt-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
@@ -564,7 +607,7 @@ function MarketSelector({ data, onSelect }: {
                                 <div className="text-gray-500 text-xs">Status</div>
                                 <div className={market.halted ? 'text-red-400' : market.currentMarket ? 'text-green-400' : 'text-gray-500'}>
                                   {market.halted ? 'Halted' : market.currentMarket ? 
-                                    `${market.currentMarket.elapsed.toFixed(1)}m` : 
+                                    `${(market.currentMarket.elapsed ?? 0).toFixed(1)}m` : 
                                     'Waiting'
                                   }
                                 </div>
@@ -573,15 +616,15 @@ function MarketSelector({ data, onSelect }: {
                             {market.currentMarket && !market.halted && (
                               <div className="mt-3 pt-3 border-t border-gray-800">
                                 <div className="flex items-center justify-between text-xs">
-                                  <span className="text-gray-400">Current: ${market.currentMarket.openPrice.toFixed(0)}</span>
-                                  <span className={market.currentMarket.changePercent >= 0 ? 'text-green-400' : 'text-red-400'}>
-                                    {market.currentMarket.changePercent >= 0 ? '↑' : '↓'} {Math.abs(market.currentMarket.changePercent).toFixed(3)}%
+                                  <span className="text-gray-400">Current: ${(market.currentMarket.openPrice ?? 0).toFixed(0)}</span>
+                                  <span className={(market.currentMarket.changePercent ?? 0) >= 0 ? 'text-green-400' : 'text-red-400'}>
+                                    {(market.currentMarket.changePercent ?? 0) >= 0 ? '↑' : '↓'} {Math.abs(market.currentMarket.changePercent ?? 0).toFixed(3)}%
                                   </span>
                                 </div>
                                 <div className="mt-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
                                   <div 
                                     className="h-full bg-purple-500 transition-all"
-                                    style={{ width: `${(market.currentMarket.elapsed / (market.timeframe === '5min' ? 5 : 15)) * 100}%` }}
+                                    style={{ width: `${((market.currentMarket.elapsed ?? 0) / (market.timeframe === '5min' ? 5 : 15)) * 100}%` }}
                                   />
                                 </div>
                               </div>
@@ -637,7 +680,7 @@ function OverviewView({ data, tradingMode, filteredStrategies }: {
               Live Bets
             </h3>
             <span className="text-xs sm:text-sm text-gray-400">
-              Market {data.currentMarket.elapsed.toFixed(1)}/{duration} min
+              Market {(data.currentMarket?.elapsed ?? 0).toFixed(1)}/{duration} min
             </span>
           </div>
           
@@ -833,15 +876,38 @@ function OverviewView({ data, tradingMode, filteredStrategies }: {
         </div>
       </div>
 
-      {/* Recent Trades */}
+      {/* Recent Trades - Show live or paper history based on mode */}
       <div className="bg-gray-900 rounded-lg p-3 sm:p-4 border border-gray-800">
-        <h3 className="text-sm sm:text-lg font-semibold mb-3 sm:mb-4">📜 Recent Trades</h3>
+        <h3 className="text-sm sm:text-lg font-semibold mb-3 sm:mb-4">
+          📜 Recent {tradingMode === 'live' ? 'Live' : 'Paper'} Trades
+        </h3>
         <div className="space-y-2 max-h-96 overflow-y-auto">
-          {data.strategies
-            .flatMap(s => s.history.map(h => ({ ...h, strategyId: s.id, strategyName: s.name, strategyColor: s.color })))
-            .sort((a, b) => b.id.localeCompare(a.id))
-            .slice(0, 20)
-            .map(trade => (
+          {(() => {
+            const trades = filteredStrategies
+              .flatMap(s => {
+                // Use liveHistory for live mode, history for paper mode
+                const tradeHistory = tradingMode === 'live' ? (s.liveHistory || []) : s.history;
+                return tradeHistory.map(h => ({ ...h, strategyId: s.id, strategyName: s.name, strategyColor: s.color }));
+              })
+              .sort((a, b) => {
+                // Sort by timestamp if available, otherwise by id
+                const timeA = (a as any).timestamp || 0;
+                const timeB = (b as any).timestamp || 0;
+                if (timeA && timeB) return timeB - timeA;
+                return b.id.localeCompare(a.id);
+              })
+              .slice(0, 20);
+            
+            if (trades.length === 0) {
+              return (
+                <div className="text-center text-gray-500 py-8">
+                  No {tradingMode === 'live' ? 'live' : 'paper'} trades yet.
+                  {tradingMode === 'live' && ' Trades will appear after market resolution.'}
+                </div>
+              );
+            }
+            
+            return trades.map(trade => (
               <div key={trade.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-800 rounded p-2 gap-1 sm:gap-2">
                 <div className="flex items-center gap-2 text-xs sm:text-sm">
                   <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: trade.strategyColor }} />
@@ -859,7 +925,8 @@ function OverviewView({ data, tradingMode, filteredStrategies }: {
                   </span>
                 </div>
               </div>
-            ))}
+            ));
+          })()}
         </div>
       </div>
     </div>
@@ -991,14 +1058,20 @@ function StrategyCard({ strategy, tradingMode = 'paper', onClick }: {
   );
 }
 
-function DetailView({ strategy, market, assetPrice }: { 
+function DetailView({ strategy, market, assetPrice, marketKey, tradingMode = 'paper' }: { 
   strategy: ReturnType<typeof usePolymarketData>['strategies'][0];
   market?: ReturnType<typeof usePolymarketData>['currentMarket'];
   assetPrice: number;
+  marketKey?: string;
+  tradingMode?: 'paper' | 'live';
 }) {
   const pos = strategy.currentMarket;
   const elapsed = market?.elapsed || 0;
   const fills = pos?.bets.filter(b => b.executed).length || 0;
+  
+  // Get market duration from key (BTC-5min = 5, ETH-15min = 15, etc.)
+  const duration = marketKey?.includes('5min') ? 5 : marketKey?.includes('15min') ? 15 : 5;
+  const asset = marketKey?.split('-')[0] || 'BTC';
   
   const cost = pos?.costBet || 0;
   const shares = pos?.shares || 0;
@@ -1008,8 +1081,12 @@ function DetailView({ strategy, market, assetPrice }: {
     (market?.changePercent || 0) >= 0 ? 65 : 35 : 
     (market?.changePercent || 0) < 0 ? 65 : 35) : 50;
   
-  const recentWins = strategy.history.filter(t => t.result === 'WIN').slice(0, 5);
-  const totalClaimed = strategy.history.filter(t => t.result === 'WIN').reduce((sum, t) => sum + t.payout, 0);
+  // Use live or paper history based on mode
+  const isLiveMode = tradingMode === 'live' && strategy.liveMode;
+  const tradeHistory = isLiveMode ? (strategy.liveHistory || []) : strategy.history;
+  
+  const recentWins = tradeHistory.filter(t => t.result === 'WIN').slice(0, 5);
+  const totalClaimed = tradeHistory.filter(t => t.result === 'WIN').reduce((sum, t) => sum + (t.payout || 0), 0);
   
   const avgWin = strategy.wins > 0 
     ? strategy.history.filter(t => t.result === 'WIN').reduce((sum, t) => sum + t.pnl, 0) / strategy.wins 
@@ -1022,18 +1099,24 @@ function DetailView({ strategy, market, assetPrice }: {
     <div className="space-y-4">
       {/* Current Market Panel */}
       <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-lg font-semibold" style={{ color: strategy.color }}>{strategy.name}</h2>
-            <p className="text-gray-500 text-sm">{strategy.description}</p>
+        {/* Market Title */}
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-gray-400 text-sm">
+            {`${asset} Up or Down - ${duration}min`}
           </div>
           {pos?.side && (
-            <div className={`px-4 py-2 rounded-lg text-lg font-bold ${
-              pos.side === 'Up' ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'
+            <div className={`px-3 py-1 rounded text-sm font-bold ${
+              pos.side === 'Up' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
             }`}>
-              {pos.side === 'Up' ? '📈' : '📉'} {pos.side}
+              {pos.side === 'Up' ? '▲' : '▼'} {pos.side.toUpperCase()}
             </div>
           )}
+        </div>
+        
+        {/* Strategy Name */}
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold" style={{ color: strategy.color }}>{strategy.name}</h2>
+          <p className="text-gray-500 text-sm">{strategy.description}</p>
         </div>
 
         {/* Stats */}
@@ -1074,18 +1157,36 @@ function DetailView({ strategy, market, assetPrice }: {
           </div>
         </div>
 
-        {/* Progress */}
+        {/* Progress Bar with Win/Lose Labels */}
         <div className="mb-2">
-          <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+          <div className="flex justify-between text-xs mb-1">
+            <span className="text-green-400">Win: +${ifWin.toFixed(2)}</span>
+            <span className="text-red-400">Lose: -${cost.toFixed(2)}</span>
+          </div>
+          <div className="h-3 bg-gray-800 rounded-full overflow-hidden relative">
+            {/* Time progress */}
             <div 
-              className="h-full bg-green-500 transition-all duration-1000"
-              style={{ width: `${(elapsed / 15) * 100}%` }}
+              className="h-full bg-gradient-to-r from-green-600 to-green-500 transition-all duration-1000"
+              style={{ width: `${Math.min(100, (elapsed / duration) * 100)}%` }}
+            />
+            {/* Win probability marker */}
+            <div 
+              className="absolute top-0 bottom-0 w-0.5 bg-white/50"
+              style={{ left: `${winProb}%` }}
             />
           </div>
+          <div className="text-right text-xs text-gray-500 mt-0.5">{winProb}%</div>
         </div>
-        <div className="flex items-center justify-between text-xs text-gray-400">
-          <span>Elapsed: {elapsed.toFixed(2)} / 15.00 | Fills: {fills}/4</span>
-          <span>{winProb}%</span>
+        
+        {/* Footer Stats */}
+        <div className="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-gray-800">
+          <span>Elapsed: {elapsed < duration ? elapsed.toFixed(2) : '—'} / {duration} | Fills: {fills}/4</span>
+          <span className="font-mono">
+            {asset}: ${assetPrice.toLocaleString(undefined, {maximumFractionDigits: 0})}
+            <span className={`ml-1 ${(market?.changePercent || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              ${((market?.changePercent || 0) * assetPrice / 100).toFixed(0)}
+            </span>
+          </span>
         </div>
       </div>
 
@@ -1169,42 +1270,84 @@ function DetailView({ strategy, market, assetPrice }: {
       {/* P&L Chart + Claims */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 bg-gray-900 rounded-lg p-4 border border-gray-800">
-          <h3 className="text-lg font-semibold mb-4">Cumulative P&L</h3>
-          {strategy.pnlHistory.length > 0 ? (
-            <div className="h-48 flex items-end relative">
-              <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col justify-between text-xs text-gray-500">
-                <span>${Math.max(...strategy.pnlHistory.map(p => p.cumulative), 0).toFixed(0)}</span>
-                <span>$0</span>
-                <span>${Math.min(...strategy.pnlHistory.map(p => p.cumulative), 0).toFixed(0)}</span>
+          <h3 className="text-lg font-semibold mb-4">
+            Trade History {isLiveMode && <span className="text-xs text-yellow-400 ml-2">LIVE</span>}
+            <span className="text-xs text-gray-500 ml-2">(Last 20 trades)</span>
+          </h3>
+          {(() => {
+            // Show last 20 trades as individual bars
+            const recentTrades = tradeHistory.slice(-20);
+            
+            if (recentTrades.length === 0) {
+              return <div className="h-48 flex items-center justify-center text-gray-500">No trades yet</div>;
+            }
+            
+            const maxPnl = Math.max(...recentTrades.map(t => Math.abs(t.pnl)), 10);
+            
+            // Calculate running total for the visible trades
+            let runningTotal = 0;
+            const tradesWithTotal = recentTrades.map(t => {
+              runningTotal += t.pnl;
+              return { ...t, runningTotal };
+            });
+            
+            return (
+              <div className="h-48 flex flex-col">
+                {/* Bar chart */}
+                <div className="flex-1 flex items-center relative border-b border-gray-700">
+                  <div className="absolute left-0 top-0 bottom-0 w-10 flex flex-col justify-between text-xs text-gray-500 pr-1">
+                    <span className="text-green-400">+${maxPnl.toFixed(0)}</span>
+                    <span className="text-gray-600">$0</span>
+                    <span className="text-red-400">-${maxPnl.toFixed(0)}</span>
+                  </div>
+                  <div className="flex-1 ml-10 h-full flex items-center">
+                    {/* Zero line */}
+                    <div className="absolute left-10 right-0 h-px bg-gray-600" style={{ top: '50%' }} />
+                    {/* Bars */}
+                    <div className="w-full h-full flex items-center gap-0.5">
+                      {tradesWithTotal.map((t, i) => {
+                        const height = Math.min(Math.abs(t.pnl) / maxPnl * 45, 45);
+                        const isWin = t.pnl >= 0;
+                        return (
+                          <div
+                            key={i}
+                            className="flex-1 flex flex-col items-center justify-center relative group"
+                            style={{ height: '100%' }}
+                          >
+                            <div
+                              className={`w-full max-w-[20px] rounded-sm transition-all ${isWin ? 'bg-green-500 hover:bg-green-400' : 'bg-red-500 hover:bg-red-400'}`}
+                              style={{
+                                height: `${height}%`,
+                                position: 'absolute',
+                                [isWin ? 'bottom' : 'top']: '50%',
+                              }}
+                            />
+                            {/* Tooltip */}
+                            <div className="absolute bottom-full mb-2 hidden group-hover:block z-10">
+                              <div className="bg-gray-800 text-xs rounded px-2 py-1 whitespace-nowrap border border-gray-700">
+                                <div className={isWin ? 'text-green-400' : 'text-red-400'}>
+                                  {isWin ? '+' : ''}${t.pnl.toFixed(2)}
+                                </div>
+                                <div className="text-gray-400">{t.time}</div>
+                                <div className="text-gray-500">Total: ${t.runningTotal.toFixed(0)}</div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+                {/* Summary row */}
+                <div className="flex justify-between items-center pt-2 text-xs">
+                  <span className="text-gray-500">{recentTrades.length} trades shown</span>
+                  <span className={runningTotal >= 0 ? 'text-green-400' : 'text-red-400'}>
+                    Period P&L: {runningTotal >= 0 ? '+' : ''}${runningTotal.toFixed(2)}
+                  </span>
+                </div>
               </div>
-              <div className="flex-1 ml-12 h-full flex items-end">
-                <svg className="w-full h-full" preserveAspectRatio="none">
-                  <line x1="0" x2="100%" y1="50%" y2="50%" stroke="#374151" strokeDasharray="4" />
-                  <polyline
-                    fill="none"
-                    stroke="#22c55e"
-                    strokeWidth="2"
-                    points={strategy.pnlHistory.map((p, i) => {
-                      const x = (i / Math.max(strategy.pnlHistory.length - 1, 1)) * 100;
-                      const maxAbs = Math.max(...strategy.pnlHistory.map(pt => Math.abs(pt.cumulative)), 1);
-                      const y = 50 - (p.cumulative / maxAbs) * 45;
-                      return `${x}%,${y}%`;
-                    }).join(' ')}
-                  />
-                  {strategy.pnlHistory.map((p, i) => {
-                    const x = (i / Math.max(strategy.pnlHistory.length - 1, 1)) * 100;
-                    const maxAbs = Math.max(...strategy.pnlHistory.map(pt => Math.abs(pt.cumulative)), 1);
-                    const y = 50 - (p.cumulative / maxAbs) * 45;
-                    return (
-                      <circle key={i} cx={`${x}%`} cy={`${y}%`} r="3" fill={p.pnl >= 0 ? '#22c55e' : '#ef4444'} />
-                    );
-                  })}
-                </svg>
-              </div>
-            </div>
-          ) : (
-            <div className="h-48 flex items-center justify-center text-gray-500">No trades yet</div>
-          )}
+            );
+          })()}
         </div>
 
         <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
@@ -1261,31 +1404,69 @@ function DetailView({ strategy, market, assetPrice }: {
         </div>
       </div>
 
-      {/* Trade History */}
+      {/* Market History Table */}
       <div className="bg-gray-900 rounded-lg p-3 sm:p-4 border border-gray-800">
-        <h3 className="text-sm sm:text-lg font-semibold mb-3 sm:mb-4">📜 Trade History</h3>
-        <div className="space-y-2 max-h-96 overflow-y-auto">
-          {strategy.history.length === 0 ? (
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm sm:text-lg font-semibold">
+            📁 Market History {isLiveMode && <span className="text-xs text-yellow-400 ml-2">LIVE</span>}
+          </h3>
+          <span className="text-xs text-gray-500">
+            {tradeHistory.length + (strategy.pendingBets?.length || 0)} trades
+          </span>
+        </div>
+        
+        {/* Table Header */}
+        <div className="hidden sm:grid grid-cols-7 gap-2 text-xs text-gray-400 uppercase border-b border-gray-800 pb-2 mb-2">
+          <span>Time</span>
+          <span>Side</span>
+          <span className="text-right">Shares</span>
+          <span className="text-right">Cost</span>
+          <span className="text-right">Payout</span>
+          <span className="text-right">P&L</span>
+          <span className="text-right">Result</span>
+        </div>
+        
+        <div className="space-y-1 max-h-80 overflow-y-auto">
+          {/* Pending Bets First */}
+          {(strategy.pendingBets || []).map((bet: any, i: number) => (
+            <div key={`pending-${i}`} className="grid grid-cols-2 sm:grid-cols-7 gap-2 py-2 text-sm border-b border-gray-800/50 bg-yellow-900/10">
+              <span className="text-gray-400">{bet.time || '—'}</span>
+              <span className={bet.side === 'Up' ? 'text-green-400 font-semibold' : 'text-red-400 font-semibold'}>
+                {bet.side?.toUpperCase() || '—'}
+              </span>
+              <span className="text-right text-gray-300 hidden sm:block">{bet.shares?.toFixed(1) || '—'}</span>
+              <span className="text-right text-gray-300 hidden sm:block">${bet.amount?.toFixed(2) || '0'}</span>
+              <span className="text-right text-gray-500 hidden sm:block">$0.00</span>
+              <span className="text-right text-yellow-400 hidden sm:block">—</span>
+              <span className="text-right">
+                <span className="px-2 py-0.5 rounded text-xs bg-yellow-900/50 text-yellow-400">PENDING</span>
+              </span>
+            </div>
+          ))}
+          
+          {/* Completed Trades */}
+          {tradeHistory.length === 0 && (strategy.pendingBets?.length || 0) === 0 ? (
             <div className="text-gray-500 text-center py-8 text-sm">No trades yet</div>
           ) : (
-            strategy.history.map(trade => (
-              <div key={trade.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-800 rounded p-2 sm:p-3 gap-2">
-                <div className="flex items-center gap-2 sm:gap-4">
-                  <span className={`text-sm sm:text-lg ${trade.side === 'Up' ? 'text-green-400' : 'text-red-400'}`}>
-                    {trade.side === 'Up' ? '📈' : '📉'} {trade.side}
+            [...tradeHistory].reverse().map((trade: any) => (
+              <div key={trade.id} className="grid grid-cols-2 sm:grid-cols-7 gap-2 py-2 text-sm border-b border-gray-800/50 hover:bg-gray-800/30">
+                <span className="text-gray-400">{trade.time}</span>
+                <span className={trade.side === 'Up' ? 'text-green-400 font-semibold' : 'text-red-400 font-semibold'}>
+                  {trade.side?.toUpperCase()}
+                </span>
+                <span className="text-right text-gray-300 hidden sm:block">{(trade.shares || trade.cost / 0.5)?.toFixed(1)}</span>
+                <span className="text-right text-gray-300 hidden sm:block">${trade.cost?.toFixed(2)}</span>
+                <span className="text-right text-gray-300 hidden sm:block">${(trade.payout || 0)?.toFixed(2)}</span>
+                <span className={`text-right font-mono ${trade.pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {trade.pnl >= 0 ? '+' : ''}${trade.pnl?.toFixed(2)}
+                </span>
+                <span className="text-right">
+                  <span className={`px-2 py-0.5 rounded text-xs ${
+                    trade.result === 'WIN' ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'
+                  }`}>
+                    {trade.result}
                   </span>
-                  <span className="text-gray-500 text-xs sm:text-sm">{trade.time}</span>
-                </div>
-                <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-6 text-xs sm:text-sm">
-                  <div><span className="text-gray-400">$</span>{trade.cost.toFixed(0)}</div>
-                  <div><span className="text-gray-400 hidden sm:inline">→</span> ${trade.payout.toFixed(0)}</div>
-                  <div className={`font-mono font-bold ${trade.pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {trade.pnl >= 0 ? '+' : ''}${trade.pnl.toFixed(0)}
-                  </div>
-                  <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs ${trade.result === 'WIN' ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>
-                    {trade.result === 'WIN' ? 'W' : 'L'}
-                  </span>
-                </div>
+                </span>
               </div>
             ))
           )}

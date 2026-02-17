@@ -341,6 +341,26 @@ export function getLiveBetsByStatus(status: string): LiveBetRecord[] {
   return liveBetsByStatusStmt.all(status) as LiveBetRecord[];
 }
 
+const liveBetByOrderIdStmt = db.prepare(`
+  SELECT * FROM live_bets WHERE order_id = ?
+`);
+
+export function getLiveBetByOrderId(orderId: string): LiveBetRecord | null {
+  return liveBetByOrderIdStmt.get(orderId) as LiveBetRecord | null;
+}
+
+export function getPendingBets(): LiveBetRecord[] {
+  return getLiveBetsByStatus('pending');
+}
+
+const resolvedBetsStmt = db.prepare(`
+  SELECT * FROM live_bets WHERE status IN ('resolved', 'redeemed') ORDER BY created_at DESC
+`);
+
+export function getResolvedBets(): LiveBetRecord[] {
+  return resolvedBetsStmt.all() as LiveBetRecord[];
+}
+
 const allLiveBetsStmt = db.prepare(`
   SELECT * FROM live_bets ORDER BY created_at DESC
 `);

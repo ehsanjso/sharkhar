@@ -2,30 +2,42 @@ import { PolymarketClient } from './polymarket';
 import { BTCPriceTracker } from './btc-price';
 import { TradingStrategy } from './strategy';
 import { getNewsService } from './news-research';
+import { RedemptionService } from './redemption';
 export class PolymarketBTCBot {
     config;
     polymarket;
     priceTracker;
     strategy;
     newsService;
+    redemptionService;
     currentSession = null;
     currentMarket = null;
     marketCheckInterval = null;
     tradingInterval = null;
+    redemptionInterval = null;
     latestResearch = null;
+    // Budget management
+    initialBudget; // Original starting budget
+    currentBudget; // Active trading budget
+    lockedProfit = 0; // Profit locked away (not used for trading)
+    profitLockTriggered = false; // Whether 3x trigger has fired
     stats = {
         totalMarkets: 0,
         wins: 0,
         losses: 0,
         totalWagered: 0,
         totalPnL: 0,
+        totalRedeemed: 0,
     };
     constructor(config) {
         this.config = config;
+        this.initialBudget = config.totalBudget;
+        this.currentBudget = config.totalBudget;
         this.polymarket = new PolymarketClient(config);
         this.priceTracker = new BTCPriceTracker(config.wsUrl);
         this.strategy = new TradingStrategy(config);
         this.newsService = getNewsService(process.env.TAVILY_API_KEY);
+        this.redemptionService = new RedemptionService(config.privateKey);
     }
     async start() {
         console.log(`
@@ -38,9 +50,78 @@ export class PolymarketBTCBot {
         await this.polymarket.initialize();
         // Connect to BTC price feed
         await this.priceTracker.connect();
+        // Check for pending redemptions on startup
+        await this.checkAndRedeemPositions();
+        // Start periodic redemption checks (every 5 minutes)
+        this.startRedemptionMonitoring();
         // Start monitoring for new markets
         this.startMarketMonitoring();
         console.log('\n🚀 Bot started! Waiting for markets...\n');
+    }
+    /**
+     * Check and redeem any resolved positions, update budget
+     */
+    async checkAndRedeemPositions() {
+        try {
+            console.log('\n💰 Checking for redeemable positions...');
+            const result = await this.redemptionService.redeemAllPending();
+            if (result.totalRedeemed > 0) {
+                this.stats.totalRedeemed += result.totalRedeemed;
+                console.log(`\n🎉 Redeemed $${result.totalRedeemed.toFixed(2)} total!`);
+            }
+            // Get total wallet balance
+            const walletBalance = result.newBalance;
+            // Check profit protection: if total balance >= 3x initial budget
+            // Lock 2x as profit and continue trading with 1x
+            this.checkProfitProtection(walletBalance);
+            // Update current budget (wallet balance minus locked profit)
+            const previousBudget = this.currentBudget;
+            this.currentBudget = walletBalance - this.lockedProfit;
+            if (this.currentBudget !== previousBudget) {
+                console.log(`💵 Trading budget: $${previousBudget.toFixed(2)} → $${this.currentBudget.toFixed(2)}`);
+            }
+            console.log(`📊 Wallet: $${walletBalance.toFixed(2)} | Trading: $${this.currentBudget.toFixed(2)} | Locked: $${this.lockedProfit.toFixed(2)}\n`);
+        }
+        catch (error) {
+            console.error('❌ Redemption check failed:', error.message);
+        }
+    }
+    /**
+     * Profit protection: When we hit 3x initial budget, lock 2x and trade with 1x
+     * This ensures we always recoup our initial investment and play with house money
+     */
+    checkProfitProtection(walletBalance) {
+        const triggerThreshold = this.initialBudget * 3;
+        // Only trigger once - when we first hit 3x
+        if (!this.profitLockTriggered && walletBalance >= triggerThreshold) {
+            // Lock 2x initial budget as profit
+            const profitToLock = this.initialBudget * 2;
+            this.lockedProfit = profitToLock;
+            this.profitLockTriggered = true;
+            console.log(`
+╔══════════════════════════════════════════════════════════╗
+║  🎉 PROFIT PROTECTION TRIGGERED!                         ║
+╠══════════════════════════════════════════════════════════╣
+║  💰 Hit 3x initial budget ($${triggerThreshold.toFixed(2)})
+║  🔒 Locking $${profitToLock.toFixed(2)} profit (2x initial)
+║  📈 Continuing with $${this.initialBudget.toFixed(2)} (1x initial)
+║  ✅ Initial investment SECURED!
+╚══════════════════════════════════════════════════════════╝
+      `);
+        }
+    }
+    /**
+     * Start periodic redemption monitoring
+     */
+    startRedemptionMonitoring() {
+        // Check every 5 minutes
+        this.redemptionInterval = setInterval(async () => {
+            // Don't check during active trading session
+            if (this.currentSession && this.currentSession.result === 'PENDING') {
+                return;
+            }
+            await this.checkAndRedeemPositions();
+        }, 5 * 60 * 1000);
     }
     startMarketMonitoring() {
         // Check for new markets every 30 seconds
@@ -68,13 +149,14 @@ export class PolymarketBTCBot {
         const btcOpenPrice = this.priceTracker.getOpenPrice();
         // Create new session
         this.currentSession = this.strategy.createSession(market, btcOpenPrice);
+        const lockedInfo = this.lockedProfit > 0 ? ` (🔒 $${this.lockedProfit.toFixed(2)} locked)` : '';
         console.log(`
 ┌─────────────────────────────────────────┐
 │ 📈 NEW TRADING SESSION                  │
 ├─────────────────────────────────────────┤
 │ Market: ${market.marketId.substring(0, 20)}...
 │ BTC Open: $${btcOpenPrice.toLocaleString()}
-│ Budget: $${this.config.totalBudget}
+│ Budget: $${this.currentBudget.toFixed(2)}${lockedInfo}
 │ Min Prob: ${(this.config.minProbability * 100).toFixed(0)}%
 └─────────────────────────────────────────┘
     `);
@@ -203,7 +285,7 @@ export class PolymarketBTCBot {
             `Side: ${this.currentSession?.side || 'DECIDING'}   `);
     }
     async endSession() {
-        if (!this.currentSession)
+        if (!this.currentSession || !this.currentMarket)
             return;
         console.log('\n\n⏰ Market ended!');
         // Clear trading interval
@@ -223,9 +305,31 @@ export class PolymarketBTCBot {
         }
         this.stats.totalWagered += this.currentSession.totalInvested;
         this.stats.totalPnL += this.currentSession.profit;
+        // Record bet for redemption tracking
+        if (this.currentSession.totalInvested > 0 && this.currentSession.side) {
+            const tokenId = this.currentSession.side === 'UP'
+                ? this.currentMarket.upTokenId
+                : this.currentMarket.downTokenId;
+            // Get condition ID from market (we'll need to add this to market data)
+            const conditionId = await this.polymarket.getConditionId(this.currentMarket.marketId);
+            if (conditionId) {
+                this.redemptionService.addBetRecord({
+                    conditionId,
+                    tokenId,
+                    marketSlug: `btc-${this.currentSession.side.toLowerCase()}-${this.currentMarket.marketId.substring(0, 8)}`,
+                    side: this.currentSession.side,
+                    timestamp: Date.now(),
+                });
+            }
+        }
         // Print summary
         console.log(this.strategy.getSummary(this.currentSession));
         this.printStats();
+        // Wait a bit for market to resolve, then try redemption
+        console.log('\n⏳ Waiting 60s for market resolution...');
+        setTimeout(async () => {
+            await this.checkAndRedeemPositions();
+        }, 60 * 1000);
         // Reset for next market
         this.currentSession = null;
         this.currentMarket = null;
@@ -234,6 +338,8 @@ export class PolymarketBTCBot {
         const winRate = this.stats.totalMarkets > 0
             ? ((this.stats.wins / this.stats.totalMarkets) * 100).toFixed(1)
             : '0.0';
+        const totalValue = this.currentBudget + this.lockedProfit;
+        const roi = ((totalValue - this.initialBudget) / this.initialBudget * 100).toFixed(1);
         console.log(`
 📊 OVERALL STATS
 ────────────────
@@ -241,6 +347,13 @@ Markets: ${this.stats.totalMarkets}
 Win Rate: ${winRate}% (${this.stats.wins}W / ${this.stats.losses}L)
 Total Wagered: $${this.stats.totalWagered.toFixed(2)}
 Total P&L: ${this.stats.totalPnL >= 0 ? '+' : ''}$${this.stats.totalPnL.toFixed(2)}
+Redeemed: $${this.stats.totalRedeemed.toFixed(2)}
+────────────────
+Initial Budget: $${this.initialBudget.toFixed(2)}
+Trading Budget: $${this.currentBudget.toFixed(2)}
+Locked Profit: $${this.lockedProfit.toFixed(2)} 🔒
+Total Value: $${totalValue.toFixed(2)} (${roi}% ROI)
+${this.profitLockTriggered ? '✅ Initial investment secured!' : `⏳ ${((totalValue / this.initialBudget) * 100).toFixed(0)}% to profit lock (need 300%)`}
     `);
     }
     stop() {
@@ -250,8 +363,17 @@ Total P&L: ${this.stats.totalPnL >= 0 ? '+' : ''}$${this.stats.totalPnL.toFixed(
         if (this.tradingInterval) {
             clearInterval(this.tradingInterval);
         }
+        if (this.redemptionInterval) {
+            clearInterval(this.redemptionInterval);
+        }
         this.priceTracker.disconnect();
         console.log('\n👋 Bot stopped');
+    }
+    /**
+     * Get current available budget
+     */
+    getBudget() {
+        return this.currentBudget;
     }
 }
 //# sourceMappingURL=bot.js.map

@@ -1,1 +1,189 @@
-[]
+[
+  {
+    "conditionId": "0x19e77bc46e80a0fa9a59140785f05645a94d936d27cd39d51f4dffff5dcd0c32",
+    "tokenId": "76262685323568253206970416256050388861354313894159619843814159260714096184191",
+    "marketSlug": "btc-updown-5m-1771278000",
+    "side": "Down",
+    "timestamp": 1771278060782,
+    "redeemed": true
+  },
+  {
+    "conditionId": "0x47df549a34923c8a71b143756bb8a139855a509b7de6dd6701ba333fe179a722",
+    "tokenId": "9720715924858311458953707549511955090058349213452755627835940832779298381743",
+    "marketSlug": "btc-updown-5m-1771278300",
+    "side": "Down",
+    "timestamp": 1771278460708,
+    "redeemed": true
+  },
+  {
+    "conditionId": "0xd6afad9c3791a1f7763f141678280ab61d7da0a606ad9397118cd99b89a06b4b",
+    "tokenId": "115605430882360101204343968720961203386669506789495852513138399300256155082228",
+    "marketSlug": "btc-updown-5m-1771291500",
+    "side": "Down",
+    "timestamp": 1771291700768,
+    "redeemed": true,
+    "lastAttempt": 1771294090512,
+    "attemptCount": 1,
+    "lastError": "missing revert data in call exception; Transaction reverted without a reason string [ See: https://l"
+  },
+  {
+    "conditionId": "0x3a117330d5f70820b6326bbdbb5a3407eb76cf23c779c08896853e8ae82e5995",
+    "tokenId": "94027150979975740785478985699985941993258788220001275965415240195128284059868",
+    "marketSlug": "btc-updown-5m-1771292400",
+    "side": "Down",
+    "timestamp": 1771292600923,
+    "redeemed": true,
+    "lastAttempt": 1771294813799,
+    "attemptCount": 1,
+    "lastError": "missing revert data in call exception; Transaction reverted without a reason string [ See: https://l"
+  },
+  {
+    "conditionId": "0xcf5940220887f1f3cb846ea4f06aa3b8257073ece816a4011375ab8a8bfb9d32",
+    "tokenId": "91059298555278255322529236340876798933208015525467516133553256560260463196858",
+    "marketSlug": "btc-updown-5m-1771293000",
+    "side": "Down",
+    "timestamp": 1771293101273,
+    "redeemed": true
+  },
+  {
+    "conditionId": "0x8b9395872b3f8fe8c069e337b8467884f2672830d41c9eebfdf4c318054490c9",
+    "tokenId": "98283367739748563242968940291524303897786619668631103776190848283440680670640",
+    "marketSlug": "btc-updown-5m-1771293300",
+    "side": "Down",
+    "timestamp": 1771293501860,
+    "redeemed": true,
+    "lastAttempt": 1771294542966,
+    "attemptCount": 3,
+    "lastError": "missing revert data in call exception; Transaction reverted without a reason string [ See: https://l"
+  },
+  {
+    "conditionId": "0xedc6b7a7309622ded7175461eeb7189e121f3fef40f10eff70d736bc94cdc990",
+    "tokenId": "65177043593963484798300865956302792475911120479700712669437357537605640552831",
+    "marketSlug": "btc-updown-5m-1771294800",
+    "side": "Up",
+    "timestamp": 1771294916437,
+    "redeemed": true
+  },
+  {
+    "conditionId": "0x215c26c805ab3eec915e9abb2d6596aeb7ed9399fcc216ac13fa085ac5e5137d",
+    "tokenId": "78438662477210299320227416587603937260827493989982354769901479161367078151088",
+    "marketSlug": "btc-updown-5m-1771295100",
+    "side": "Down",
+    "timestamp": 1771295201604,
+    "redeemed": true
+  },
+  {
+    "conditionId": "0x3bb422f70f7aba0b9baafdafe80c596b65b46cb2f6f7ed27af77d11b8a5cf12f",
+    "tokenId": "94442459095964370739018200555440640277099022158326990812434551448115420981113",
+    "marketSlug": "btc-updown-5m-1771295400",
+    "side": "Down",
+    "timestamp": 1771295501807,
+    "redeemed": true,
+    "lastAttempt": 1771295856000,
+    "attemptCount": 2,
+    "lastError": "missing revert data in call exception; Transaction reverted without a reason string [ See: https://l"
+  },
+  {
+    "conditionId": "0x8cb263ba23e7bdba13f541079a3925de8231620c67198431ca2cdb0cb769633a",
+    "tokenId": "98013287975052832722626595185490455310359365594328078480776410366836799433965",
+    "marketSlug": "btc-updown-5m-1771297200",
+    "side": "Down",
+    "timestamp": 1771297285871,
+    "redeemed": true
+  },
+  {
+    "conditionId": "0x69cb59248fd4590032d7d92796ba7ac2778d3def512ca09f78254e5297b269c4",
+    "tokenId": "52162631982258926463410128728484954873673567355598398134074849458388168043998",
+    "marketSlug": "btc-updown-5m-1771297500",
+    "side": "Down",
+    "timestamp": 1771297585821,
+    "redeemed": true
+  },
+  {
+    "conditionId": "0x4e3d2111f3638a249a923e0c5f373a26dc6f912a1389461240e6ae43e901b22a",
+    "tokenId": "2747775212633879246065124806801767169573950076000302990317866551578551668532",
+    "marketSlug": "btc-updown-5m-1771297800",
+    "side": "Down",
+    "timestamp": 1771297861000,
+    "redeemed": true,
+    "lastAttempt": 1771298580273,
+    "attemptCount": 3,
+    "lastError": "missing revert data in call exception; Transaction reverted without a reason string [ See: https://l"
+  },
+  {
+    "conditionId": "0xc20c9ffe1f808462be62fe1160c62a2fb95f4919aa354582b0d10c8a9fdc597e",
+    "tokenId": "112164472401744107052381882863173217283685637484328461632412748758955570970702",
+    "marketSlug": "btc-updown-5m-1771299000",
+    "side": "Down",
+    "timestamp": 1771299161228,
+    "redeemed": true,
+    "redeemedAt": 1771302475315,
+    "note": "Marked as processed - positions resolved"
+  },
+  {
+    "conditionId": "0x49ae215c89f7731c9c7cb87eb65ae7e8169defd27a6ffe7a11b1a934c7b36a17",
+    "tokenId": "31172228906460583170917374275015422389929970975591160328005219416392771222185",
+    "marketSlug": "btc-updown-5m-1771299300",
+    "side": "Down",
+    "timestamp": 1771299371469,
+    "redeemed": true
+  },
+  {
+    "conditionId": "0x2e6b951ebb5f45a79a2f94a30cbe84f22337937c5a0233223c439f9dfbd1c97d",
+    "tokenId": "86810603678778896733335936405376186498416659208282901002237694808622906397338",
+    "marketSlug": "btc-updown-5m-1771299600",
+    "side": "Up",
+    "timestamp": 1771299762018,
+    "redeemed": true
+  },
+  {
+    "conditionId": "0xde3f43fb9293459b4f014ea145473959588d67733f1bdb0ffe6a4d50cad81321",
+    "tokenId": "32476970697168490160816429165092480365514392521018658402876773884339665470193",
+    "marketSlug": "btc-updown-5m-1771300500",
+    "side": "Down",
+    "timestamp": 1771300560908,
+    "redeemed": true,
+    "lastAttempt": 1771301063333,
+    "attemptCount": 3,
+    "lastError": "missing revert data in call exception; Transaction reverted without a reason string [ See: https://l"
+  },
+  {
+    "conditionId": "0x25c4fa540df83ff25e8b3cc979f8bd871f06133fc72d3a5dc55a9bd2c75b8b3c",
+    "tokenId": "42411424256504851346442743140162958395240388440402404838043103944589755485340",
+    "marketSlug": "btc-updown-5m-1771301400",
+    "side": "Up",
+    "timestamp": 1771301475730,
+    "redeemed": true,
+    "redeemedAt": 1771302475322,
+    "note": "Marked as processed - positions resolved"
+  },
+  {
+    "conditionId": "0x70a6975267b17d31a884951027ff2f2265f1fe50df09c750ed56bcfb69566a55",
+    "tokenId": "4932859160493927906618727599346479991312430709662382783111122704423240948994",
+    "marketSlug": "btc-updown-5m-1771301700",
+    "side": "Down",
+    "timestamp": 1771301799471,
+    "redeemed": true,
+    "redeemedAt": 1771302475323,
+    "note": "Marked as processed - positions resolved"
+  },
+  {
+    "conditionId": "0x42ec0ee7021fc158f48d10123f1b80e49572d587d2970d260da1fa3c138c47a0",
+    "tokenId": "75066291550801633830399674617509076443628512207385163100146066627184565835426",
+    "marketSlug": "btc-updown-5m-1771303800",
+    "side": "Down",
+    "timestamp": 1771303875811,
+    "redeemed": false
+  },
+  {
+    "conditionId": "0x9a0b1c38d64412e276b74c8d6850d284ba038375e0e94084c3fa348ce85868ca",
+    "tokenId": "53424176671557043142771917679353990358213937505057115238413305928367074362075",
+    "marketSlug": "btc-updown-5m-1771305600",
+    "side": "Down",
+    "timestamp": 1771305661259,
+    "redeemed": true,
+    "lastAttempt": 1771305963070,
+    "attemptCount": 1,
+    "lastError": "missing revert data in call exception; Transaction reverted without a reason string [ See: https://l"
+  }
+]

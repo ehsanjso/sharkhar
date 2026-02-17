@@ -11,7 +11,7 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { liveTrading } from './live-trading.js';
+import { liveTrading, checkMarketOutcome, getMarketBySlug } from './live-trading.js';
 import * as db from './database.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -20,6 +20,20 @@ const __dirname = path.dirname(__filename);
 const PORT = 8084;
 const STATE_FILE = './data/multi-market-state.json';
 const OLD_STATE_FILE = './data/multi-strategy-state.json';
+
+// ============ Paper Trading Toggle ============
+const PAPER_TRADING_ENABLED = false;  // Set to false to disable all paper trading
+
+// ============ Multi-Phase Order Execution ============
+const USE_MULTI_PHASE_ORDERS = true;  // Use 3-phase order execution for better fill rates
+const ORDER_RETRY_CONFIG = {
+  phase1TimeoutMs: 8000,    // Wait 8s after FOK rejection
+  phase2Increment: 0.02,    // +2¢ for phase 2
+  phase2TimeoutMs: 12000,   // Wait 12s for phase 2 fill
+  phase3Increment: 0.04,    // +4¢ for phase 3
+  phase3TimeoutMs: 8000,    // Wait 8s for phase 3 fill
+  sizeReduction: 0.9,       // 90% of previous size each phase
+};
 
 // ============ Telegram Alerting Config ============
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
@@ -291,6 +305,8 @@ interface BotState {
   selectedMarket: string | null;
   globalHalt: boolean;     // true = ALL markets stopped
   walletBalance: number;   // On-chain USDC.e balance
+  maintenanceMode: boolean;  // true = preparing for restart, no new bets
+  maintenanceSince: number | null;  // timestamp when maintenance started
 }
 
 // ============ State ============
@@ -302,6 +318,8 @@ let state: BotState = {
   selectedMarket: null,
   globalHalt: false,
   walletBalance: 0,
+  maintenanceMode: false,
+  maintenanceSince: null,
 };
 
 let clients: Set<WebSocket> = new Set();
@@ -575,22 +593,66 @@ async function fetchWalletBalance(): Promise<void> {
   }
 }
 
+// ============ Chainlink Price Feeds (Same source as Polymarket) ============
+// Polymarket uses Chainlink data streams for resolution
+// See: https://data.chain.link/streams/btc-usd
+const CHAINLINK_FEEDS: Record<CryptoAsset, string> = {
+  BTC: '0xc907E116054Ad103354f2D350FD2514433D57F6f', // BTC/USD on Polygon
+  ETH: '0xF9680D99D6C9589e2a93a78A04A279e509205945', // ETH/USD on Polygon  
+  SOL: '0x10C8264C0935b3B9870013e057f330Ff3e9C56dC', // SOL/USD on Polygon (proxy)
+};
+
+const CHAINLINK_ABI = [
+  'function latestRoundData() view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound)',
+  'function decimals() view returns (uint8)'
+];
+
+let chainlinkProvider: any = null;
+
+async function getChainlinkProvider() {
+  if (!chainlinkProvider) {
+    const { ethers } = await import('ethers');
+    const { getSimpleProvider } = await import('./rpc.js');
+    chainlinkProvider = getSimpleProvider();
+  }
+  return chainlinkProvider;
+}
+
+async function fetchChainlinkPrice(asset: CryptoAsset): Promise<number | null> {
+  try {
+    const { ethers } = await import('ethers');
+    const provider = await getChainlinkProvider();
+    const feedAddress = CHAINLINK_FEEDS[asset];
+    
+    const feed = new ethers.Contract(feedAddress, CHAINLINK_ABI, provider);
+    const [, answer] = await feed.latestRoundData();
+    const decimals = await feed.decimals();
+    const price = parseFloat(ethers.utils.formatUnits(answer, decimals));
+    
+    return price;
+  } catch (error: any) {
+    // Silent fail - will use cached price
+    return null;
+  }
+}
+
 // ============ Price Fetching ============
 async function fetchPrices(): Promise<void> {
   try {
-    const symbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT'];
-    const response = await fetch(`https://api.binance.com/api/v3/ticker/price?symbols=${JSON.stringify(symbols)}`);
-    const data = await response.json() as { symbol: string; price: string }[];
+    // Fetch from Chainlink (same source Polymarket uses for resolution)
+    const [btcPrice, ethPrice, solPrice] = await Promise.all([
+      fetchChainlinkPrice('BTC'),
+      fetchChainlinkPrice('ETH'),
+      fetchChainlinkPrice('SOL'),
+    ]);
     
     // Also fetch wallet balance
     fetchWalletBalance();
     
-    for (const item of data) {
-      const price = parseFloat(item.price);
-      if (item.symbol === 'BTCUSDT') state.prices.BTC = price;
-      else if (item.symbol === 'ETHUSDT') state.prices.ETH = price;
-      else if (item.symbol === 'SOLUSDT') state.prices.SOL = price;
-    }
+    // Update prices (keep old value if fetch failed)
+    if (btcPrice !== null) state.prices.BTC = btcPrice;
+    if (ethPrice !== null) state.prices.ETH = ethPrice;
+    if (solPrice !== null) state.prices.SOL = solPrice;
     
     state.connected = true;
     state.live = true;
@@ -1202,14 +1264,17 @@ function scaledBettingStrategy(market: MarketState, strategy: StrategyState, ope
 }
 
 function canPlaceBet(marketState: MarketState, strategy: StrategyState): boolean {
+  // Check maintenance mode - no new bets during maintenance
+  if (state.maintenanceMode) return false;
+  
   // Check global halt
   if (state.globalHalt) return false;
   
-  // Check market halt
-  if (marketState.halted) return false;
+  // Check market halt (but live mode has its own check later)
+  if (marketState.halted && !strategy.liveMode) return false;
   
-  // Check strategy halt
-  if (strategy.halted) return false;
+  // Check strategy halt for PAPER mode only (live has its own liveHalted flag)
+  if (strategy.halted && !strategy.liveMode) return false;
   
   // Check stop loss - auto halt if balance below threshold
   if (strategy.balance <= strategy.stopLossThreshold) {
@@ -1274,9 +1339,17 @@ async function placeBet(marketState: MarketState, strategy: StrategyState, amoun
     }
     
     // Cap bet to available wallet balance AND strategy's AVAILABLE balance (not locked funds)
-    let liveBetAmount = Math.min(amount, availableWallet, availableBudget);
+    // Also cap to MAX_BET_PCT of AVAILABLE budget to prevent over-betting
+    const MAX_BET_PCT = 0.42; // Max ~42% of available budget per bet
+    const maxBetFromBudget = availableBudget * MAX_BET_PCT;
+    let liveBetAmount = Math.min(amount, availableWallet, availableBudget, maxBetFromBudget);
     
-    if (liveBetAmount < 1) {
+    if (liveBetAmount < amount) {
+      console.log(`   🔒 [${strategy.name}] Bet capped: $${amount.toFixed(2)} → $${liveBetAmount.toFixed(2)} (max ${MAX_BET_PCT * 100}% of $${availableBudget.toFixed(2)} available)`);
+    }
+    
+    // Minimum $3 to ensure 5+ shares at typical prices (50¢)
+    if (liveBetAmount < 3) {
       // Check WHY we can't bet
       if (strategy.liveBalance < 1) {
         // Total budget exhausted - HALT LIVE ONLY
@@ -1322,28 +1395,38 @@ async function placeBet(marketState: MarketState, strategy: StrategyState, amoun
           
           // Place the real order at market price
           addStrategyLog(strategy, 'clob', `Sending CLOB order: ${side} $${liveBetAmount} @ ${(bidPrice * 100).toFixed(0)}¢`);
-          const result = await liveTrading.placeOrder(tokenId, side, liveBetAmount, bidPrice);
+          
+          // Use multi-phase execution for better fill rates (handles FOK rejections)
+          const result = USE_MULTI_PHASE_ORDERS
+            ? await liveTrading.placeOrderWithRetry(tokenId, side, liveBetAmount, bidPrice, ORDER_RETRY_CONFIG)
+            : await liveTrading.placeOrder(tokenId, side, liveBetAmount, bidPrice);
           
           if (result.success) {
-            addStrategyLog(strategy, 'fill', `✅ Order filled! ID: ${result.orderId}, Shares: ${result.shares}`, { orderId: result.orderId, shares: result.shares });
-            console.log(`   💰 [LIVE] ${strategy.name}: $${liveBetAmount} ${side} @ ${(bidPrice * 100).toFixed(0)}¢`);
-            console.log(`      Order ID: ${result.orderId}, Shares: ${result.shares}`);
-            sendTelegramAlert(`💰 *LIVE BET*\n\n${marketState.key} ${strategy.name}\n$${liveBetAmount} on ${side}\nWallet remaining: $${(availableWallet - liveBetAmount).toFixed(2)}\nOrder: ${result.orderId}`);
+            // Use ACTUAL fill data, not intended amounts
+            const actualShares = result.shares || Math.floor(liveBetAmount / bidPrice);
+            const actualPrice = result.price || bidPrice;
+            const actualCost = actualShares * actualPrice; // What we ACTUALLY paid
             
-            // Track live deployed and deduct from live balance
-            strategy.liveDeployed += liveBetAmount;
-            strategy.liveBalance -= liveBetAmount;
+            // Single clear fill log line (like: [LIVE] PLACE+FILL DOWN @ $0.52 x 42 shares ($21.84) [0x8e64...] — immediate fill!)
+            const shortOrderId = result.orderId ? `[${result.orderId.substring(0, 10)}...]` : '';
+            const fillLogLine = `[LIVE] PLACE+FILL ${side} @ $${actualPrice.toFixed(2)} x ${actualShares.toFixed(0)} shares ($${actualCost.toFixed(2)}) ${shortOrderId} — immediate fill!`;
+            console.log(`   ✅ ${fillLogLine}`);
+            addStrategyLog(strategy, 'fill', fillLogLine, { orderId: result.orderId, shares: actualShares, price: actualPrice, cost: actualCost });
+            sendTelegramAlert(`✅ *PLACE+FILL*\n\n${marketState.key} ${strategy.name}\n${side} @ $${actualPrice.toFixed(2)} x ${actualShares.toFixed(0)} shares\nCost: $${actualCost.toFixed(2)}\nWallet: $${(availableWallet - actualCost).toFixed(2)}`);
+            
+            // Track live deployed and deduct from live balance using ACTUAL cost
+            strategy.liveDeployed += actualCost;
+            strategy.liveBalance -= actualCost;
             
             // Track in current market state for UI display
-            const actualShares = result.shares || Math.floor(liveBetAmount / bidPrice);
             market.bets.push({
               minute: Date.now(),
-              amount: liveBetAmount,
+              amount: actualCost,
               executed: true,
               shares: actualShares,
-              price: bidPrice,
+              price: actualPrice,
             });
-            market.costBet += liveBetAmount;
+            market.costBet += actualCost;
             market.shares += actualShares;
             market.avgPrice = market.costBet / market.shares;
             market.fills++;
@@ -1352,7 +1435,7 @@ async function placeBet(marketState: MarketState, strategy: StrategyState, amoun
             if (liveMarket.conditionId) {
               recordBet(liveMarket.conditionId, tokenId, liveMarket.slug || liveMarket.title, side);
               
-              // Track with new bet tracker for complete lifecycle
+              // Track with new bet tracker for complete lifecycle (use ACTUAL values)
               const trackedBet = trackBetPlaced({
                 orderId: result.orderId || `unknown_${Date.now()}`,
                 strategyId: strategy.id,
@@ -1361,18 +1444,18 @@ async function placeBet(marketState: MarketState, strategy: StrategyState, amoun
                 conditionId: liveMarket.conditionId,
                 tokenId: tokenId,
                 side: side as 'Up' | 'Down',
-                betAmount: liveBetAmount,
-                price: bidPrice,
+                betAmount: actualCost,  // ACTUAL cost, not intended
+                price: actualPrice,
                 shares: actualShares,
               });
               
               // Mark as filled immediately since we got shares
               if (result.orderId && actualShares > 0) {
-                trackBetFilled(result.orderId, actualShares, bidPrice);
+                trackBetFilled(result.orderId, actualShares, actualPrice);
               }
             }
             
-            // Save live bet to database for tracking
+            // Save live bet to database for tracking (use ACTUAL values)
             const liveBetId = db.saveLiveBet({
               strategy_id: strategy.id,
               market_key: marketState.key,
@@ -1381,30 +1464,35 @@ async function placeBet(marketState: MarketState, strategy: StrategyState, amoun
               token_id: tokenId,
               order_id: result.orderId,
               side: side as 'Up' | 'Down',
-              amount: liveBetAmount,
-              price: bidPrice,
+              amount: actualCost,  // ACTUAL cost
+              price: actualPrice,
               shares: actualShares,
               status: 'pending',
             });
             
-            // Track this bet as pending - funds are now locked
+            // Track this bet as pending - funds are now locked (use ACTUAL cost)
             strategy.pendingBets.push({
               conditionId: liveMarket.conditionId || '',
               tokenId: tokenId,
-              betAmount: liveBetAmount,
-              expectedPayout: actualShares, // Max payout if we win
+              betAmount: actualCost,  // ACTUAL cost
+              expectedPayout: actualShares, // Max payout if we win ($1/share)
               marketResolved: false,
               won: null,
               timestamp: Date.now(),
+              // Dashboard display fields
+              time: new Date().toLocaleTimeString(),
+              side: side,
+              shares: actualShares,
+              amount: actualCost,  // ACTUAL cost
             });
-            strategy.lockedFunds += liveBetAmount;
-            addStrategyLog(strategy, 'info', `🔒 $${liveBetAmount} locked (total locked: $${strategy.lockedFunds.toFixed(2)})`);
+            strategy.lockedFunds += actualCost;
+            addStrategyLog(strategy, 'info', `🔒 $${actualCost.toFixed(2)} locked (total locked: $${strategy.lockedFunds.toFixed(2)})`);
             
-            db.dbLog.info('live', `Live bet placed: ${side} $${liveBetAmount}`, {
+            db.dbLog.info('live', `Live bet placed: ${side} ${actualShares.toFixed(2)} shares @ ${(actualPrice * 100).toFixed(1)}¢ = $${actualCost.toFixed(2)}`, {
               betId: liveBetId,
               orderId: result.orderId,
               shares: actualShares,
-              price: bidPrice,
+              price: actualPrice,
             }, strategy.id, marketState.key);
           } else {
             addStrategyLog(strategy, 'error', `❌ Order failed: ${result.error}`, { error: result.error });
@@ -1424,6 +1512,11 @@ async function placeBet(marketState: MarketState, strategy: StrategyState, amoun
   if (strategy.liveMode) {
     // Live mode handled above - don't run paper simulation
     return;
+  }
+  
+  // Global paper trading toggle
+  if (!PAPER_TRADING_ENABLED) {
+    return;  // Paper trading disabled globally
   }
   
   // Paper trading simulation
@@ -1453,7 +1546,7 @@ async function placeBet(marketState: MarketState, strategy: StrategyState, amoun
 }
 
 // ============ Market Management ============
-function startMarket(marketState: MarketState): void {
+async function startMarket(marketState: MarketState): Promise<void> {
   const now = Date.now();
   const duration = getDurationMinutes(marketState.timeframe);
   
@@ -1475,13 +1568,22 @@ function startMarket(marketState: MarketState): void {
   
   const marketId = `${marketState.key}-${alignedStart}`;
   
+  // Fetch fresh price at candle start for accurate "price to beat"
+  const freshOpenPrice = await fetchChainlinkPrice(marketState.asset) || marketState.currentPrice;
+  
   marketState.currentMarket = {
     id: marketId,
     title: `${marketState.asset} ${duration}min - ${new Date(alignedStart).toLocaleTimeString()}`,
     startTime: alignedStart,
     endTime: alignedEnd,
-    openPrice: marketState.currentPrice,
+    openPrice: freshOpenPrice,
   };
+  
+  // Update the market's current price too
+  if (freshOpenPrice) {
+    marketState.currentPrice = freshOpenPrice;
+    state.prices[marketState.asset] = freshOpenPrice;
+  }
   
   console.log(`   ⏰ Aligned to Polymarket window: ${new Date(alignedStart).toLocaleTimeString()} - ${new Date(alignedEnd).toLocaleTimeString()}`);
   
@@ -1549,7 +1651,108 @@ function tradingTick(marketState: MarketState): void {
   broadcastState();
 }
 
-function endMarket(marketState: MarketState): void {
+// Track pending background resolutions
+interface PendingResolution {
+  marketKey: string;
+  marketSlug: string;
+  conditionId?: string;
+  openPrice: number;
+  closePrice: number;
+  priceBasedUp: boolean;
+  strategies: Array<{
+    id: string;
+    side: 'Up' | 'Down';
+    shares: number;
+    costBet: number;
+    avgPrice: number;
+    liveMode: boolean;
+    liveDeployed: number;
+  }>;
+  startTime: number;
+}
+const pendingResolutions: PendingResolution[] = [];
+
+// Background polling for market resolution
+async function pollForResolution(pending: PendingResolution): Promise<void> {
+  const maxAttempts = 20;  // Max 20 attempts
+  const pollIntervalMs = 15000;  // Poll every 15 seconds
+  
+  console.log(`🔄 [Background] Starting resolution polling for ${pending.marketSlug}`);
+  
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      // Get market info
+      const marketInfo = await getMarketBySlug(pending.marketSlug);
+      if (!marketInfo?.conditionId) {
+        console.log(`   [${attempt}/${maxAttempts}] Market not found yet...`);
+        await new Promise(r => setTimeout(r, pollIntervalMs));
+        continue;
+      }
+      
+      pending.conditionId = marketInfo.conditionId;
+      
+      // Check if resolved
+      const outcome = await checkMarketOutcome(marketInfo.conditionId);
+      if (!outcome) {
+        console.log(`   [${attempt}/${maxAttempts}] Not resolved yet, waiting ${pollIntervalMs/1000}s...`);
+        await new Promise(r => setTimeout(r, pollIntervalMs));
+        continue;
+      }
+      
+      // RESOLVED! Log and update P&L
+      const wentUp = outcome === 'Up';
+      console.log(`✅ [Background] Market resolved: ${pending.marketSlug} → ${outcome.toUpperCase()}`);
+      
+      // Check if Polymarket disagrees with our price prediction
+      if (wentUp !== pending.priceBasedUp) {
+        console.log(`   ⚠️ Polymarket says ${outcome}, we predicted ${pending.priceBasedUp ? 'UP' : 'DOWN'} - MISMATCH!`);
+      }
+      
+      // Update each strategy with actual results
+      for (const stratData of pending.strategies) {
+        const marketState = state.markets.find(m => m.key === pending.marketKey);
+        const strategy = marketState?.strategies.find(s => s.id === stratData.id);
+        if (!strategy) continue;
+        
+        const won = (wentUp && stratData.side === 'Up') || (!wentUp && stratData.side === 'Down');
+        const payout = won ? stratData.shares : 0;
+        const pnl = payout - stratData.costBet;
+        
+        // Log final result
+        const modeLabel = stratData.liveMode ? '🔴 LIVE' : '📄 Paper';
+        console.log(`   ${modeLabel} ${strategy.name}: ${won ? 'WIN' : 'LOSS'} | Cost=$${stratData.costBet.toFixed(2)} Payout=$${payout.toFixed(2)} | P&L=$${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}`);
+        addStrategyLog(strategy, 'resolve', 
+          `${modeLabel} CONFIRMED: ${outcome} | ${won ? 'WIN' : 'LOSS'} | Cost=$${stratData.costBet.toFixed(2)} Payout=$${payout.toFixed(2)} | P&L=$${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}`,
+          { outcome, won, pnl, payout, cost: stratData.costBet }
+        );
+        
+        // Send telegram alert with actual result
+        if (stratData.liveMode) {
+          sendTelegramAlert(`${won ? '✅' : '❌'} *RESOLVED: ${outcome}*\n\n${pending.marketKey} ${strategy.name}\nBet: ${stratData.side} | Result: ${won ? 'WIN' : 'LOSS'}\nCost: $${stratData.costBet.toFixed(2)}\nPayout: $${payout.toFixed(2)}\nP&L: $${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}`);
+        }
+      }
+      
+      // Remove from pending
+      const idx = pendingResolutions.indexOf(pending);
+      if (idx >= 0) pendingResolutions.splice(idx, 1);
+      
+      saveState();
+      broadcastState();
+      return;
+      
+    } catch (error: any) {
+      console.log(`   [${attempt}/${maxAttempts}] Error polling: ${error.message}`);
+      await new Promise(r => setTimeout(r, pollIntervalMs));
+    }
+  }
+  
+  console.log(`❌ [Background] Resolution polling timed out for ${pending.marketSlug} after ${maxAttempts} attempts`);
+  // Remove from pending even on timeout
+  const idx = pendingResolutions.indexOf(pending);
+  if (idx >= 0) pendingResolutions.splice(idx, 1);
+}
+
+async function endMarket(marketState: MarketState): Promise<void> {
   if (!marketState.currentMarket) return;
   
   if (marketState.tradingTimer) {
@@ -1559,10 +1762,62 @@ function endMarket(marketState: MarketState): void {
   
   const openPrice = marketState.currentMarket.openPrice;
   const closePrice = marketState.currentPrice;
-  const wentUp = closePrice >= openPrice;
   
-  console.log(`\n📊 [${marketState.key}] Ended - ${wentUp ? 'UP' : 'DOWN'}`);
+  // Our price-based prediction (for quick display)
+  const priceBasedUp = closePrice >= openPrice;
+  
+  console.log(`\n📊 [${marketState.key}] Ended - Price says ${priceBasedUp ? 'UP' : 'DOWN'}`);
   console.log(`   $${openPrice.toLocaleString()} → $${closePrice.toLocaleString()}`);
+  
+  // Build the Polymarket slug
+  const assetLower = marketState.asset.toLowerCase();
+  const tfLabel = marketState.timeframe === '5min' ? '5m' : '15m';
+  const windowTimestamp = Math.floor(marketState.currentMarket.startTime / 1000);
+  const marketSlug = `${assetLower}-updown-${tfLabel}-${windowTimestamp}`;
+  
+  // Collect strategy data for background resolution
+  const strategiesData: PendingResolution['strategies'] = [];
+  for (const strategy of marketState.strategies) {
+    const strategyMarket = strategy.currentMarket;
+    if (strategyMarket && strategyMarket.fills > 0) {
+      strategiesData.push({
+        id: strategy.id,
+        side: strategyMarket.side || 'Up',
+        shares: strategyMarket.shares,
+        costBet: strategyMarket.costBet,
+        avgPrice: strategyMarket.avgPrice,
+        liveMode: strategy.liveMode,
+        liveDeployed: strategy.liveDeployed,
+      });
+    }
+  }
+  
+  // Start background resolution polling (non-blocking)
+  if (strategiesData.length > 0) {
+    const pending: PendingResolution = {
+      marketKey: marketState.key,
+      marketSlug,
+      openPrice,
+      closePrice,
+      priceBasedUp,
+      strategies: strategiesData,
+      startTime: Date.now(),
+    };
+    pendingResolutions.push(pending);
+    
+    // Log that we're starting background polling
+    const windowSeconds = marketState.timeframe === '5min' ? 300 : 900;
+    console.log(`   🔄 Background resolve: waiting ~${windowSeconds}s for ${marketSlug} to settle on Polymarket`);
+    
+    // Start polling in background (don't await)
+    setTimeout(() => pollForResolution(pending), 30000); // Start polling after 30s
+  }
+  
+  // Continue immediately with price-based prediction for UI (will be corrected by background poll)
+  const wentUp = priceBasedUp;
+  const outcomeSource = 'price (awaiting Polymarket confirmation)';
+  
+  console.log(`   📊 Final result: ${wentUp ? 'UP' : 'DOWN'} (source: ${outcomeSource})`);
   
   for (const strategy of marketState.strategies) {
     const strategyMarket = strategy.currentMarket;
@@ -1642,34 +1897,24 @@ function endMarket(marketState: MarketState): void {
       const livePayout = won ? Math.floor(liveBetThisMarket / strategyMarket.avgPrice) : 0;
       const liveMarketPnl = livePayout - liveBetThisMarket;
       
-      // Update P&L tracking
-      strategy.livePnl += liveMarketPnl;
-      if (won) {
-        strategy.liveWins++;
-        // WIN: Mark pending bets as resolved, awaiting redemption
-        // DON'T unlock funds yet - wait for actual redemption
-        for (const pending of strategy.pendingBets) {
-          if (!pending.marketResolved) {
-            pending.marketResolved = true;
-            pending.won = true;
-            pending.expectedPayout = livePayout;
-          }
+      // DON'T update liveWins/liveLosses or livePnl here based on prediction!
+      // The chain is the source of truth - let BetTracker verify from actual token balances.
+      // Just mark pending bets as "awaiting chain confirmation"
+      for (const pending of strategy.pendingBets) {
+        if (!pending.marketResolved) {
+          pending.marketResolved = true;
+          pending.won = null; // NULL = awaiting chain confirmation
+          pending.expectedPayout = won ? livePayout : 0;
+          pending.predictedWon = won; // Store prediction for logging only
         }
-        addStrategyLog(strategy, 'info', `✅ WIN - $${livePayout} awaiting redemption (still locked: $${strategy.lockedFunds.toFixed(2)})`);
-      } else {
-        strategy.liveLosses++;
-        // LOSS: Unlock the bet amount (it's gone, not coming back)
-        // Remove resolved losing bets from pending
-        const losingBets = strategy.pendingBets.filter(b => !b.marketResolved);
-        for (const bet of losingBets) {
-          bet.marketResolved = true;
-          bet.won = false;
-          strategy.lockedFunds = Math.max(0, strategy.lockedFunds - bet.betAmount);
-        }
-        // Clean up resolved losing bets
-        strategy.pendingBets = strategy.pendingBets.filter(b => !(b.marketResolved && b.won === false));
-        addStrategyLog(strategy, 'info', `❌ LOSS - $${liveBetThisMarket.toFixed(2)} lost, unlocked (locked: $${strategy.lockedFunds.toFixed(2)})`);
       }
+      
+      // Log prediction but note it's awaiting chain confirmation
+      const predictionEmoji = won ? '📈' : '📉';
+      addStrategyLog(strategy, 'info', `${predictionEmoji} Prediction: ${won ? 'WIN' : 'LOSS'} - awaiting chain confirmation (locked: $${strategy.lockedFunds.toFixed(2)})`);
+      
+      // DON'T update liveWins/liveLosses/livePnl here - wait for chain confirmation
+      // DON'T unlock funds - wait for chain confirmation
       
       strategy.liveHistory.unshift({
         ...tradeRecord,
@@ -1858,11 +2103,92 @@ const server = http.createServer(async (req, res) => {
 
   if (url === '/api/poly/resume' && req.method === 'POST') {
     state.globalHalt = false;
+    state.maintenanceMode = false;  // Also exit maintenance mode
+    state.maintenanceSince = null;
     saveState();
     broadcastState();
     sendTelegramAlert('▶️ *TRADING RESUMED*\n\nAll markets active again.');
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true, message: 'Trading resumed', globalHalt: false }));
+    return;
+  }
+
+  // ============ MAINTENANCE MODE ENDPOINTS ============
+  if (url === '/api/poly/maintenance' && req.method === 'POST') {
+    state.maintenanceMode = true;
+    state.maintenanceSince = Date.now();
+    saveState();
+    broadcastState();
+    sendTelegramAlert('🔧 *MAINTENANCE MODE*\n\nNo new bets will be placed.\nWaiting for current positions to resolve before restart.');
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, message: 'Maintenance mode enabled', maintenanceMode: true }));
+    return;
+  }
+
+  if (url === '/api/poly/maintenance/status') {
+    // Check if safe to restart
+    let totalPending = 0;
+    let totalLocked = 0;
+    const activeMarkets: string[] = [];
+    
+    for (const market of state.markets) {
+      if (market.currentMarket) {
+        activeMarkets.push(`${market.key} (${(market.currentMarket.durationMinutes - market.currentMarket.elapsed).toFixed(1)}m left)`);
+      }
+      for (const strategy of market.strategies) {
+        totalPending += strategy.pendingBets?.length || 0;
+        totalLocked += strategy.lockedFunds || 0;
+      }
+    }
+    
+    const safeToRestart = totalPending === 0 && totalLocked === 0 && activeMarkets.length === 0;
+    
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      maintenanceMode: state.maintenanceMode,
+      since: state.maintenanceSince,
+      safeToRestart,
+      pendingBets: totalPending,
+      lockedFunds: totalLocked,
+      activeMarkets,
+      recommendation: safeToRestart 
+        ? '✅ Safe to restart now' 
+        : `⏳ Wait for: ${totalPending} pending bets, $${totalLocked.toFixed(0)} locked, ${activeMarkets.length} active markets`
+    }));
+    return;
+  }
+
+  if (url === '/api/poly/safe-restart' && req.method === 'POST') {
+    // Enter maintenance mode and prepare for restart
+    state.maintenanceMode = true;
+    state.maintenanceSince = Date.now();
+    saveState();
+    broadcastState();
+    
+    // Check if already safe
+    let totalPending = 0;
+    let totalLocked = 0;
+    
+    for (const market of state.markets) {
+      for (const strategy of market.strategies) {
+        totalPending += strategy.pendingBets?.length || 0;
+        totalLocked += strategy.lockedFunds || 0;
+      }
+    }
+    
+    const safeNow = totalPending === 0 && totalLocked === 0;
+    
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      success: true,
+      maintenanceMode: true,
+      safeToRestart: safeNow,
+      pendingBets: totalPending,
+      lockedFunds: totalLocked,
+      message: safeNow 
+        ? 'Safe to restart now! Run: pm2 restart polymarket-multi'
+        : `Maintenance mode enabled. Poll /api/poly/maintenance/status until safe.`
+    }));
     return;
   }
 
@@ -2107,16 +2433,29 @@ const server = http.createServer(async (req, res) => {
         
         strategy.liveMode = data.live ?? false;
         
-        // Set funding if provided
+        // Set funding if provided - RESET LIVE STATS
         if (data.funding && data.live) {
+          // Live trading stats
+          strategy.liveAllocation = data.funding;
+          strategy.liveBalance = data.funding;
+          strategy.liveDeployed = 0;
+          strategy.livePnl = 0;
+          strategy.liveWins = 0;
+          strategy.liveLosses = 0;
+          strategy.liveHistory = [];
+          strategy.lockedFunds = 0;
+          strategy.pendingBets = [];
+          strategy.liveHalted = false;
+          strategy.liveHaltedReason = undefined;
+          // Also update paper stats for consistency
           strategy.balance = data.funding;
           strategy.startingBalance = data.funding;
-          strategy.stopLossThreshold = Math.floor(data.funding * 0.25);  // 25% of new funding
+          strategy.stopLossThreshold = Math.floor(data.funding * 0.25);
           strategy.totalPnl = 0;
           strategy.deployed = 0;
           strategy.wins = 0;
           strategy.losses = 0;
-          strategy.halted = false;  // Reset halt status
+          strategy.halted = false;
           strategy.haltedReason = undefined;
         }
         
@@ -2317,6 +2656,8 @@ wss.on('connection', (ws) => {
             strategy.liveLosses = 0;
             strategy.halted = false;
             strategy.haltedReason = undefined;
+            strategy.liveHalted = false;
+            strategy.liveHaltedReason = undefined;
             console.log(`💰 LIVE MODE: ${strategy.name} in ${msg.key} - Budget: $${funding}`);
             sendTelegramAlert(`💰 *LIVE MODE ENABLED*\n\n${msg.key} ${strategy.name}\nBudget: $${funding}\n\nStrategy will stop if budget drops below $${(funding * 0.1).toFixed(2)} (10%)`);
           } else if (!strategy.liveMode && wasLive) {
@@ -2406,6 +2747,70 @@ ${MARKET_CONFIGS.map(c => `    • ${c.asset} ${c.timeframe}`).join('\n')}
         const trackerResult = await checkAndRedeemAll(process.env.PRIVATE_KEY!);
         if (trackerResult.redeemed > 0 || trackerResult.resolved > 0) {
           console.log(`   📊 [BetTracker] Checked: ${trackerResult.checked}, Resolved: ${trackerResult.resolved}, Redeemed: ${trackerResult.redeemed}`);
+        }
+        
+        // Handle chain-confirmed results - update strategy state from truth source
+        for (const confirmed of trackerResult.confirmedResults) {
+          for (const market of state.markets) {
+            for (const strategy of market.strategies) {
+              if (strategy.id !== confirmed.strategyId) continue;
+              
+              // Find and update the pending bet
+              const pendingIdx = strategy.pendingBets.findIndex(b => 
+                b.conditionId === confirmed.conditionId || b.tokenId === confirmed.tokenId
+              );
+              
+              if (pendingIdx >= 0) {
+                const pending = strategy.pendingBets[pendingIdx];
+                const wasCorrectPrediction = pending.predictedWon === confirmed.won;
+                
+                if (confirmed.won) {
+                  // Chain confirms WIN
+                  strategy.liveWins++;
+                  strategy.liveBalance += confirmed.payout;
+                  strategy.lockedFunds = Math.max(0, strategy.lockedFunds - pending.betAmount);
+                  strategy.livePnl += confirmed.pnl;
+                  addStrategyLog(strategy, 'resolve', `✅ CHAIN CONFIRMED WIN! +$${confirmed.payout.toFixed(2)} (P&L: $${confirmed.pnl.toFixed(2)})`);
+                  console.log(`   ✅ [${strategy.name}] Chain confirmed WIN: +$${confirmed.payout.toFixed(2)}`);
+                } else {
+                  // Chain confirms LOSS
+                  strategy.liveLosses++;
+                  strategy.lockedFunds = Math.max(0, strategy.lockedFunds - pending.betAmount);
+                  strategy.livePnl += confirmed.pnl;
+                  addStrategyLog(strategy, 'resolve', `❌ CHAIN CONFIRMED LOSS: $${pending.betAmount.toFixed(2)} lost`);
+                  console.log(`   ❌ [${strategy.name}] Chain confirmed LOSS: $${pending.betAmount.toFixed(2)}`);
+                }
+                
+                // Add to liveHistory for dashboard display
+                strategy.liveHistory = strategy.liveHistory || [];
+                strategy.liveHistory.unshift({
+                  id: `chain-${confirmed.conditionId.substring(0, 12)}-${Date.now()}`,
+                  time: new Date().toLocaleTimeString(),
+                  timestamp: Date.now(),
+                  marketId: confirmed.conditionId,
+                  side: (pending as any).side || 'Unknown',
+                  shares: confirmed.payout,
+                  cost: pending.betAmount,
+                  payout: confirmed.payout,
+                  pnl: confirmed.pnl,
+                  result: confirmed.won ? 'WIN' as const : 'LOSS' as const,
+                  assetOpen: 0,
+                  assetClose: 0,
+                });
+                strategy.liveHistory = strategy.liveHistory.slice(0, 50);
+                
+                // Log if prediction was wrong
+                if (!wasCorrectPrediction && pending.predictedWon !== null) {
+                  console.log(`   ⚠️ [${strategy.name}] Prediction was WRONG! Predicted ${pending.predictedWon ? 'WIN' : 'LOSS'}, chain says ${confirmed.won ? 'WIN' : 'LOSS'}`);
+                  addStrategyLog(strategy, 'error', `⚠️ Prediction mismatch! Predicted ${pending.predictedWon ? 'WIN' : 'LOSS'}, actual ${confirmed.won ? 'WIN' : 'LOSS'}`);
+                }
+                
+                // Remove from pending
+                strategy.pendingBets.splice(pendingIdx, 1);
+                saveState();
+              }
+            }
+          }
         }
         
         // Also run old auto-redeem for any bets not in tracker

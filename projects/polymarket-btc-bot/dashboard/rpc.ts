@@ -13,20 +13,28 @@ import * as ethers from 'ethers';
 const POLYGON_RPCS = [
   // Premium RPCs (add API keys to .env)
   process.env.ALCHEMY_RPC || '',           // Best: Alchemy
+  process.env.TATUM_RPC ? `${process.env.TATUM_RPC}/${process.env.TATUM_API_KEY}` : '', // Tatum
   process.env.QUICKNODE_RPC || '',          // QuickNode
   
   // Public RPCs - expanded list with more reliable options
   'https://polygon.llamarpc.com',           // LlamaNodes - good reliability
   'https://polygon-bor-rpc.publicnode.com', // PublicNode
+  'https://polygon.publicnode.com',         // PublicNode alt
   'https://rpc.ankr.com/polygon',           // Ankr
   'https://1rpc.io/matic',                  // 1RPC - privacy focused
   'https://polygon.meowrpc.com',            // MeowRPC - low latency
   'https://polygon.gateway.tenderly.co',    // Tenderly
   'https://api.zan.top/node/v1/polygon/mainnet/public', // ZAN
-  'https://polygon-mainnet.public.blastapi.io',
-  'https://polygon.blockpi.network/v1/rpc/public',
-  'https://polygon.drpc.org',
+  'https://polygon-mainnet.public.blastapi.io', // Blast
+  'https://polygon.blockpi.network/v1/rpc/public', // BlockPi
+  'https://polygon.drpc.org',               // DRPC
+  'https://polygon.api.onfinality.io/public', // OnFinality
+  'https://public.stackup.sh/api/v1/node/polygon-mainnet', // Stackup
+  'https://poly-rpc.gateway.pokt.network/', // Pocket Network
+  'https://rpc-mainnet.maticvigil.com',     // MaticVigil
+  'https://matic-mainnet-full-rpc.bwarelabs.com', // Bware Labs
   'https://rpc-mainnet.matic.quiknode.pro', // QuickNode public
+  'https://rpc-mainnet.matic.network',      // Official Matic
   'https://polygon-rpc.com',                // Official - often congested (last resort)
 ].filter(rpc => rpc.length > 0);
 

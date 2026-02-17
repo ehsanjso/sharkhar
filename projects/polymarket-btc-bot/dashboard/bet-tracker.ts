@@ -23,6 +23,7 @@ const CTF_ABI = [
 
 /**
  * Track a new bet when order is placed (uses existing db.saveLiveBet)
+ * Includes deduplication to prevent duplicate entries on restart
  */
 export function trackBetPlaced(params: {
   orderId: string;
@@ -37,6 +38,27 @@ export function trackBetPlaced(params: {
   price?: number;
   shares?: number;
 }): number {
+  // Check for duplicate by orderId first (most reliable)
+  const existingByOrder = db.getLiveBetByOrderId?.(params.orderId);
+  if (existingByOrder) {
+    console.log(`⚠️ [BetTracker] Duplicate bet detected (orderId: ${params.orderId}), skipping`);
+    return existingByOrder.id!;
+  }
+  
+  // Also check for recent duplicate by strategyId + tokenId + amount (within last 60 seconds)
+  const pending = db.getLiveBetsByStatus('pending');
+  const recentDuplicate = pending.find(b => 
+    b.strategy_id === params.strategyId &&
+    b.token_id === params.tokenId &&
+    Math.abs(b.amount - params.betAmount) < 0.01 &&
+    b.created_at && (Date.now() - new Date(b.created_at).getTime()) < 60000
+  );
+  
+  if (recentDuplicate) {
+    console.log(`⚠️ [BetTracker] Duplicate bet detected (recent same bet), skipping`);
+    return recentDuplicate.id!;
+  }
+  
   const betId = db.saveLiveBet({
     strategy_id: params.strategyId,
     market_key: params.marketKey,
@@ -82,11 +104,21 @@ export function getPendingBets(): db.LiveBetRecord[] {
 /**
  * Check and redeem all pending bets
  */
+export interface ChainConfirmedResult {
+  conditionId: string;
+  tokenId: string;
+  strategyId: string;
+  won: boolean;
+  payout: number;
+  pnl: number;
+}
+
 export async function checkAndRedeemAll(privateKey: string): Promise<{
   checked: number;
   resolved: number;
   redeemed: number;
   totalPnL: number;
+  confirmedResults: ChainConfirmedResult[];
 }> {
   const provider = new ethers.providers.StaticJsonRpcProvider(
     process.env.ALCHEMY_RPC || 'https://polygon.llamarpc.com',
@@ -99,48 +131,66 @@ export async function checkAndRedeemAll(privateKey: string): Promise<{
   let resolved = 0;
   let redeemed = 0;
   let totalPnL = 0;
+  const confirmedResults: ChainConfirmedResult[] = [];
+  
+  // Track which tokenIds we've already processed to handle shared positions
+  const processedTokens = new Map<string, { won: boolean; totalPayout: number; redeemed: boolean }>();
   
   if (pending.length === 0) {
-    return { checked: 0, resolved: 0, redeemed: 0, totalPnL: 0 };
+    return { checked: 0, resolved: 0, redeemed: 0, totalPnL: 0, confirmedResults: [] };
   }
   
   console.log(`🔍 [BetTracker] Checking ${pending.length} pending bets...`);
   db.dbLog.live('info', `Checking ${pending.length} pending bets`);
   
+  // Group bets by tokenId to handle shared positions correctly
+  const betsByToken = new Map<string, typeof pending>();
   for (const bet of pending) {
-    if (!bet.condition_id || !bet.token_id) continue;
+    if (!bet.token_id) continue;
+    if (!betsByToken.has(bet.token_id)) {
+      betsByToken.set(bet.token_id, []);
+    }
+    betsByToken.get(bet.token_id)!.push(bet);
+  }
+  
+  // Process each unique tokenId once
+  for (const [tokenId, bets] of betsByToken) {
+    const firstBet = bets[0];
+    if (!firstBet.condition_id) continue;
     
     try {
-      // Check token balance
-      const balance = await ctf.balanceOf(wallet.address, bet.token_id);
+      // Check token balance ONCE per tokenId
+      const balance = await ctf.balanceOf(wallet.address, tokenId);
       const balanceNum = parseFloat(ethers.utils.formatUnits(balance, 6));
       
       // Check if market is resolved
-      const payoutDenom = await ctf.payoutDenominator(bet.condition_id);
+      const payoutDenom = await ctf.payoutDenominator(firstBet.condition_id);
       const isResolved = payoutDenom.gt(0);
       
       if (!isResolved) {
-        // Market not resolved yet
+        // Market not resolved yet - skip all bets for this token
         continue;
       }
       
-      // Market is resolved
-      resolved++;
-      
-      // Determine result
+      // Market is resolved - determine result for ALL bets on this token
       const won = balanceNum > 0;
       const result = won ? 'WIN' : 'LOSS';
       
+      // Calculate total invested by all strategies in this token
+      const totalInvested = bets.reduce((sum, b) => sum + b.amount, 0);
+      
+      resolved += bets.length;
+      
       if (won && balanceNum > 0) {
-        // Try to redeem
-        console.log(`🔄 [BetTracker] Redeeming $${balanceNum.toFixed(2)} from bet #${bet.id}...`);
-        db.dbLog.live('info', `Redeeming $${balanceNum.toFixed(2)} from bet #${bet.id}`, { betId: bet.id, amount: balanceNum }, bet.strategy_id, bet.market_key);
+        // Try to redeem ONCE for all bets on this token
+        console.log(`🔄 [BetTracker] Redeeming $${balanceNum.toFixed(2)} from ${bets.length} bets on token...`);
+        db.dbLog.live('info', `Redeeming $${balanceNum.toFixed(2)} from ${bets.length} bets`, { tokenId, amount: balanceNum });
         
         try {
           const tx = await ctf.redeemPositions(
             USDC_E,
             '0x0000000000000000000000000000000000000000000000000000000000000000',
-            bet.condition_id,
+            firstBet.condition_id,
             [1, 2],
             {
               gasLimit: 500000,
@@ -150,42 +200,71 @@ export async function checkAndRedeemAll(privateKey: string): Promise<{
           );
           
           await tx.wait(1);
-          
-          // Update bet as redeemed
-          db.updateLiveBetStatusById(bet.id!, 'redeemed', result, balanceNum);
-          
           redeemed++;
-          const pnl = balanceNum - bet.amount;
-          totalPnL += pnl;
           
-          db.dbLog.live('info', `Redeemed $${balanceNum.toFixed(2)}! P&L: $${pnl.toFixed(2)}`, {
-            betId: bet.id,
-            pnl,
-            txHash: tx.hash,
-          }, bet.strategy_id, bet.market_key);
+          // Distribute payout proportionally to all strategies that bet on this token
+          for (const bet of bets) {
+            const proportion = bet.amount / totalInvested;
+            const betPayout = balanceNum * proportion;
+            const betPnl = betPayout - bet.amount;
+            
+            // Update bet as redeemed with proportional payout
+            db.updateLiveBetStatusById(bet.id!, 'redeemed', 'WIN', betPayout);
+            totalPnL += betPnl;
+            
+            db.dbLog.live('info', `Bet #${bet.id} WIN! Payout: $${betPayout.toFixed(2)}, P&L: $${betPnl.toFixed(2)}`, {
+              betId: bet.id,
+              pnl: betPnl,
+              proportion: (proportion * 100).toFixed(0) + '%',
+            }, bet.strategy_id, bet.market_key);
+            
+            console.log(`✅ [BetTracker] Bet #${bet.id} (${bet.strategy_id}) WIN! $${betPayout.toFixed(2)} (${(proportion * 100).toFixed(0)}% share)`);
+            
+            // Record chain-confirmed result for each strategy
+            confirmedResults.push({
+              conditionId: bet.condition_id,
+              tokenId: bet.token_id,
+              strategyId: bet.strategy_id,
+              won: true,
+              payout: betPayout,
+              pnl: betPnl,
+            });
+          }
           
-          console.log(`✅ [BetTracker] Redeemed $${balanceNum.toFixed(2)}! P&L: $${pnl.toFixed(2)}`);
+          console.log(`✅ [BetTracker] Redeemed $${balanceNum.toFixed(2)} total, distributed to ${bets.length} strategies`);
           
         } catch (txError: any) {
-          db.dbLog.live('error', `Redeem failed: ${txError.message?.substring(0, 100)}`, { betId: bet.id, error: txError.message }, bet.strategy_id, bet.market_key);
+          db.dbLog.live('error', `Redeem failed: ${txError.message?.substring(0, 100)}`, { tokenId, error: txError.message });
           console.error(`❌ [BetTracker] Redeem failed: ${txError.message?.substring(0, 50)}`);
         }
       } else {
-        // Lost or already redeemed - just update status
-        db.updateLiveBetStatusById(bet.id!, 'resolved', result, 0);
-        const pnl = -bet.amount;
-        totalPnL += pnl;
-        db.dbLog.live('info', `Bet #${bet.id} ${result}: P&L $${pnl.toFixed(2)}`, { betId: bet.id, result, pnl }, bet.strategy_id, bet.market_key);
-        console.log(`📕 [BetTracker] Bet #${bet.id} ${result}: P&L $${pnl.toFixed(2)}`);
+        // Lost or already redeemed - update ALL bets on this token as LOSS
+        for (const bet of bets) {
+          db.updateLiveBetStatusById(bet.id!, 'resolved', 'LOSS', 0);
+          const pnl = -bet.amount;
+          totalPnL += pnl;
+          db.dbLog.live('info', `Bet #${bet.id} LOSS: P&L $${pnl.toFixed(2)}`, { betId: bet.id, result: 'LOSS', pnl }, bet.strategy_id, bet.market_key);
+          console.log(`📕 [BetTracker] Bet #${bet.id} (${bet.strategy_id}) LOSS: P&L $${pnl.toFixed(2)}`);
+          
+          // Record chain-confirmed result (loss) for each strategy
+          confirmedResults.push({
+            conditionId: bet.condition_id,
+            tokenId: bet.token_id,
+            strategyId: bet.strategy_id,
+            won: false,
+            payout: 0,
+            pnl,
+          });
+        }
       }
       
     } catch (error: any) {
-      db.dbLog.live('error', `Error checking bet #${bet.id}: ${error.message?.substring(0, 100)}`, { betId: bet.id, error: error.message }, bet.strategy_id, bet.market_key);
-      console.error(`⚠️ [BetTracker] Error checking bet #${bet.id}: ${error.message?.substring(0, 50)}`);
+      db.dbLog.live('error', `Error checking token ${tokenId}: ${error.message?.substring(0, 100)}`, { tokenId, error: error.message });
+      console.error(`⚠️ [BetTracker] Error checking token: ${error.message?.substring(0, 50)}`);
     }
   }
   
-  return { checked: pending.length, resolved, redeemed, totalPnL };
+  return { checked: pending.length, resolved, redeemed, totalPnL, confirmedResults };
 }
 
 /**
@@ -217,4 +296,44 @@ export function getStats(): {
  */
 export function getRecentHistory(limit = 20): db.LiveBetRecord[] {
   return db.getRecentLiveBets(limit);
+}
+
+/**
+ * Get comprehensive live trading status for logging
+ */
+export function getLiveStatus(): {
+  summary: string;
+  pendingBets: any[];
+  recentResolved: any[];
+  unredeemed: any[];
+  walletBalance: number | null;
+} {
+  const pending = db.getPendingBets();
+  const resolved = db.getResolvedBets().slice(0, 10);
+  const unredeemed = resolved.filter(b => b.result === 'WIN' && !b.redeemed_at);
+  
+  const summary = `📊 Live Trading Status:
+  - Pending bets: ${pending.length}
+  - Unredeemed wins: ${unredeemed.length}
+  - Recent resolved: ${resolved.length}`;
+  
+  return {
+    summary,
+    pendingBets: pending,
+    recentResolved: resolved,
+    unredeemed,
+    walletBalance: null // Will be filled by caller
+  };
+}
+
+/**
+ * Log detailed bet lifecycle events
+ */
+export function logBetEvent(event: string, betId: number, details: Record<string, any> = {}) {
+  const timestamp = new Date().toISOString();
+  const detailStr = Object.entries(details).map(([k, v]) => `${k}=${v}`).join(', ');
+  console.log(`📝 [BetTracker] ${timestamp} | Bet #${betId} | ${event} | ${detailStr}`);
+  
+  // Also log to database
+  db.dbLog.info('live', `Bet #${betId}: ${event}`, details);
 }

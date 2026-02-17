@@ -105,13 +105,23 @@ def run_resolve(args):
 
 def run_reset(args):
     """Reset portfolio."""
+    preserve = not getattr(args, 'clear_pending', False)
+    
     if not args.force:
-        confirm = input(f"Reset portfolio to ${args.cash:.2f}? This will archive current data. (y/N): ")
+        pending = get_pending_bets()
+        msg = f"Reset portfolio to ${args.cash:.2f}?"
+        if pending and preserve:
+            msg += f" ({len(pending)} pending bets will be preserved)"
+        elif pending and not preserve:
+            msg += f" ({len(pending)} pending bets will be CLEARED)"
+        msg += " (y/N): "
+        
+        confirm = input(msg)
         if confirm.lower() != 'y':
             print("Cancelled.")
             return
     
-    reset_portfolio(args.cash)
+    reset_portfolio(args.cash, preserve_pending=preserve)
     print_portfolio()
 
 def run_auto(args):
@@ -305,6 +315,8 @@ Examples:
     reset_parser = subparsers.add_parser('reset', help='Reset portfolio')
     reset_parser.add_argument('--cash', type=float, default=50.0)
     reset_parser.add_argument('--force', action='store_true')
+    reset_parser.add_argument('--clear-pending', action='store_true', dest='clear_pending',
+                              help='Also clear pending bets (default: preserve them)')
     reset_parser.set_defaults(func=run_reset)
     
     # Auto command
