@@ -361,3 +361,26 @@ The spare capacity cron runs at noon daily. Priority order:
 - **Spare capacity cron works** — Good pattern for using downtime productively
 - **Research compounds** — Each topic builds on previous (MCP → HA → Ollama → all connect)
 - **Small code fixes matter** — Timeouts, retries, and proper error handling prevent silent failures
+
+## Weekly Archive
+
+_Automated summaries of archived daily memory files._
+
+### 2026-02-01
+- **Set up Claude quota monitoring** — Cron job at 9am/3pm/9pm; goal is 80% usage at each reset (session ~5hrs, weekly All Models Thu 10:59pm, Sonnet Sat 4:59pm)
+- **Built Agent Dashboard in Mission Control** — Context recovery center showing quota status, cron job health, recent activity feed; helps me orient after waking up fresh each session
+- **Added Cron Jobs page** — Detailed view of scheduled jobs with success/failure counts, timing, and error display
+- **Researched advanced Pi-hole features** — REST API, regex filtering, local DNS records (.local domains), DHCP mode; potential Mission Control integration and ClawdBot skill opportunity
+
+### 2026-01-31
+- **Deployed Uptime Kuma via Docker** — Monitors 9 services (Pi-hole, Mission Control, SSH, router, internet connectivity); accessible at port 3001 with admin/clawd2026!
+- **Switched from npm to Docker installation** — npm dev version (2.0.0-dev.0) had SQL migration bugs; Docker provides stability, auto-restart, and easier management
+- **Documented service port map** — 3000 (Mission Control), 3001 (Uptime Kuma), 80/443 (Pi-hole web), 53 (Pi-hole DNS), 22 (SSH)
+- **Lesson learned** — Avoid dev versions in production; simple port checks more reliable than complex protocol checks for monitoring
+
+### 2026-01-30
+- **Built Mission Control app** — Next.js dashboard with document viewer, task board, and shadcn/ui styling; set up systemd service for persistent running
+- **Completed Alex Finn automation suite** — Three cron jobs: Morning Brief (8am), Daily Research (2pm), Proactive Coder (11pm); installed Last30Days skill
+- **Added video production tooling** — Remotion project with templates, video clip extraction scripts, researched Pi 5 optimization (concurrency=2, JPEG frames, H.264 codec)
+- **Established memory system philosophy** — Daily journals for session logs, separate docs for important concepts, Mission Control as the personal tool for tracking work
+

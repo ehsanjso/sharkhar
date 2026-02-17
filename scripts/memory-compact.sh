@@ -10,7 +10,7 @@
 #
 # What it does:
 #   1. Finds daily memory files older than threshold
-#   2. Summarizes each using Haiku (cheap, fast)
+#   2. Summarizes each using clawdbot agent (Haiku preferred for cost)
 #   3. Appends summaries to MEMORY.md under "## Weekly Archive"
 #   4. Moves processed files to memory/archive/
 #
@@ -77,10 +77,11 @@ success() {
 }
 
 # Get list of daily memory files older than threshold
-# Returns: list of filenames (YYYY-MM-DD.md format)
+# Returns: list of filenames (YYYY-MM-DD.md format only, not other files)
 get_old_files() {
     local days=$1
-    find "$MEMORY_DIR" -maxdepth 1 -name "20*.md" -type f -mtime +"$days" | sort
+    # Match only YYYY-MM-DD.md format
+    find "$MEMORY_DIR" -maxdepth 1 -type f -name "20[0-9][0-9]-[0-9][0-9]-[0-9][0-9].md" -mtime +"$days" | sort
 }
 
 # Check if file is already archived
@@ -89,22 +90,41 @@ is_archived() {
     [[ -f "${ARCHIVE_DIR}/${filename}" ]]
 }
 
-# Summarize a memory file using Haiku
-# TODO: Session 2 - Implement actual summarization
+# Summarize a memory file using clawdbot agent
 summarize_file() {
     local filepath=$1
     local filename
     filename=$(basename "$filepath")
+    local content
     
-    # TODO: Call Haiku via clawdbot sessions_send or direct API
-    # For now, placeholder that extracts headers/key lines
+    # Read file content
+    content=$(cat "$filepath")
     
-    echo "# PLACEHOLDER SUMMARY for ${filename}"
-    echo "# Session 2: Replace with actual Haiku summarization"
-    echo ""
+    # Call clawdbot agent with summarization prompt
+    local prompt="Summarize this daily memory file into 3-5 bullet points of key learnings, decisions, or notable events. Be concise. Skip routine entries. Output ONLY the bullet points, no preamble.
+
+If nothing significant, output exactly: No significant entries.
+
+---
+${content}
+---"
+
+    local result
+    result=$(clawdbot agent --message "$prompt" --session-id "memory-compact-$(date +%Y%m%d)" --json --timeout 60 2>/dev/null)
     
-    # Extract section headers as rough summary
-    grep -E "^##" "$filepath" 2>/dev/null | head -5 || echo "- (no sections found)"
+    # Extract the text from JSON response
+    echo "$result" | jq -r '.result.payloads[0].text // "Failed to summarize"' 2>/dev/null || echo "Failed to summarize"
+}
+
+# Ensure MEMORY.md has the Weekly Archive section
+ensure_archive_section() {
+    if ! grep -q "^## Weekly Archive" "$MEMORY_FILE" 2>/dev/null; then
+        echo "" >> "$MEMORY_FILE"
+        echo "## Weekly Archive" >> "$MEMORY_FILE"
+        echo "" >> "$MEMORY_FILE"
+        echo "_Automated summaries of archived daily memory files._" >> "$MEMORY_FILE"
+        echo "" >> "$MEMORY_FILE"
+    fi
 }
 
 # Append summary to MEMORY.md under Weekly Archive section
@@ -112,13 +132,28 @@ append_to_memory() {
     local date_str=$1
     local summary=$2
     
-    # TODO: Session 2 - Implement proper appending
-    # Should add under "## Weekly Archive" section
-    # Create section if doesn't exist
+    ensure_archive_section
     
-    echo "### ${date_str}"
-    echo "$summary"
-    echo ""
+    # Create temp file with new content inserted after "## Weekly Archive" header
+    local temp_file
+    temp_file=$(mktemp)
+    
+    awk -v date="$date_str" -v summary="$summary" '
+        /^## Weekly Archive/ {
+            print
+            getline  # skip blank line after header
+            print
+            getline  # skip description line
+            print
+            print ""
+            print "### " date
+            print summary
+            next
+        }
+        { print }
+    ' "$MEMORY_FILE" > "$temp_file"
+    
+    mv "$temp_file" "$MEMORY_FILE"
 }
 
 # Move file to archive
@@ -180,6 +215,7 @@ main() {
     
     local count=0
     local skipped=0
+    local processed_dates=""
     
     while IFS= read -r filepath; do
         local filename
@@ -199,14 +235,29 @@ main() {
         
         if $dry_run; then
             echo "  [DRY RUN] Would summarize: ${filepath}"
+            echo "  [DRY RUN] Would append to: ${MEMORY_FILE}"
             echo "  [DRY RUN] Would archive to: ${ARCHIVE_DIR}/${filename}"
         else
-            # TODO: Session 2 - Implement actual processing
-            # 1. Summarize with Haiku
-            # 2. Append to MEMORY.md  
-            # 3. Archive file
+            # 1. Summarize with clawdbot agent
+            log "  Summarizing..."
+            local summary
+            summary=$(summarize_file "$filepath")
             
-            echo "  [NOT IMPLEMENTED] Summarization pending Session 2"
+            if [[ -n "$summary" && "$summary" != "Failed to summarize" ]]; then
+                # 2. Append to MEMORY.md
+                log "  Appending to MEMORY.md..."
+                append_to_memory "$date_str" "$summary"
+                
+                # 3. Archive file
+                log "  Archiving..."
+                archive_file "$filepath"
+                
+                processed_dates="${processed_dates}${date_str} "
+            else
+                warn "  Failed to summarize ${filename}, skipping archive"
+                skipped=$((skipped + 1))
+                continue
+            fi
         fi
         
         count=$((count + 1))
@@ -215,11 +266,15 @@ main() {
     echo ""
     success "Processed: ${count} files"
     if [[ $skipped -gt 0 ]]; then
-        log "Skipped: ${skipped} files (already archived)"
+        log "Skipped: ${skipped} files (already archived or failed)"
     fi
     
     if $dry_run; then
         warn "Dry run - no changes made"
+    else
+        if [[ $count -gt 0 ]]; then
+            log "Archived dates: ${processed_dates}"
+        fi
     fi
 }
 
