@@ -1,21 +1,44 @@
 #!/usr/bin/env python3
 """
 Polymarket Paper Trading Portfolio
-Tracks simulated positions and calculates P&L.
+Now backed by SQLite database for proper separation of paper/live.
+
+This module provides backward-compatible functions that wrap the new database.
 """
 
-import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 
+# Import the new database module
+from database import TradingDatabase, TradingMode, Trade, get_paper_db
+
+# Legacy data paths (for migration reference)
 DATA_DIR = Path(__file__).parent / "data"
-PORTFOLIO_FILE = DATA_DIR / "portfolio.json"
-BETS_FILE = DATA_DIR / "bets.json"
-HISTORY_FILE = DATA_DIR / "history.json"
 
+# Global database instance (default to paper trading)
+_db: Optional[TradingDatabase] = None
+_mode: TradingMode = TradingMode.PAPER
+
+
+def set_trading_mode(mode: TradingMode):
+    """Set trading mode (PAPER or LIVE). Call before any other functions."""
+    global _db, _mode
+    _mode = mode
+    _db = TradingDatabase(mode)
+
+
+def _get_db() -> TradingDatabase:
+    """Get or create database instance."""
+    global _db
+    if _db is None:
+        _db = TradingDatabase(_mode)
+    return _db
+
+
+# Legacy Bet dataclass for backward compatibility
 @dataclass
 class Bet:
     id: str
@@ -33,6 +56,28 @@ class Bet:
     resolved_at: Optional[str] = None
     notes: str = ""
 
+
+def _trade_to_bet(trade: Trade) -> Bet:
+    """Convert new Trade object to legacy Bet for compatibility."""
+    return Bet(
+        id=str(trade.id),
+        market_id=trade.market_id,
+        market_question=trade.market_question,
+        outcome=trade.outcome,
+        side=trade.side,
+        amount=trade.amount,
+        price=trade.price,
+        shares=trade.shares,
+        placed_at=trade.placed_at,
+        resolved=trade.status != "PENDING",
+        won=trade.status == "WON" if trade.status != "PENDING" else None,
+        payout=trade.payout,
+        resolved_at=trade.resolved_at,
+        notes=trade.notes,
+    )
+
+
+# Legacy Portfolio class for backward compatibility
 @dataclass
 class Portfolio:
     cash: float
@@ -46,8 +91,10 @@ class Portfolio:
     
     @property
     def total_value(self) -> float:
-        """Cash + unrealized value of pending bets."""
-        return self.cash  # We'll add pending bet value separately
+        """Cash + pending investments (at cost, conservative estimate)."""
+        db = _get_db()
+        stats = db.get_portfolio_stats()
+        return stats["total_value"]
     
     @property
     def win_rate(self) -> float:
@@ -62,64 +109,49 @@ class Portfolio:
     def pnl_pct(self) -> float:
         return (self.pnl / self.starting_cash) * 100 if self.starting_cash > 0 else 0
 
-def ensure_data_dir():
-    DATA_DIR.mkdir(exist_ok=True)
 
 def load_portfolio() -> Portfolio:
-    """Load portfolio from disk or create new one."""
-    ensure_data_dir()
+    """Load portfolio from database."""
+    db = _get_db()
+    stats = db.get_portfolio_stats()
     
-    if PORTFOLIO_FILE.exists():
-        with open(PORTFOLIO_FILE) as f:
-            data = json.load(f)
-            return Portfolio(**data)
-    
-    # Create new portfolio with $50
     return Portfolio(
-        cash=50.0,
-        starting_cash=50.0,
-        created_at=datetime.now(timezone.utc).isoformat(),
+        cash=stats["cash"],
+        starting_cash=stats["starting_cash"],
+        created_at=datetime.now(timezone.utc).isoformat(),  # Not tracked per-trade
         last_updated=datetime.now(timezone.utc).isoformat(),
+        total_bets=stats["total_trades"],
+        total_wins=stats["wins"],
+        total_losses=stats["losses"],
+        total_pending=stats["pending"],
     )
 
+
 def save_portfolio(portfolio: Portfolio):
-    """Save portfolio to disk."""
-    ensure_data_dir()
-    portfolio.last_updated = datetime.now(timezone.utc).isoformat()
-    with open(PORTFOLIO_FILE, 'w') as f:
-        json.dump(asdict(portfolio), f, indent=2)
+    """Save portfolio snapshot to database."""
+    db = _get_db()
+    db.save_snapshot()
+
 
 def load_bets() -> list[Bet]:
-    """Load all bets from disk."""
-    ensure_data_dir()
-    
-    if not BETS_FILE.exists():
-        return []
-    
-    with open(BETS_FILE) as f:
-        data = json.load(f)
-        return [Bet(**b) for b in data]
+    """Load all bets (trades) from database."""
+    db = _get_db()
+    # Get all trades, not just pending
+    with db._connect() as conn:
+        rows = conn.execute("SELECT * FROM trades ORDER BY placed_at").fetchall()
+        trades = [db._row_to_trade(row) for row in rows]
+    return [_trade_to_bet(t) for t in trades]
+
 
 def save_bets(bets: list[Bet]):
-    """Save all bets to disk."""
-    ensure_data_dir()
-    with open(BETS_FILE, 'w') as f:
-        json.dump([asdict(b) for b in bets], f, indent=2, default=str)
+    """No-op for backward compatibility. Database auto-saves."""
+    pass
+
 
 def add_to_history(event: dict):
-    """Append event to history log."""
-    ensure_data_dir()
-    
-    history = []
-    if HISTORY_FILE.exists():
-        with open(HISTORY_FILE) as f:
-            history = json.load(f)
-    
-    event['timestamp'] = datetime.now(timezone.utc).isoformat()
-    history.append(event)
-    
-    with open(HISTORY_FILE, 'w') as f:
-        json.dump(history, f, indent=2, default=str)
+    """Log event to database history."""
+    db = _get_db()
+    db._log_event(event.get("type", "UNKNOWN"), event)
 
 def place_bet(
     market_id: str,
@@ -135,15 +167,15 @@ def place_bet(
     
     Returns (success, message)
     """
-    portfolio = load_portfolio()
-    bets = load_bets()
+    db = _get_db()
+    stats = db.get_portfolio_stats()
     
     # Validate
     if amount <= 0:
         return False, "Amount must be positive"
     
-    if amount > portfolio.cash:
-        return False, f"Insufficient funds. Have ${portfolio.cash:.2f}, need ${amount:.2f}"
+    if amount > stats["cash"]:
+        return False, f"Insufficient funds. Have ${stats['cash']:.2f}, need ${amount:.2f}"
     
     if price <= 0 or price >= 1:
         return False, f"Invalid price: {price}. Must be between 0 and 1"
@@ -154,10 +186,9 @@ def place_bet(
     # Calculate shares
     shares = amount / price
     
-    # Create bet
-    bet_id = f"bet_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{market_id[:8]}"
-    bet = Bet(
-        id=bet_id,
+    # Create trade in database
+    trade = Trade(
+        id=None,  # Auto-generated
         market_id=market_id,
         market_question=market_question,
         outcome=outcome,
@@ -165,231 +196,161 @@ def place_bet(
         amount=amount,
         price=price,
         shares=shares,
+        status="PENDING",
         placed_at=datetime.now(timezone.utc).isoformat(),
         notes=notes,
     )
     
-    # Update portfolio
-    portfolio.cash -= amount
-    portfolio.total_bets += 1
-    portfolio.total_pending += 1
+    trade_id = db.add_trade(trade)
     
-    # Save
-    bets.append(bet)
-    save_bets(bets)
-    save_portfolio(portfolio)
-    
-    # Log to history
-    add_to_history({
-        "type": "BET_PLACED",
-        "bet_id": bet_id,
-        "market_id": market_id,
-        "question": market_question[:50],
-        "outcome": outcome,
-        "side": side,
-        "amount": amount,
-        "price": price,
-        "shares": shares,
-    })
-    
-    return True, f"[WIN] Placed ${amount:.2f} on {outcome} {side} @ {price:.2%}. Shares: {shares:.2f}"
+    return True, f"✅ Placed ${amount:.2f} on {outcome} {side} @ {price:.2%}. Shares: {shares:.2f} [ID: {trade_id}]"
+
 
 def resolve_bet(bet_id: str, won: bool, market_outcome: str = "") -> tuple[bool, str]:
     """
     Resolve a bet as won or lost.
+    ONLY place where P&L is calculated - from ACTUAL payout.
     
     Returns (success, message)
     """
-    portfolio = load_portfolio()
-    bets = load_bets()
+    db = _get_db()
     
-    # Find bet
-    bet = None
-    for b in bets:
-        if b.id == bet_id:
-            bet = b
-            break
+    # Handle both old string IDs and new int IDs
+    try:
+        trade_id = int(bet_id.replace("bet_", "").split("_")[0]) if bet_id.startswith("bet_") else int(bet_id)
+    except ValueError:
+        # Try to find by old-style ID in notes or as exact match
+        trade_id = int(bet_id) if bet_id.isdigit() else None
+        if trade_id is None:
+            return False, f"Invalid bet ID format: {bet_id}"
     
-    if not bet:
+    trade = db.get_trade(trade_id)
+    if not trade:
         return False, f"Bet not found: {bet_id}"
     
-    if bet.resolved:
-        return False, f"Bet already resolved: {bet_id}"
+    if trade.status != "PENDING":
+        return False, f"Bet already resolved: {bet_id} ({trade.status})"
     
-    # Calculate payout
+    # Calculate payout from ACTUAL result
+    # Winner gets $1 per share, loser gets $0
     if won:
-        # Winner gets $1 per share
-        payout = bet.shares
-        portfolio.cash += payout
-        portfolio.total_wins += 1
+        payout = trade.shares  # $1 per share
     else:
-        payout = 0
-        portfolio.total_losses += 1
+        payout = 0.0
     
-    portfolio.total_pending -= 1
-    
-    # Update bet
-    bet.resolved = True
-    bet.won = won
-    bet.payout = payout
-    bet.resolved_at = datetime.now(timezone.utc).isoformat()
-    
-    # Save
-    save_bets(bets)
-    save_portfolio(portfolio)
-    
-    # Log to history
-    profit = payout - bet.amount
-    add_to_history({
-        "type": "BET_RESOLVED",
-        "bet_id": bet_id,
-        "market_id": bet.market_id,
-        "won": won,
-        "amount": bet.amount,
-        "payout": payout,
-        "profit": profit,
-        "market_outcome": market_outcome,
-    })
+    # Resolve in database (this calculates profit = payout - amount)
+    resolved_trade = db.resolve_trade(trade_id, won=won, payout=payout)
     
     status = "WON" if won else "LOST"
-    return True, f"📊 Bet {status}! Invested ${bet.amount:.2f}, payout ${payout:.2f} (P&L: ${profit:+.2f})"
+    return True, f"📊 Bet {status}! Invested ${trade.amount:.2f}, payout ${payout:.2f} (P&L: ${resolved_trade.profit:+.2f})"
 
 def get_pending_bets() -> list[Bet]:
     """Get all unresolved bets."""
-    bets = load_bets()
-    return [b for b in bets if not b.resolved]
+    db = _get_db()
+    trades = db.get_pending_trades()
+    return [_trade_to_bet(t) for t in trades]
+
 
 def get_portfolio_summary() -> dict:
-    """Get full portfolio summary."""
-    portfolio = load_portfolio()
-    pending = get_pending_bets()
-    
-    # Calculate unrealized value (assume current price = entry price for simplicity)
-    unrealized_value = sum(b.shares * b.price for b in pending)
-    total_invested = sum(b.amount for b in pending)
+    """
+    Get full portfolio summary.
+    All values from database - single source of truth.
+    """
+    db = _get_db()
+    stats = db.get_portfolio_stats()
     
     return {
-        "cash": portfolio.cash,
-        "starting_cash": portfolio.starting_cash,
-        "total_value": portfolio.cash + unrealized_value,
-        "pnl": portfolio.pnl,
-        "pnl_pct": portfolio.pnl_pct,
-        "total_bets": portfolio.total_bets,
-        "wins": portfolio.total_wins,
-        "losses": portfolio.total_losses,
-        "pending": portfolio.total_pending,
-        "win_rate": portfolio.win_rate,
-        "pending_bets": len(pending),
-        "total_invested_pending": total_invested,
-        "created_at": portfolio.created_at,
-        "last_updated": portfolio.last_updated,
+        "mode": stats["mode"],
+        "cash": stats["cash"],
+        "starting_cash": stats["starting_cash"],
+        "total_value": stats["total_value"],
+        "pnl": stats["realized_pnl"],
+        "pnl_pct": (stats["realized_pnl"] / stats["starting_cash"] * 100) 
+                   if stats["starting_cash"] > 0 else 0,
+        "total_bets": stats["total_trades"],
+        "wins": stats["wins"],
+        "losses": stats["losses"],
+        "pending": stats["pending"],
+        "win_rate": stats["win_rate"],
+        "pending_bets": stats["pending"],
+        "total_invested_pending": stats["pending_invested"],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "last_updated": datetime.now(timezone.utc).isoformat(),
     }
+
 
 def print_portfolio():
     """Pretty print portfolio status."""
     summary = get_portfolio_summary()
     pending = get_pending_bets()
     
-    pnl_emoji = "[UP]" if summary['pnl'] >= 0 else "[DOWN]"
+    pnl_emoji = "📈" if summary['pnl'] >= 0 else "📉"
+    mode_label = summary.get('mode', 'paper').upper()
     
     print(f"\n{'='*60}")
-    print(f"[PORTFOLIO] POLYMARKET PAPER TRADING PORTFOLIO")
+    print(f"💼 POLYMARKET {mode_label} TRADING PORTFOLIO")
     print(f"{'='*60}")
     print(f"  Cash:           ${summary['cash']:.2f}")
+    print(f"  Pending:        ${summary['total_invested_pending']:.2f}")
     print(f"  Total Value:    ${summary['total_value']:.2f}")
     print(f"  {pnl_emoji} P&L:           ${summary['pnl']:+.2f} ({summary['pnl_pct']:+.1f}%)")
     print(f"  Starting:       ${summary['starting_cash']:.2f}")
     print(f"{'='*60}")
     print(f"  Total Bets:     {summary['total_bets']}")
-    print(f"  Wins:           {summary['wins']} [WIN]")
-    print(f"  Losses:         {summary['losses']} [LOSS]")
-    print(f"  Pending:        {summary['pending']} [PENDING]")
+    print(f"  Wins:           {summary['wins']} ✅")
+    print(f"  Losses:         {summary['losses']} ❌")
+    print(f"  Pending:        {summary['pending']} ⏳")
     print(f"  Win Rate:       {summary['win_rate']*100:.1f}%")
     print(f"{'='*60}")
     
     if pending:
-        print(f"\n[LIST] PENDING BETS ({len(pending)}):")
+        print(f"\n⏳ PENDING BETS ({len(pending)}):")
         for bet in pending:
             q = bet.market_question[:40] + "..." if len(bet.market_question) > 40 else bet.market_question
-            print(f"  - {bet.outcome} {bet.side} @ {bet.price:.2%}")
-            print(f"    {q}")
-            print(f"    Amount: ${bet.amount:.2f} | Shares: {bet.shares:.2f}")
+            print(f"  [{bet.id}] {bet.outcome} {bet.side} @ {bet.price:.2%}")
+            print(f"      {q}")
+            print(f"      Amount: ${bet.amount:.2f} | Shares: {bet.shares:.2f}")
             print()
 
-def reset_portfolio(starting_cash: float = 50.0, preserve_pending: bool = True):
+
+def reset_portfolio(starting_cash: float = 50.0, preserve_pending: bool = False):
     """Reset portfolio to initial state.
     
     Args:
         starting_cash: New starting cash amount
-        preserve_pending: If True, keep unresolved bets and adjust cash accordingly
+        preserve_pending: If True, keep unresolved bets (NOT RECOMMENDED for clean reset)
     """
-    ensure_data_dir()
+    db = _get_db()
     
-    # Load existing pending bets if we want to preserve them
-    pending_bets = []
-    pending_invested = 0.0
     if preserve_pending:
-        pending_bets = get_pending_bets()
-        pending_invested = sum(b.amount for b in pending_bets)
+        print("⚠️  Warning: preserve_pending is deprecated. Pending bets will be archived to history.")
     
-    # Archive old data
-    now = datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')
-    for f in [PORTFOLIO_FILE, BETS_FILE, HISTORY_FILE]:
-        if f.exists():
-            archive = DATA_DIR / f"archive_{now}_{f.name}"
-            f.rename(archive)
+    # Reset database (archives to history)
+    db.reset(starting_cash, keep_history=True)
     
-    # Calculate available cash (starting cash minus what's locked in pending bets)
-    available_cash = starting_cash - pending_invested
-    if available_cash < 0:
-        available_cash = 0
-        print(f"[WARNING] Pending bets (${pending_invested:.2f}) exceed starting cash. Available cash set to $0.")
-    
-    # Create portfolio with pending bets accounted for
-    portfolio = Portfolio(
-        cash=available_cash,
-        starting_cash=starting_cash,
-        created_at=datetime.now(timezone.utc).isoformat(),
-        last_updated=datetime.now(timezone.utc).isoformat(),
-        total_bets=len(pending_bets),
-        total_pending=len(pending_bets),
-    )
-    save_portfolio(portfolio)
-    
-    # Save pending bets (or empty list if not preserving)
-    save_bets(pending_bets)
-    
-    # Log reset to history
-    add_to_history({
-        "type": "PORTFOLIO_RESET",
-        "starting_cash": starting_cash,
-        "preserved_bets": len(pending_bets),
-        "locked_in_bets": pending_invested,
-        "available_cash": available_cash,
-    })
-    
-    if pending_bets:
-        print(f"Portfolio reset with ${starting_cash:.2f}")
-        print(f"  [PRESERVED] {len(pending_bets)} pending bets (${pending_invested:.2f} locked)")
-        print(f"  [AVAILABLE] ${available_cash:.2f} cash")
-    else:
-        print(f"Portfolio reset with ${starting_cash:.2f}")
+    print(f"✅ Portfolio reset with ${starting_cash:.2f}")
 
 if __name__ == "__main__":
     import argparse
     
-    parser = argparse.ArgumentParser(description="Manage paper trading portfolio")
+    parser = argparse.ArgumentParser(description="Manage trading portfolio")
     parser.add_argument("action", choices=["status", "reset", "pending"], 
                         help="Action to perform")
+    parser.add_argument("--mode", choices=["paper", "live"], default="paper",
+                        help="Trading mode (default: paper)")
     parser.add_argument("--cash", type=float, default=50.0, 
                         help="Starting cash for reset")
     
     args = parser.parse_args()
     
+    # Set trading mode
+    mode = TradingMode.PAPER if args.mode == "paper" else TradingMode.LIVE
+    set_trading_mode(mode)
+    
     if args.action == "status":
         print_portfolio()
     elif args.action == "reset":
-        confirm = input(f"Reset portfolio with ${args.cash}? (y/N): ")
+        confirm = input(f"Reset {args.mode.upper()} portfolio with ${args.cash}? (y/N): ")
         if confirm.lower() == 'y':
             reset_portfolio(args.cash)
         else:
@@ -398,6 +359,6 @@ if __name__ == "__main__":
         pending = get_pending_bets()
         if pending:
             for b in pending:
-                print(f"{b.id}: {b.outcome} {b.side} @ {b.price:.2%} - ${b.amount:.2f}")
+                print(f"[{b.id}] {b.outcome} {b.side} @ {b.price:.2%} - ${b.amount:.2f}")
         else:
             print("No pending bets")

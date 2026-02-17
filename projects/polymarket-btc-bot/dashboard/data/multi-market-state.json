@@ -790,156 +790,6 @@
           "stopLossThreshold": 6,
           "logs": [
             {
-              "time": "8:54:27 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:54:27 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:54:32 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:54:32 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:54:37 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:54:37 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:54:42 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:54:42 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:54:47 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:54:47 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:54:52 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:54:52 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:54:57 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:54:57 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:56:42 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:58:22 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:58:27 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:58:32 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:58:37 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:58:37 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:58:42 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:58:42 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:58:47 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:58:47 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:58:52 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:58:52 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:58:57 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:58:57 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:59:02 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:59:02 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
               "time": "8:59:07 a.m.",
               "type": "error",
               "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
@@ -1036,6 +886,156 @@
             },
             {
               "time": "8:59:57 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:03:27 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:03:32 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:03:37 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:03:42 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:03:47 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:03:52 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:03:57 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:02 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:07 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:07 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:12 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:12 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:17 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:17 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:22 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:22 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:27 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:27 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:32 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:32 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:37 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:37 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:42 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:42 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:47 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:47 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:52 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:52 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:57 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:04:57 a.m.",
               "type": "error",
               "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
             }
@@ -2200,86 +2200,6 @@
           "stopLossThreshold": 6,
           "logs": [
             {
-              "time": "8:33:06 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:33:11 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:33:16 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:41:02 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:41:07 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:41:12 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:41:17 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:41:22 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:41:27 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:41:32 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:41:37 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:42:42 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:42:47 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:42:52 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:42:57 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
-              "time": "8:43:02 a.m.",
-              "type": "error",
-              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
-            },
-            {
               "time": "8:43:07 a.m.",
               "type": "error",
               "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
@@ -2446,6 +2366,86 @@
             },
             {
               "time": "8:58:17 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:02:42 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:02:47 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:02:52 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:02:57 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:03:02 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:03:07 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:03:12 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:03:17 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:07:42 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:07:47 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:07:52 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:07:57 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:08:02 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:08:07 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:08:12 a.m.",
+              "type": "error",
+              "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
+            },
+            {
+              "time": "9:08:17 a.m.",
               "type": "error",
               "message": "⚠️ Wallet empty ($0.00) - waiting for redemption"
             }
@@ -3381,5 +3381,5 @@
       "totalBalance": 96
     }
   ],
-  "savedAt": 1771336802436
+  "savedAt": 1771337402674
 }
