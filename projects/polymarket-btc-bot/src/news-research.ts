@@ -40,7 +40,11 @@ export class NewsResearchService {
     const query = customQuery || 'Bitcoin BTC price movement today news';
     
     try {
-      const cmd = `PYTHONIOENCODING=utf-8 python3 ${this.scriptPath} "${query}" --topic news --max-results 5 --json --api-key "${this.apiKey}"`;
+      // Sanitize query to prevent command injection
+      const sanitizedQuery = query.replace(/["`$\\]/g, '').substring(0, 200);
+      const sanitizedApiKey = (this.apiKey || '').replace(/["`$\\]/g, '');
+      
+      const cmd = `PYTHONIOENCODING=utf-8 python3 ${this.scriptPath} "${sanitizedQuery}" --topic news --max-results 5 --json --api-key "${sanitizedApiKey}"`;
       const { stdout } = await execAsync(cmd, { timeout: 30000, env: { ...process.env, PYTHONIOENCODING: 'utf-8' } });
       
       const data = JSON.parse(stdout);

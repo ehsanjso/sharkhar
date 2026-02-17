@@ -468,9 +468,131 @@ function saveState(): void {
   }
 }
 
-function loadState(): boolean {
+function loadStateFromDatabase(): boolean {
   try {
-    // Try new multi-market state file first
+    console.log('📦 Loading state from database...');
+    let loadedCount = 0;
+    
+    // Load global halt state
+    const globalHaltRow = db.db.prepare('SELECT value FROM global_state WHERE key = ?').get('globalHalt') as { value: string } | undefined;
+    state.globalHalt = globalHaltRow?.value === 'true';
+    
+    // Load each market's strategies from database
+    for (const market of state.markets) {
+      const dbStrategies = db.loadStrategiesForMarket(market.key);
+      
+      // Load market halted state
+      const marketRow = db.db.prepare('SELECT halted FROM markets WHERE key = ?').get(market.key) as { halted: number } | undefined;
+      market.halted = marketRow?.halted === 1;
+      
+      for (const dbStrat of dbStrategies) {
+        const strategy = market.strategies.find(s => s.id === dbStrat.id);
+        if (strategy) {
+          // Paper trading stats
+          strategy.balance = dbStrat.balance ?? strategy.startingBalance;
+          strategy.totalPnl = dbStrat.total_pnl ?? 0;
+          strategy.totalMarkets = dbStrat.total_markets ?? 0;
+          strategy.deployed = dbStrat.deployed ?? 0;
+          strategy.wins = dbStrat.wins ?? 0;
+          strategy.losses = dbStrat.losses ?? 0;
+          strategy.winRate = dbStrat.win_rate ?? 0;
+          strategy.roi = dbStrat.roi ?? 0;
+          
+          // Live trading stats
+          strategy.liveMode = dbStrat.live_mode === 1;
+          strategy.liveAllocation = dbStrat.live_allocation ?? 10;
+          strategy.liveBalance = dbStrat.live_balance ?? strategy.liveAllocation;
+          strategy.liveDeployed = dbStrat.live_deployed ?? 0;
+          strategy.livePnl = dbStrat.live_pnl ?? 0;
+          strategy.liveWins = dbStrat.live_wins ?? 0;
+          strategy.liveLosses = dbStrat.live_losses ?? 0;
+          
+          // Control flags
+          strategy.halted = dbStrat.halted === 1;
+          strategy.haltedReason = dbStrat.halted_reason;
+          strategy.stopLossThreshold = dbStrat.stop_loss_threshold ?? 25;
+          strategy.lockedFunds = dbStrat.locked_funds ?? 0;
+          
+          // Load trade history from database
+          const dbTrades = db.loadTradesForStrategy(dbStrat.id, market.key, 50);
+          strategy.history = dbTrades.filter(t => !t.is_live).map(t => ({
+            id: t.id,
+            time: t.created_at ? new Date(t.created_at).toLocaleTimeString() : '',
+            marketId: t.market_id,
+            side: (t.side === 'Up' || t.side === 'Down') ? t.side : 'Up' as 'Up' | 'Down',
+            shares: t.shares,
+            cost: t.cost,
+            payout: t.payout,
+            pnl: t.pnl,
+            result: t.result as 'WIN' | 'LOSS',
+            assetOpen: t.asset_open,
+            assetClose: t.asset_close,
+          }));
+          
+          strategy.liveHistory = dbTrades.filter(t => t.is_live).map(t => ({
+            id: t.id,
+            time: t.created_at ? new Date(t.created_at).toLocaleTimeString() : '',
+            timestamp: t.created_at ? new Date(t.created_at).getTime() : Date.now(),
+            marketId: t.market_id,
+            side: (t.side === 'Up' || t.side === 'Down') ? t.side : 'Up', // Default to Up if unknown
+            shares: t.shares,
+            cost: t.cost,
+            payout: t.payout,
+            pnl: t.pnl,
+            result: t.result as 'WIN' | 'LOSS',
+            assetOpen: t.asset_open,
+            assetClose: t.asset_close,
+          })) as any[];
+          
+          // Load pending bets from database
+          const pendingBets = db.getPendingBets().filter(b => b.strategy_id === dbStrat.id && b.market_key === market.key);
+          strategy.pendingBets = pendingBets.map(b => ({
+            conditionId: b.condition_id || '',
+            tokenId: b.token_id || '',
+            betAmount: b.amount,
+            expectedPayout: b.shares, // shares = expected payout
+            marketResolved: b.status === 'resolved' || b.status === 'redeemed',
+            won: b.result === 'WIN' ? true : b.result === 'LOSS' ? false : null,
+            timestamp: b.created_at ? new Date(b.created_at).getTime() : Date.now(),
+          }));
+          
+          // Rebuild P&L history from trades
+          let cumulative = 0;
+          strategy.pnlHistory = strategy.history.map((h, i) => {
+            cumulative += h.pnl;
+            return { market: i + 1, pnl: h.pnl, cumulative };
+          });
+          
+          loadedCount++;
+        }
+      }
+      
+      // Calculate market totals
+      market.totalPnl = market.strategies.reduce((sum, s) => sum + s.totalPnl + s.livePnl, 0);
+      market.totalBalance = market.strategies.reduce((sum, s) => sum + s.balance + s.liveBalance, 0);
+    }
+    
+    if (loadedCount > 0) {
+      console.log(`📦 Loaded ${loadedCount} strategies from database`);
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Failed to load state from database:', error);
+    return false;
+  }
+}
+
+function loadState(): boolean {
+  // PRIMARY: Load from database (source of truth)
+  if (loadStateFromDatabase()) {
+    console.log('📦 State loaded from DATABASE (primary source)');
+    return true;
+  }
+  
+  // FALLBACK: Load from JSON file only if database is empty
+  console.log('📂 Database empty, trying JSON file fallback...');
+  try {
     if (fs.existsSync(STATE_FILE)) {
       const saved = JSON.parse(fs.readFileSync(STATE_FILE, 'utf-8'));
       
@@ -522,53 +644,15 @@ function loadState(): boolean {
             market.totalBalance = savedMarket.totalBalance ?? STRATEGIES.length * 100;
           }
         }
-        console.log('📂 Loaded saved state from multi-market file');
-        return true;
-      }
-    }
-    
-    // Try to migrate from old single-market state file
-    if (fs.existsSync(OLD_STATE_FILE)) {
-      console.log('📂 Migrating from old single-market state file...');
-      const saved = JSON.parse(fs.readFileSync(OLD_STATE_FILE, 'utf-8'));
-      
-      if (saved.strategies && Array.isArray(saved.strategies)) {
-        // Apply old data to BTC-15min market
-        const btc15Market = state.markets.find(m => m.key === 'BTC-15min');
-        if (btc15Market) {
-          for (const savedStrategy of saved.strategies) {
-            const strategy = btc15Market.strategies.find(s => s.id === savedStrategy.id);
-            if (strategy) {
-              strategy.balance = savedStrategy.balance ?? strategy.startingBalance;
-              strategy.totalPnl = savedStrategy.totalPnl ?? 0;
-              strategy.totalMarkets = savedStrategy.totalMarkets ?? 0;
-              strategy.deployed = savedStrategy.deployed ?? 0;
-              strategy.wins = savedStrategy.wins ?? 0;
-              strategy.losses = savedStrategy.losses ?? 0;
-              strategy.winRate = savedStrategy.winRate ?? 0;
-              strategy.roi = savedStrategy.roi ?? 0;
-              // Migrate history (convert btcOpen/btcClose to assetOpen/assetClose)
-              strategy.history = (savedStrategy.history || []).map((h: any) => ({
-                ...h,
-                assetOpen: h.btcOpen || h.assetOpen,
-                assetClose: h.btcClose || h.assetClose,
-              }));
-              strategy.pnlHistory = savedStrategy.pnlHistory ?? [];
-            }
-          }
-          btc15Market.totalPnl = saved.totalPnl ?? 0;
-          btc15Market.totalBalance = saved.totalBalance ?? STRATEGIES.length * 100;
-          console.log(`   ✅ Migrated BTC-15min: $${btc15Market.totalBalance.toFixed(0)} balance, $${btc15Market.totalPnl.toFixed(0)} P&L`);
-        }
-        
-        // Save in new format
+        console.log('📂 Loaded saved state from JSON file (fallback)');
+        // Migrate JSON data to database
         saveState();
-        console.log('📂 Migration complete, saved in new format');
+        console.log('📂 Migrated JSON data to database');
         return true;
       }
     }
   } catch (error) {
-    console.error('Failed to load state:', error);
+    console.error('Failed to load state from file:', error);
   }
   return false;
 }

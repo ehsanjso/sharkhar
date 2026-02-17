@@ -192,7 +192,10 @@
     "marketSlug": "btc-updown-5m-1771305900",
     "side": "Up",
     "timestamp": 1771306101653,
-    "redeemed": false
+    "redeemed": true,
+    "attemptCount": 1,
+    "redeemedAt": 1771309752503,
+    "note": "No tokens (lost or already redeemed)"
   },
   {
     "conditionId": "0xe72ecde86ef32789814b94f3a1053d323604916064953e7ca4cce33a1d11e6de",
@@ -200,7 +203,10 @@
     "marketSlug": "btc-updown-5m-1771306500",
     "side": "Down",
     "timestamp": 1771306560991,
-    "redeemed": false
+    "redeemed": true,
+    "attemptCount": 1,
+    "redeemedAt": 1771309752555,
+    "note": "No tokens (lost or already redeemed)"
   },
   {
     "conditionId": "0x04cb0c87264cffcc26c797ec8419b09f93bac539564ca68400362e834db6b6c8",
@@ -208,7 +214,10 @@
     "marketSlug": "btc-updown-5m-1771306800",
     "side": "Up",
     "timestamp": 1771306900968,
-    "redeemed": false
+    "redeemed": true,
+    "attemptCount": 1,
+    "redeemedAt": 1771309752637,
+    "note": "No tokens (lost or already redeemed)"
   },
   {
     "conditionId": "0xbce41b90efc0bed5603836005e69628bfb72e3f169e45f2f69d6b8ae944c5a0a",
@@ -216,7 +225,10 @@
     "marketSlug": "btc-updown-5m-1771307100",
     "side": "Down",
     "timestamp": 1771307176005,
-    "redeemed": false
+    "redeemed": true,
+    "attemptCount": 1,
+    "redeemedAt": 1771309752689,
+    "note": "No tokens (lost or already redeemed)"
   },
   {
     "conditionId": "0xb0c4fe9686250ddb389786c13a0faac7083d7b2add8168d7a4a273f33c069a7f",
@@ -224,6 +236,9 @@
     "marketSlug": "btc-updown-5m-1771307400",
     "side": "Down",
     "timestamp": 1771307460886,
-    "redeemed": false
+    "redeemed": true,
+    "attemptCount": 1,
+    "redeemedAt": 1771309752755,
+    "note": "No tokens (lost or already redeemed)"
   }
 ]

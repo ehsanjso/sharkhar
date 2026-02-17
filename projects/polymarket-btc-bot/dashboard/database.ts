@@ -146,16 +146,20 @@ export interface StrategyRecord {
   deployed: number;
   wins: number;
   losses: number;
-  live_mode: boolean;
+  live_mode: boolean | number;
   live_allocation: number;
   live_balance: number;
   live_deployed: number;
   live_pnl: number;
   live_wins: number;
   live_losses: number;
-  halted: boolean;
+  halted: boolean | number;
   halted_reason?: string;
   stop_loss_threshold: number;
+  // Additional fields
+  locked_funds?: number;
+  win_rate?: number;
+  roi?: number;
 }
 
 const upsertStrategy = db.prepare(`
@@ -211,6 +215,9 @@ export function loadStrategiesForMarket(marketKey: string): StrategyRecord[] {
     ...row,
     live_mode: row.live_mode === 1,
     halted: row.halted === 1,
+    locked_funds: row.locked_funds ?? 0,
+    win_rate: row.win_rate ?? 0,
+    roi: row.roi ?? 0,
   }));
 }
 
@@ -220,7 +227,7 @@ export interface TradeRecord {
   strategy_id: string;
   market_key: string;
   market_id: string;
-  side: 'Up' | 'Down';
+  side: 'Up' | 'Down' | string;
   shares: number;
   cost: number;
   payout: number;
@@ -228,7 +235,8 @@ export interface TradeRecord {
   result: 'WIN' | 'LOSS' | null;
   asset_open: number;
   asset_close: number;
-  is_live: boolean;
+  is_live: boolean | number;
+  created_at?: string;
 }
 
 const insertTrade = db.prepare(`
@@ -275,13 +283,16 @@ export interface LiveBetRecord {
   condition_id?: string;
   token_id?: string;
   order_id?: string;
-  side: 'Up' | 'Down';
+  side: 'Up' | 'Down' | string;
   amount: number;
   price: number;
   shares: number;
-  status: 'pending' | 'resolved' | 'redeemed' | 'failed';
-  result?: 'WIN' | 'LOSS';
+  status: 'pending' | 'resolved' | 'redeemed' | 'failed' | string;
+  result?: 'WIN' | 'LOSS' | string;
   payout?: number;
+  created_at?: string;
+  resolved_at?: string;
+  redeemed_at?: string;
 }
 
 const insertLiveBet = db.prepare(`

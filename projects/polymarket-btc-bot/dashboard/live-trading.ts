@@ -128,6 +128,7 @@ interface OrderResult {
 class LiveTradingClient {
   private client: ClobClient | null = null;
   private initialized = false;
+  private initializing = false;  // Prevent concurrent initialization
   private dryRun: boolean;
   private privateKey: string;
 
@@ -143,6 +144,18 @@ class LiveTradingClient {
   async initialize(): Promise<boolean> {
     if (this.initialized) return true;
     if (!this.privateKey) return false;
+    
+    // Prevent concurrent initialization
+    if (this.initializing) {
+      console.log('⏳ Client initialization already in progress, waiting...');
+      // Wait for initialization to complete
+      while (this.initializing) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      return this.initialized;
+    }
+
+    this.initializing = true;
 
     try {
       // Use centralized RPC module for reliable connection
@@ -177,6 +190,8 @@ class LiveTradingClient {
     } catch (error: any) {
       console.error('❌ Failed to initialize live trading:', error.message);
       return false;
+    } finally {
+      this.initializing = false;
     }
   }
 

@@ -8,8 +8,12 @@
 
 import { ethers } from 'ethers';
 import * as db from './database.js';
+import { withRetry, createSigner, markRpcSuccess, markRpcFailed } from './rpc.js';
 import dotenv from 'dotenv';
 dotenv.config({ path: '../.env' });
+
+// Track if checkAndRedeemAll is already running to prevent concurrent execution
+let isCheckingRedemptions = false;
 
 // Contracts
 const CTF_ADDRESS = '0x4D97DCd97eC945f40cF65F87097ACe5EA0476045';
@@ -120,11 +124,33 @@ export async function checkAndRedeemAll(privateKey: string): Promise<{
   totalPnL: number;
   confirmedResults: ChainConfirmedResult[];
 }> {
-  const provider = new ethers.providers.StaticJsonRpcProvider(
-    process.env.ALCHEMY_RPC || 'https://polygon.llamarpc.com',
-    137
-  );
-  const wallet = new ethers.Wallet(privateKey, provider);
+  // Prevent concurrent execution
+  if (isCheckingRedemptions) {
+    console.log('⏳ [BetTracker] Redemption check already in progress, skipping...');
+    return { checked: 0, resolved: 0, redeemed: 0, totalPnL: 0, confirmedResults: [] };
+  }
+  
+  isCheckingRedemptions = true;
+  
+  try {
+    return await doCheckAndRedeemAll(privateKey);
+  } finally {
+    isCheckingRedemptions = false;
+  }
+}
+
+async function doCheckAndRedeemAll(privateKey: string): Promise<{
+  checked: number;
+  resolved: number;
+  redeemed: number;
+  totalPnL: number;
+  confirmedResults: ChainConfirmedResult[];
+}> {
+  // First, clean up any stale bets (older than 10 minutes)
+  cleanupStaleBets(10);
+  
+  // Use centralized signer with RPC health tracking
+  const wallet = createSigner(privateKey);
   const ctf = new ethers.Contract(CTF_ADDRESS, CTF_ABI, wallet);
   
   const pending = getPendingBets();
@@ -259,12 +285,53 @@ export async function checkAndRedeemAll(privateKey: string): Promise<{
       }
       
     } catch (error: any) {
-      db.dbLog.live('error', `Error checking token ${tokenId}: ${error.message?.substring(0, 100)}`, { tokenId, error: error.message });
-      console.error(`⚠️ [BetTracker] Error checking token: ${error.message?.substring(0, 50)}`);
+      const errorMsg = error.message?.substring(0, 100) || 'Unknown error';
+      db.dbLog.live('error', `Error checking token ${tokenId}: ${errorMsg}`, { tokenId, error: errorMsg });
+      console.error(`⚠️ [BetTracker] Error checking token: ${errorMsg.substring(0, 50)}`);
+      
+      // If we get repeated errors, mark very old bets as failed to prevent infinite loops
+      // The cleanupStaleBets() at the start handles this, but we also handle immediate failures
+      for (const bet of bets) {
+        const betAge = Date.now() - new Date(bet.created_at || 0).getTime();
+        // If bet is older than 15 minutes and we can't check it, mark as failed
+        if (betAge > 15 * 60 * 1000) {
+          console.log(`⚠️ [BetTracker] Marking stuck bet #${bet.id} as FAILED (${(betAge / 60000).toFixed(0)} min old, RPC errors)`);
+          db.updateLiveBetStatusById(bet.id!, 'resolved', 'FAILED', 0);
+          db.dbLog.live('error', `Bet #${bet.id} marked FAILED due to RPC errors`, { betId: bet.id, age: betAge }, bet.strategy_id, bet.market_key);
+        }
+      }
     }
   }
   
   return { checked: pending.length, resolved, redeemed, totalPnL, confirmedResults };
+}
+
+/**
+ * Clean up stale pending bets that are older than maxAge
+ * This prevents bets from getting stuck in "pending" status forever
+ */
+export function cleanupStaleBets(maxAgeMinutes = 10): number {
+  const cutoffTime = Date.now() - (maxAgeMinutes * 60 * 1000);
+  const pending = db.getLiveBetsByStatus('pending');
+  let cleaned = 0;
+  
+  for (const bet of pending) {
+    const betTime = bet.created_at ? new Date(bet.created_at).getTime() : 0;
+    
+    if (betTime > 0 && betTime < cutoffTime) {
+      // Bet is older than maxAge - mark as failed/resolved
+      console.log(`🧹 [BetTracker] Cleaning stale bet #${bet.id} (${bet.strategy_id}) - ${((Date.now() - betTime) / 60000).toFixed(0)} min old`);
+      db.updateLiveBetStatusById(bet.id!, 'resolved', 'STALE', 0);
+      db.dbLog.live('warn', `Stale bet cleaned: #${bet.id} after ${maxAgeMinutes}min`, { betId: bet.id }, bet.strategy_id, bet.market_key);
+      cleaned++;
+    }
+  }
+  
+  if (cleaned > 0) {
+    console.log(`🧹 [BetTracker] Cleaned ${cleaned} stale pending bets`);
+  }
+  
+  return cleaned;
 }
 
 /**

@@ -1,9 +1,21 @@
+/**
+ * Polymarket BTC Bot
+ * Single-asset trading bot for BTC 15-minute markets
+ * 
+ * Fixed issues:
+ * - Better error boundaries
+ * - Proper null checks
+ * - Safe condition ID handling
+ * - Memory leak prevention
+ */
+
 import { PolymarketClient } from './polymarket';
 import { BTCPriceTracker } from './btc-price';
 import { TradingStrategy } from './strategy';
 import { BotConfig, TradingSession, BTCMarket } from './types';
 import { getNewsService, NewsResearchService, ResearchReport } from './news-research';
 import { RedemptionService } from './redemption';
+import { shouldEnterMarket, checkProfitability, PROFITABILITY_DEFAULTS } from './profitability';
 
 export class PolymarketBTCBot {
   private config: BotConfig;
@@ -20,10 +32,14 @@ export class PolymarketBTCBot {
   private latestResearch: ResearchReport | null = null;
   
   // Budget management
-  private initialBudget: number;      // Original starting budget
-  private currentBudget: number;      // Active trading budget
-  private lockedProfit: number = 0;   // Profit locked away (not used for trading)
-  private profitLockTriggered: boolean = false;  // Whether 3x trigger has fired
+  private initialBudget: number;
+  private currentBudget: number;
+  private lockedProfit: number = 0;
+  private profitLockTriggered: boolean = false;
+  
+  // Prevent concurrent operations
+  private isCheckingMarket = false;
+  private isCheckingRedemptions = false;
   
   private stats = {
     totalMarkets: 0,
@@ -53,28 +69,40 @@ export class PolymarketBTCBot {
 ╚══════════════════════════════════════════════════╝
     `);
 
-    // Initialize Polymarket client
-    await this.polymarket.initialize();
+    try {
+      // Initialize Polymarket client
+      await this.polymarket.initialize();
 
-    // Connect to BTC price feed
-    await this.priceTracker.connect();
+      // Connect to BTC price feed
+      await this.priceTracker.connect();
 
-    // Check for pending redemptions on startup
-    await this.checkAndRedeemPositions();
+      // Check for pending redemptions on startup
+      await this.checkAndRedeemPositions();
 
-    // Start periodic redemption checks (every 5 minutes)
-    this.startRedemptionMonitoring();
+      // Start periodic redemption checks (every 5 minutes)
+      this.startRedemptionMonitoring();
 
-    // Start monitoring for new markets
-    this.startMarketMonitoring();
+      // Start monitoring for new markets
+      this.startMarketMonitoring();
 
-    console.log('\n🚀 Bot started! Waiting for markets...\n');
+      console.log('\n🚀 Bot started! Waiting for markets...\n');
+    } catch (error: any) {
+      console.error('❌ Failed to start bot:', error.message);
+      throw error;
+    }
   }
 
   /**
    * Check and redeem any resolved positions, update budget
    */
   private async checkAndRedeemPositions(): Promise<void> {
+    // Prevent concurrent redemption checks
+    if (this.isCheckingRedemptions) {
+      return;
+    }
+    
+    this.isCheckingRedemptions = true;
+    
     try {
       console.log('\n💰 Checking for redeemable positions...');
       
@@ -88,34 +116,32 @@ export class PolymarketBTCBot {
       // Get total wallet balance
       const walletBalance = result.newBalance;
       
-      // Check profit protection: if total balance >= 3x initial budget
-      // Lock 2x as profit and continue trading with 1x
+      // Check profit protection
       this.checkProfitProtection(walletBalance);
       
-      // Update current budget (wallet balance minus locked profit)
+      // Update current budget
       const previousBudget = this.currentBudget;
-      this.currentBudget = walletBalance - this.lockedProfit;
+      this.currentBudget = Math.max(0, walletBalance - this.lockedProfit);
       
-      if (this.currentBudget !== previousBudget) {
+      if (Math.abs(this.currentBudget - previousBudget) > 0.01) {
         console.log(`💵 Trading budget: $${previousBudget.toFixed(2)} → $${this.currentBudget.toFixed(2)}`);
       }
       
       console.log(`📊 Wallet: $${walletBalance.toFixed(2)} | Trading: $${this.currentBudget.toFixed(2)} | Locked: $${this.lockedProfit.toFixed(2)}\n`);
     } catch (error: any) {
       console.error('❌ Redemption check failed:', error.message);
+    } finally {
+      this.isCheckingRedemptions = false;
     }
   }
 
   /**
    * Profit protection: When we hit 3x initial budget, lock 2x and trade with 1x
-   * This ensures we always recoup our initial investment and play with house money
    */
   private checkProfitProtection(walletBalance: number): void {
     const triggerThreshold = this.initialBudget * 3;
     
-    // Only trigger once - when we first hit 3x
     if (!this.profitLockTriggered && walletBalance >= triggerThreshold) {
-      // Lock 2x initial budget as profit
       const profitToLock = this.initialBudget * 2;
       this.lockedProfit = profitToLock;
       this.profitLockTriggered = true;
@@ -162,12 +188,25 @@ export class PolymarketBTCBot {
     if (this.currentSession && this.currentSession.result === 'PENDING') {
       return;
     }
+    
+    // Prevent concurrent checks
+    if (this.isCheckingMarket) {
+      return;
+    }
+    
+    this.isCheckingMarket = true;
+    
+    try {
+      const market = await this.polymarket.findActiveBTCMarket();
 
-    const market = await this.polymarket.findActiveBTCMarket();
-
-    if (market && market.marketId !== this.currentMarket?.marketId) {
-      console.log(`\n🎯 New BTC market found: ${market.marketId}`);
-      await this.startTradingSession(market);
+      if (market && market.marketId && market.marketId !== this.currentMarket?.marketId) {
+        console.log(`\n🎯 New BTC market found: ${market.marketId}`);
+        await this.startTradingSession(market);
+      }
+    } catch (error: any) {
+      console.error('Error checking for market:', error.message);
+    } finally {
+      this.isCheckingMarket = false;
     }
   }
 
@@ -177,6 +216,11 @@ export class PolymarketBTCBot {
     // Set BTC open price
     this.priceTracker.setOpenPrice();
     const btcOpenPrice = this.priceTracker.getOpenPrice();
+
+    if (btcOpenPrice === 0) {
+      console.error('❌ Cannot start session: no BTC price available');
+      return;
+    }
 
     // Create new session
     this.currentSession = this.strategy.createSession(market, btcOpenPrice);
@@ -205,14 +249,17 @@ export class PolymarketBTCBot {
       console.log('📰 Fetching market news...');
       this.latestResearch = await this.newsService.searchBitcoinNews();
       
-      const sentimentEmoji = {
-        'BULLISH': '🟢',
-        'BEARISH': '🔴',
-        'NEUTRAL': '⚪'
-      };
-      
-      console.log(`\n${sentimentEmoji[this.latestResearch.sentiment]} News Sentiment: ${this.latestResearch.sentiment} (${(this.latestResearch.confidence * 100).toFixed(0)}%)`);
-      console.log(`📝 ${this.latestResearch.answer.substring(0, 150)}...\n`);
+      if (this.latestResearch) {
+        const sentimentEmoji = {
+          'BULLISH': '🟢',
+          'BEARISH': '🔴',
+          'NEUTRAL': '⚪'
+        };
+        
+        const emoji = sentimentEmoji[this.latestResearch.sentiment] || '⚪';
+        console.log(`\n${emoji} News Sentiment: ${this.latestResearch.sentiment} (${(this.latestResearch.confidence * 100).toFixed(0)}%)`);
+        console.log(`📝 ${this.latestResearch.answer.substring(0, 150)}...\n`);
+      }
     } catch (error) {
       console.log('⚠️ Could not fetch news research');
     }
@@ -238,70 +285,90 @@ export class PolymarketBTCBot {
   private async tradingTick(): Promise<void> {
     if (!this.currentSession || !this.currentMarket) return;
 
-    const now = Date.now();
-    const marketStart = this.currentMarket.startTime.getTime();
-    const minutesSinceStart = (now - marketStart) / (60 * 1000);
+    try {
+      const now = Date.now();
+      const marketStart = this.currentMarket.startTime.getTime();
+      const minutesSinceStart = (now - marketStart) / (60 * 1000);
 
-    // Update market data
-    this.currentMarket.minutesSinceStart = minutesSinceStart;
-    this.currentMarket.currentPrice = this.priceTracker.getPrice();
+      // Update market data
+      this.currentMarket.minutesSinceStart = minutesSinceStart;
+      const currentPrice = this.priceTracker.getPrice();
+      if (currentPrice > 0) {
+        this.currentMarket.currentPrice = currentPrice;
+      }
 
-    // Check if market ended (15 minutes)
-    if (minutesSinceStart >= 15) {
-      await this.endSession();
-      return;
-    }
+      // Check if market ended (15 minutes)
+      if (minutesSinceStart >= 15) {
+        await this.endSession();
+        return;
+      }
 
-    // Get current odds
-    const odds = await this.polymarket.getBTCMarketOdds(this.currentMarket);
-    this.currentMarket.upProbability = odds.upProbability;
-    this.currentMarket.downProbability = odds.downProbability;
+      // Get current odds
+      const odds = await this.polymarket.getBTCMarketOdds(this.currentMarket);
+      this.currentMarket.upProbability = odds.upProbability;
+      this.currentMarket.downProbability = odds.downProbability;
 
-    // If we haven't decided a side yet, try to decide
-    if (!this.currentSession.side && minutesSinceStart >= 1) {
-      const side = this.strategy.decideSide(this.priceTracker, odds);
-      if (side) {
-        // Consider news sentiment as a confirming signal
-        let finalSide = side;
-        if (this.latestResearch && this.latestResearch.confidence > 0.6) {
-          const newsSentiment = this.latestResearch.sentiment;
-          if (newsSentiment === 'BULLISH' && side === 'DOWN') {
-            console.log('⚠️ News sentiment bullish but price says DOWN - proceeding with caution');
-          } else if (newsSentiment === 'BEARISH' && side === 'UP') {
-            console.log('⚠️ News sentiment bearish but price says UP - proceeding with caution');
-          } else if (newsSentiment !== 'NEUTRAL') {
-            console.log(`✅ News sentiment confirms ${side} direction`);
+      // If we haven't decided a side yet, try to decide
+      if (!this.currentSession.side && minutesSinceStart >= 1) {
+        const side = this.strategy.decideSide(this.priceTracker, odds);
+        if (side) {
+          // Consider news sentiment as a confirming signal
+          if (this.latestResearch && this.latestResearch.confidence > 0.6) {
+            const newsSentiment = this.latestResearch.sentiment;
+            if (newsSentiment === 'BULLISH' && side === 'DOWN') {
+              console.log('⚠️ News sentiment bullish but price says DOWN - proceeding with caution');
+            } else if (newsSentiment === 'BEARISH' && side === 'UP') {
+              console.log('⚠️ News sentiment bearish but price says UP - proceeding with caution');
+            } else if (newsSentiment !== 'NEUTRAL') {
+              console.log(`✅ News sentiment confirms ${side} direction`);
+            }
+          }
+          
+          this.currentSession.side = side;
+          this.currentSession.lockedAt = new Date();
+          console.log(`\n🔒 LOCKED IN: ${side}`);
+        }
+      }
+
+      // If we have a side, check for bet opportunities
+      if (this.currentSession.side) {
+        const betToPlace = this.strategy.shouldBet(
+          this.currentSession,
+          minutesSinceStart
+        );
+
+        if (betToPlace && !betToPlace.executed) {
+          if (this.strategy.meetsThreshold(this.currentSession, odds)) {
+            // PROFITABILITY CHECK: Only bet if expected value > costs
+            const prob = this.currentSession.side === 'UP' 
+              ? odds.upProbability 
+              : odds.downProbability;
+            const profitCheck = shouldEnterMarket(prob, prob, betToPlace.amount);
+            
+            if (!profitCheck.enter) {
+              console.log(`💸❌ Skipping bet - ${profitCheck.reason}`);
+              betToPlace.executed = true;
+            } else {
+              // Adjust bet if needed
+              if (profitCheck.suggestedBet > 0 && profitCheck.suggestedBet < betToPlace.amount) {
+                betToPlace.amount = Math.max(profitCheck.suggestedBet, PROFITABILITY_DEFAULTS.minBetSize);
+              }
+              await this.placeBet(betToPlace, odds);
+            }
+          } else {
+            console.log(
+              `⏭️ Skipping bet at minute ${betToPlace.minute} - prob below threshold`
+            );
+            betToPlace.executed = true;
           }
         }
-        
-        this.currentSession.side = finalSide;
-        this.currentSession.lockedAt = new Date();
-        console.log(`\n🔒 LOCKED IN: ${finalSide}`);
       }
+
+      // Log status
+      this.logStatus(minutesSinceStart, odds);
+    } catch (error: any) {
+      console.error('Error in trading tick:', error.message);
     }
-
-    // If we have a side, check for bet opportunities
-    if (this.currentSession.side) {
-      const betToPlace = this.strategy.shouldBet(
-        this.currentSession,
-        minutesSinceStart
-      );
-
-      if (betToPlace && !betToPlace.executed) {
-        // Check if probability still meets threshold
-        if (this.strategy.meetsThreshold(this.currentSession, odds)) {
-          await this.placeBet(betToPlace, odds);
-        } else {
-          console.log(
-            `⏭️ Skipping bet at minute ${betToPlace.minute} - prob below threshold`
-          );
-          betToPlace.executed = true; // Mark as executed (skipped)
-        }
-      }
-    }
-
-    // Log status
-    this.logStatus(minutesSinceStart, odds);
   }
 
   private async placeBet(
@@ -315,32 +382,44 @@ export class PolymarketBTCBot {
         ? this.currentMarket.upTokenId
         : this.currentMarket.downTokenId;
 
+    if (!tokenId) {
+      console.error('❌ Cannot place bet: missing token ID');
+      bet.executed = true;
+      return;
+    }
+
     const price = this.strategy.calculateMakerPrice(this.currentSession, odds);
 
     console.log(
       `\n💸 Placing bet: $${bet.amount} on ${this.currentSession.side} @ $${price.toFixed(2)}`
     );
 
-    const result = await this.polymarket.placeMakerOrder(
-      tokenId,
-      price,
-      bet.amount
-    );
-
-    if (result.success) {
-      bet.executed = true;
-      bet.orderId = result.orderId;
-      bet.shares = result.shares;
-      bet.price = result.price;
-
-      this.currentSession.totalInvested += bet.amount;
-      this.currentSession.totalShares += result.shares || 0;
-
-      console.log(
-        `✅ Order placed: ${result.shares} shares @ $${price.toFixed(2)}`
+    try {
+      const result = await this.polymarket.placeMakerOrder(
+        tokenId,
+        price,
+        bet.amount
       );
-    } else {
-      console.error(`❌ Order failed: ${result.error}`);
+
+      if (result.success) {
+        bet.executed = true;
+        bet.orderId = result.orderId;
+        bet.shares = result.shares;
+        bet.price = result.price;
+
+        this.currentSession.totalInvested += bet.amount;
+        this.currentSession.totalShares += result.shares || 0;
+
+        console.log(
+          `✅ Order placed: ${result.shares} shares @ $${price.toFixed(2)}`
+        );
+      } else {
+        console.error(`❌ Order failed: ${result.error}`);
+        bet.executed = true; // Prevent infinite retries
+      }
+    } catch (error: any) {
+      console.error(`❌ Order error: ${error.message}`);
+      bet.executed = true;
     }
   }
 
@@ -365,6 +444,7 @@ export class PolymarketBTCBot {
     // Clear trading interval
     if (this.tradingInterval) {
       clearInterval(this.tradingInterval);
+      this.tradingInterval = null;
     }
 
     // Resolve session
@@ -386,21 +466,26 @@ export class PolymarketBTCBot {
 
     // Record bet for redemption tracking
     if (this.currentSession.totalInvested > 0 && this.currentSession.side) {
-      const tokenId = this.currentSession.side === 'UP' 
-        ? this.currentMarket.upTokenId 
-        : this.currentMarket.downTokenId;
-      
-      // Get condition ID from market (we'll need to add this to market data)
-      const conditionId = await this.polymarket.getConditionId(this.currentMarket.marketId);
-      
-      if (conditionId) {
-        this.redemptionService.addBetRecord({
-          conditionId,
-          tokenId,
-          marketSlug: `btc-${this.currentSession.side.toLowerCase()}-${this.currentMarket.marketId.substring(0, 8)}`,
-          side: this.currentSession.side,
-          timestamp: Date.now(),
-        });
+      try {
+        const tokenId = this.currentSession.side === 'UP' 
+          ? this.currentMarket.upTokenId 
+          : this.currentMarket.downTokenId;
+        
+        if (tokenId) {
+          const conditionId = await this.polymarket.getConditionId(this.currentMarket.marketId);
+          
+          if (conditionId) {
+            await this.redemptionService.addBetRecord({
+              conditionId,
+              tokenId,
+              marketSlug: `btc-${this.currentSession.side.toLowerCase()}-${this.currentMarket.marketId.substring(0, 8)}`,
+              side: this.currentSession.side,
+              timestamp: Date.now(),
+            });
+          }
+        }
+      } catch (error: any) {
+        console.error('Failed to record bet:', error.message);
       }
     }
 
@@ -426,7 +511,9 @@ export class PolymarketBTCBot {
         : '0.0';
 
     const totalValue = this.currentBudget + this.lockedProfit;
-    const roi = ((totalValue - this.initialBudget) / this.initialBudget * 100).toFixed(1);
+    const roi = this.initialBudget > 0 
+      ? ((totalValue - this.initialBudget) / this.initialBudget * 100).toFixed(1)
+      : '0.0';
 
     console.log(`
 📊 OVERALL STATS
@@ -448,12 +535,15 @@ ${this.profitLockTriggered ? '✅ Initial investment secured!' : `⏳ ${((totalV
   stop(): void {
     if (this.marketCheckInterval) {
       clearInterval(this.marketCheckInterval);
+      this.marketCheckInterval = null;
     }
     if (this.tradingInterval) {
       clearInterval(this.tradingInterval);
+      this.tradingInterval = null;
     }
     if (this.redemptionInterval) {
       clearInterval(this.redemptionInterval);
+      this.redemptionInterval = null;
     }
     this.priceTracker.disconnect();
     console.log('\n👋 Bot stopped');

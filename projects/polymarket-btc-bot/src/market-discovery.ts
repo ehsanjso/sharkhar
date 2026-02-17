@@ -1,11 +1,18 @@
 /**
  * Market Discovery for Crypto Candle Markets
  * Finds BTC, ETH, SOL, XRP up/down markets across all timeframes
+ * 
+ * Fixed issues:
+ * - Safe JSON parsing
+ * - Request timeouts
+ * - Better error boundaries
+ * - Memory leak prevention in watcher
  */
 
 import { CryptoAsset, Timeframe, CandleMarket, timeframeToDuration } from './types-multi';
 
 const GAMMA_API = 'https://gamma-api.polymarket.com';
+const REQUEST_TIMEOUT_MS = 10000;
 
 // Asset to slug prefix mapping
 const ASSET_SLUGS: Record<CryptoAsset, string> = {
@@ -48,6 +55,36 @@ export interface DiscoveredMarket {
 }
 
 /**
+ * Fetch with timeout
+ */
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit = {},
+  timeoutMs: number = REQUEST_TIMEOUT_MS
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+/**
+ * Safe JSON parse
+ */
+function safeJsonParse<T>(text: string, fallback: T): T {
+  try {
+    const parsed = JSON.parse(text);
+    return parsed !== null && parsed !== undefined ? parsed : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+/**
  * Discover all active candle markets
  */
 export async function discoverCandleMarkets(
@@ -57,19 +94,31 @@ export async function discoverCandleMarkets(
   const markets: DiscoveredMarket[] = [];
   const seenSlugs = new Set<string>();
 
-  // Fetch all events and strictly filter for crypto up/down markets
   try {
-    const response = await fetch(
+    const response = await fetchWithTimeout(
       `${GAMMA_API}/events?active=true&closed=false&limit=500`
     );
-    const events: any[] = await response.json();
+    
+    if (!response.ok) {
+      console.error(`Failed to fetch events: HTTP ${response.status}`);
+      return markets;
+    }
+    
+    const text = await response.text();
+    const events = safeJsonParse<any[]>(text, []);
+    
+    if (!Array.isArray(events)) {
+      console.error('Events response is not an array');
+      return markets;
+    }
     
     for (const event of events) {
+      if (!event || typeof event !== 'object') continue;
+      
       const slug = (event.slug || '').toLowerCase();
       const title = (event.title || '').toLowerCase();
       
       // STRICT check: Must have "updown" in slug OR "up or down" in title
-      // AND must be about a crypto asset price
       const isUpDownMarket = slug.includes('updown') || title.includes('up or down');
       if (!isUpDownMarket) continue;
       
@@ -86,7 +135,6 @@ export async function discoverCandleMarkets(
         
         // Determine timeframe from slug or title
         for (const timeframe of timeframes) {
-          const tfSlug = TIMEFRAME_SLUGS[timeframe];
           const tfLabels = getTimeframeLabels(timeframe);
           
           const hasTimeframe = tfLabels.some(label =>
@@ -106,8 +154,8 @@ export async function discoverCandleMarkets(
         }
       }
     }
-  } catch (error) {
-    console.error('Failed to fetch events:', error);
+  } catch (error: any) {
+    console.error('Failed to discover markets:', error.message);
   }
 
   return markets;
@@ -142,7 +190,7 @@ function parseEventToMarket(
   providedTimeframe?: Timeframe
 ): DiscoveredMarket | null {
   try {
-    if (!event.markets || event.markets.length === 0) {
+    if (!event || !event.markets || !Array.isArray(event.markets) || event.markets.length === 0) {
       return null;
     }
 
@@ -160,7 +208,7 @@ function parseEventToMarket(
     } else if (providedAsset) {
       asset = providedAsset;
     } else {
-      return null; // Can't determine asset
+      return null;
     }
     
     // Detect timeframe from slug
@@ -178,24 +226,42 @@ function parseEventToMarket(
     } else if (providedTimeframe) {
       timeframe = providedTimeframe;
     } else {
-      return null; // Can't determine timeframe
+      return null;
     }
 
     const marketData = event.markets[0];
-    const tokenIds = marketData.clobTokenIds || [];
-    const outcomes = JSON.parse(marketData.outcomes || '["Up","Down"]');
-    const prices = JSON.parse(marketData.outcomePrices || '[0.5,0.5]');
+    if (!marketData) return null;
     
-    if (tokenIds.length < 2) {
+    const tokenIds = marketData.clobTokenIds || [];
+    
+    // Safe parse outcomes and prices
+    const outcomes = safeJsonParse<string[]>(
+      typeof marketData.outcomes === 'string' ? marketData.outcomes : JSON.stringify(marketData.outcomes || []),
+      ['Up', 'Down']
+    );
+    const prices = safeJsonParse<number[]>(
+      typeof marketData.outcomePrices === 'string' ? marketData.outcomePrices : JSON.stringify(marketData.outcomePrices || []),
+      [0.5, 0.5]
+    );
+    
+    if (!Array.isArray(tokenIds) || tokenIds.length < 2) {
       return null;
     }
 
     // Determine which token is Up vs Down
-    let upIndex = outcomes.findIndex((o: string) => o.toLowerCase().includes('up'));
-    let downIndex = outcomes.findIndex((o: string) => o.toLowerCase().includes('down'));
+    let upIndex = outcomes.findIndex((o: any) => 
+      typeof o === 'string' && o.toLowerCase().includes('up')
+    );
+    let downIndex = outcomes.findIndex((o: any) => 
+      typeof o === 'string' && o.toLowerCase().includes('down')
+    );
     
     if (upIndex === -1) upIndex = 0;
     if (downIndex === -1) downIndex = 1;
+    
+    if (!tokenIds[upIndex] || !tokenIds[downIndex]) {
+      return null;
+    }
 
     const startTime = event.startTime 
       ? new Date(event.startTime) 
@@ -205,20 +271,21 @@ function parseEventToMarket(
       : new Date(startTime.getTime() + timeframeToDuration(timeframe) * 60000);
 
     return {
-      eventId: event.id?.toString() || event.slug,
-      slug: event.slug,
-      title: event.title,
+      eventId: String(event.id || event.slug || ''),
+      slug: event.slug || '',
+      title: event.title || '',
       asset,
       timeframe,
       startTime,
       endTime,
       upTokenId: tokenIds[upIndex],
       downTokenId: tokenIds[downIndex],
-      upPrice: parseFloat(prices[upIndex]) || 0.5,
-      downPrice: parseFloat(prices[downIndex]) || 0.5,
-      isLive: event.active && !event.closed,
+      upPrice: parseFloat(String(prices[upIndex])) || 0.5,
+      downPrice: parseFloat(String(prices[downIndex])) || 0.5,
+      isLive: Boolean(event.active && !event.closed),
     };
-  } catch (error) {
+  } catch (error: any) {
+    console.error('Error parsing event:', error.message);
     return null;
   }
 }
@@ -238,48 +305,82 @@ function getTimeframeLabel(tf: Timeframe): string {
  * Fetch market details from a specific event slug
  */
 export async function fetchMarketBySlug(slug: string): Promise<DiscoveredMarket | null> {
+  if (!slug) return null;
+  
   try {
-    const response = await fetch(`${GAMMA_API}/events?slug=${slug}`);
-    const events: any[] = await response.json();
+    const response = await fetchWithTimeout(`${GAMMA_API}/events?slug=${encodeURIComponent(slug)}`);
     
-    if (events.length === 0) return null;
+    if (!response.ok) {
+      return null;
+    }
+    
+    const text = await response.text();
+    const events = safeJsonParse<any[]>(text, []);
+    
+    if (!Array.isArray(events) || events.length === 0) {
+      return null;
+    }
     
     return parseEventToMarket(events[0]);
-  } catch (error) {
+  } catch (error: any) {
+    console.error(`Failed to fetch market ${slug}:`, error.message);
     return null;
   }
 }
 
 /**
  * Watch for new markets being created
+ * Returns cleanup function
  */
-export async function watchForNewMarkets(
+export function watchForNewMarkets(
   assets: CryptoAsset[],
   timeframes: Timeframe[],
   onNewMarket: (market: DiscoveredMarket) => void,
   intervalMs: number = 30000
-): Promise<() => void> {
+): () => void {
   const seenMarkets = new Set<string>();
+  let stopped = false;
+  let timeoutId: NodeJS.Timeout | null = null;
   
   const check = async () => {
-    const markets = await discoverCandleMarkets(assets, timeframes);
+    if (stopped) return;
     
-    for (const market of markets) {
-      if (!seenMarkets.has(market.eventId) && market.isLive) {
-        seenMarkets.add(market.eventId);
-        onNewMarket(market);
+    try {
+      const markets = await discoverCandleMarkets(assets, timeframes);
+      
+      for (const market of markets) {
+        const key = market.eventId || market.slug;
+        if (!seenMarkets.has(key) && market.isLive) {
+          seenMarkets.add(key);
+          try {
+            onNewMarket(market);
+          } catch (error: any) {
+            console.error('Error in onNewMarket callback:', error.message);
+          }
+        }
       }
+    } catch (error: any) {
+      console.error('Error in market watcher:', error.message);
+    }
+    
+    // Schedule next check
+    if (!stopped) {
+      timeoutId = setTimeout(check, intervalMs);
     }
   };
   
   // Initial check
-  await check();
-  
-  // Periodic checks
-  const interval = setInterval(check, intervalMs);
+  check();
   
   // Return cleanup function
-  return () => clearInterval(interval);
+  return () => {
+    stopped = true;
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+    seenMarkets.clear();
+  };
 }
 
 /**
@@ -295,18 +396,20 @@ export async function discoverFromPolymarket(
   if (!categoryUrl) return markets;
   
   try {
-    // Fetch the HTML page
-    const response = await fetch(`https://polymarket.com${categoryUrl}`, {
+    const response = await fetchWithTimeout(`https://polymarket.com${categoryUrl}`, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible)',
         'Accept': 'text/html,application/json',
       }
     });
     
+    if (!response.ok) {
+      return markets;
+    }
+    
     const html = await response.text();
     
     // Extract event slugs from the HTML
-    // Pattern: /event/{slug} where slug contains updown
     const slugRegex = /\/event\/((?:btc|eth|sol|xrp)-updown-\d+m?-\d+)/gi;
     const slugs: string[] = [];
     let match;
@@ -316,15 +419,22 @@ export async function discoverFromPolymarket(
       }
     }
     
-    // Fetch details for each discovered slug
-    for (const slug of slugs) {
-      const market = await fetchMarketBySlug(slug);
-      if (market) {
-        markets.push(market);
+    // Fetch details for each discovered slug (with concurrency limit)
+    const CONCURRENT_LIMIT = 3;
+    for (let i = 0; i < slugs.length; i += CONCURRENT_LIMIT) {
+      const batch = slugs.slice(i, i + CONCURRENT_LIMIT);
+      const results = await Promise.allSettled(
+        batch.map(slug => fetchMarketBySlug(slug))
+      );
+      
+      for (const result of results) {
+        if (result.status === 'fulfilled' && result.value) {
+          markets.push(result.value);
+        }
       }
     }
-  } catch (error) {
-    console.error(`Failed to discover from ${categoryUrl}:`, error);
+  } catch (error: any) {
+    console.error(`Failed to discover from ${categoryUrl}:`, error.message);
   }
   
   return markets;
@@ -338,21 +448,41 @@ export async function discoverAllMarkets(
   timeframes: Timeframe[] = ['5min', '15min', '1hr']
 ): Promise<DiscoveredMarket[]> {
   const allMarkets: DiscoveredMarket[] = [];
+  const seenSlugs = new Set<string>();
   
   // First try the standard API discovery
-  const apiMarkets = await discoverCandleMarkets(assets, timeframes);
-  allMarkets.push(...apiMarkets);
-  
-  // Then try web scraping for each timeframe
-  for (const tf of timeframes) {
-    const webMarkets = await discoverFromPolymarket(tf);
-    
-    // Add markets not already found
-    for (const m of webMarkets) {
-      if (assets.includes(m.asset) && !allMarkets.find(x => x.slug === m.slug)) {
+  try {
+    const apiMarkets = await discoverCandleMarkets(assets, timeframes);
+    for (const m of apiMarkets) {
+      const key = m.slug || m.eventId;
+      if (!seenSlugs.has(key)) {
+        seenSlugs.add(key);
         allMarkets.push(m);
       }
     }
+  } catch (error: any) {
+    console.error('API discovery failed:', error.message);
+  }
+  
+  // Then try web scraping for each timeframe (in parallel with limit)
+  try {
+    const webResults = await Promise.allSettled(
+      timeframes.map(tf => discoverFromPolymarket(tf))
+    );
+    
+    for (const result of webResults) {
+      if (result.status === 'fulfilled') {
+        for (const m of result.value) {
+          const key = m.slug || m.eventId;
+          if (assets.includes(m.asset) && !seenSlugs.has(key)) {
+            seenSlugs.add(key);
+            allMarkets.push(m);
+          }
+        }
+      }
+    }
+  } catch (error: any) {
+    console.error('Web discovery failed:', error.message);
   }
   
   return allMarkets;
