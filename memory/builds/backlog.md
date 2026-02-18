@@ -65,8 +65,8 @@ Priority queue of tasks for automated sessions. Pick from top.
 
 ### 4. Auto-Compaction Cron Job — IN PROGRESS
 **Goal:** Automatically summarize old daily memory files
-**Status:** Scaffolding complete (Feb 16 Session 1)
-**Next:** Session 2 - Implement Haiku summarization
+**Status:** Script complete (Feb 17 Session 2)
+**Next:** Test on real files and add cron job
 
 **Spec:**
 - Run weekly (Sunday night)
@@ -74,16 +74,19 @@ Priority queue of tasks for automated sessions. Pick from top.
 - Append key learnings to MEMORY.md
 - Archive or delete summarized files
 
-**Session 1 done:**
+**Done:**
 - [x] Created `scripts/memory-compact.sh` with structure
 - [x] Created `memory/archive/` directory
-- [x] Dry-run works (10 files would be processed)
+- [x] Dry-run works (8 files would be processed)
+- [x] Added --model flag (default: haiku for cost savings)
+- [x] Added retry logic with exponential backoff
+- [x] Added file truncation for large files
+- [x] Updated README documentation
 
-**Session 2 TODO:**
-- [ ] Implement Haiku summarization via clawdbot
-- [ ] Append summaries to MEMORY.md
-- [ ] Add cron job
-- [ ] Test on real files
+**TODO:**
+- [ ] Test on real files (run without --dry-run)
+- [ ] Add cron job for Sunday 11 PM
+- [ ] Verify MEMORY.md updates correctly
 
 ---
 
@@ -94,7 +97,7 @@ Priority queue of tasks for automated sessions. Pick from top.
 - Add security notes to AGENTS.md
 - Flag any that need confirmation before use
 
-### 6. Cron Job Cost Optimization — NEW
+### 6. Cron Job Cost Optimization — BLOCKED
 **Source:** cron-audit.sh findings (Feb 17)
 **Goal:** Switch appropriate cron jobs from default→Haiku for cost savings
 
@@ -105,6 +108,10 @@ Priority queue of tasks for automated sessions. Pick from top.
 - [ ] Daily Market Brief → Review complexity
 
 **Script created:** `./scripts/cron-audit.sh --suggest`
+
+**Note (Feb 17):** Gateway timeout when trying to modify cron jobs from within
+a cron session. Needs manual intervention or main session update.
+Commands: `clawdbot cron edit 0aac7693 --model haiku` (Pill Reminder)
 
 ---
 
