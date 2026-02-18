@@ -196,6 +196,30 @@ connectivity issues. Checks gateway process, websocket, cron jobs, sessions, and
 **Recommendations:** Automatically suggests actions based on detected issues
 (restart gateway, check logs, etc.).
 
+### cron-audit.sh
+Analyze cron jobs for cost optimization opportunities. Shows all jobs with their
+models and suggests which could be switched to Haiku for savings.
+
+```bash
+./cron-audit.sh              # Full audit with all jobs
+./cron-audit.sh --expensive  # Only show jobs using expensive models
+./cron-audit.sh --suggest    # Show optimization suggestions per job
+./cron-audit.sh --summary    # Stats only (no job list)
+./cron-audit.sh --json       # JSON output for scripts
+./cron-audit.sh --help       # Show full usage
+```
+
+**Output:**
+- Summary stats (total jobs, enabled, by model)
+- Color-coded job list with model and schedule
+- Optimization suggestions based on job name patterns
+- Potential savings estimate
+
+**Suggestion heuristics:**
+- `--suggest` detects simple task patterns (status, check, reminder, backup)
+- Recommends Haiku for simple tasks, keeps current for complex (analyze, code, review)
+- Jobs already on Haiku show "already-optimal"
+
 ### memory-search.sh
 Simple grep-based search for memory files. Stopgap until RAG/semantic search 
 is set up. Searches all memory/*.md files plus MEMORY.md.
