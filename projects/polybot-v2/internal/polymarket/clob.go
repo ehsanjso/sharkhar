@@ -367,10 +367,47 @@ func (c *Client) GetEventBySlug(ctx context.Context, slug string) (*Market, erro
 		m := event.Markets[0] // Use first market
 		market.ConditionID = m.ConditionID
 		market.Question = m.Question
+		
+		// Debug: log raw Gamma data
+		log.Info().
+			Str("outcomes_raw", m.Outcomes).
+			Str("prices_raw", m.OutcomePrices).
+			Str("tokens_raw", m.ClobTokenIds).
+			Msg("Raw GammaMarket data")
+		
 		market.Tokens = m.ParseTokens()
+		log.Info().Int("tokens", len(market.Tokens)).Msg("Using Gamma API prices")
 	}
 	
 	return market, nil
+}
+
+// fetchTokenPrice gets best bid price from CLOB order book
+func (c *Client) fetchTokenPrice(ctx context.Context, tokenID string) float64 {
+	book, err := c.GetOrderBook(ctx, tokenID)
+	if err != nil {
+		log.Warn().Err(err).Str("token", tokenID[:16]+"...").Msg("Failed to fetch order book")
+		return 0
+	}
+	
+	log.Info().Int("asks", len(book.Asks)).Int("bids", len(book.Bids)).Str("token", tokenID[:16]+"...").Msg("Order book fetched")
+	
+	// Use best ask (lowest sell price) as the market price
+	if len(book.Asks) > 0 {
+		price, _ := strconv.ParseFloat(book.Asks[0].Price, 64)
+		log.Info().Float64("askPrice", price).Msg("Using best ask")
+		return price
+	}
+	
+	// Fallback to best bid if no asks
+	if len(book.Bids) > 0 {
+		price, _ := strconv.ParseFloat(book.Bids[0].Price, 64)
+		log.Info().Float64("bidPrice", price).Msg("Using best bid")
+		return price
+	}
+	
+	log.Warn().Msg("No asks or bids in order book")
+	return 0
 }
 
 // GammaEvent represents the event structure from gamma API
@@ -402,6 +439,8 @@ func (m *GammaMarket) ParseTokens() []Token {
 	json.Unmarshal([]byte(m.ClobTokenIds), &tokenIds)
 	json.Unmarshal([]byte(m.Outcomes), &outcomes)
 	json.Unmarshal([]byte(m.OutcomePrices), &prices)
+	
+	log.Info().Strs("outcomes", outcomes).Strs("prices", prices).Msg("ParseTokens: Gamma API data")
 	
 	var tokens []Token
 	for i := 0; i < len(tokenIds) && i < len(outcomes); i++ {

@@ -86,5 +86,6 @@ func (r *Registry) List() []Strategy {
 func DefaultRegistry() *Registry {
 	r := NewRegistry()
 	r.Register(NewEnsembleStrategy())
+	r.Register(NewSimpleStrategy())
 	return r
 }

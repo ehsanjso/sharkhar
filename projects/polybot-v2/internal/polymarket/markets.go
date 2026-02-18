@@ -147,20 +147,24 @@ func (f *MarketFinder) parseMarket(m *Market) *BTCMinuteMarket {
 		direction = "down"
 	}
 	
-	// Find YES/NO tokens
+	// Find Up/Down tokens (BTC markets use "Up"/"Down", others use "Yes"/"No")
 	var upTokenID, downTokenID string
 	var upPrice, downPrice float64
 	
 	for _, t := range m.Tokens {
 		outcome := strings.ToLower(t.Outcome)
-		if outcome == "yes" {
+		if outcome == "yes" || outcome == "up" {
 			upTokenID = t.TokenID
 			upPrice = t.Price
-		} else if outcome == "no" {
+		} else if outcome == "no" || outcome == "down" {
 			downTokenID = t.TokenID
 			downPrice = t.Price
 		}
 	}
+	
+	log.Debug().Str("upToken", upTokenID).Str("downToken", downTokenID).
+		Float64("upPrice", upPrice).Float64("downPrice", downPrice).
+		Msg("Parsed market tokens")
 	
 	return &BTCMinuteMarket{
 		ConditionID: m.ConditionID,

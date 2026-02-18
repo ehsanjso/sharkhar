@@ -1,6 +1,6 @@
 # 🧠 Long-term Memory
 
-*Last updated: 2026-02-15*
+*Last updated: 2026-02-17*
 
 ## About Ehsan
 
@@ -57,6 +57,12 @@ Mobile wardrobe management app with AI features.
 **Design research:** Airbnb UX patterns, Whering app (competitor) via Mobbin
 
 **⚠️ Pi limitation:** `npx expo export -p web` OOMs at ~88% — use EAS Build instead (cloud)
+
+**EAS Build (researched Feb 12):**
+- Cloud builds bypass Pi entirely — upload code, receive binary
+- Free tier: 30 builds/month, 1,000 update MAUs
+- Internal distribution via URL (no Play Store needed for testing)
+- `eas build --platform android --profile preview` for testing builds
 
 **New Architecture (SDK 55+):**
 - JSI replaces bridge — direct memory refs, no serialization
@@ -156,6 +162,45 @@ The Agent Dashboard helps me wake up each session knowing what happened.
 **API:**
 - `/api/agent-context` — Fetches live data from gateway (quota, crons, activity)
 - Quota data from `memory/quota-cache.json` (updated by quota monitor cron)
+
+---
+
+### Polymarket Multi-Strategy Bot — Active Feb 2026
+
+Trading bot for Polymarket BTC/ETH/SOL 5-min and 15-min prediction markets.
+
+**Location:** `~/clawd/projects/polymarket-btc-bot/`
+**Dashboard:** http://192.168.0.217:8084
+
+**Key Insight:** Only 12.7% of Polymarket wallets are profitable. "If you're betting on gut feelings, you're exit liquidity for algorithmic traders." Mean reversion dominates short-term crypto markets.
+
+**Best Strategies (from paper trading):**
+- **vol-regime**: 88.5% win rate, +$642 P&L — uses Parkinson volatility
+- **ensemble**: 76.5% win rate, +$287 P&L — combines signals
+- **breakout**: 100% win rate, +$93 P&L — confirmed trend following
+
+**V2 Anti-Retail Strategies (Feb 15):**
+- Fade the Move, Stoikov Spread, Bayesian Updater, Time-Decay Reversal
+- Bet AGAINST early momentum (pros fade retail moves)
+
+**Architecture:**
+- 6 markets × 16 strategies = 96 trading instances
+- Paper vs Live mode toggle per strategy
+- Auto-halt at $25 stop loss per strategy
+
+**Major Code Audit (Feb 17):**
+- Fixed 12+ race conditions across codebase
+- Added FileMutex/SessionMutex for thread safety
+- Fixed command injection vulnerability in news-research.ts
+- Added profitability filter (min bet $5, min edge 3%)
+
+**Lessons Learned:**
+- Over-betting bug cost $110 before fix (wallet $180→$70)
+- Max bet cap: 42% of available budget
+- CTF contract addresses differ (NEG_RISK_CTF vs STANDARD_CTF)
+- Premium RPCs essential for write operations on Polygon
+
+**Next Step:** VectorBT backtesting to validate strategy performance.
 
 ---
 
@@ -325,6 +370,8 @@ The spare capacity cron runs at noon daily. Priority order:
 4. Documentation
 
 **Recent code improvements:**
+- polymarket-bot: comprehensive race condition audit, 12+ fixes, profitability filter (Feb 17)
+- polybot CLI: added `--json` flag to status command for integrations (Feb 17)
 - investor-tracker: added `status` command for monitoring cache health (cache age, entry counts, DB state) (Feb 13)
 - devlog.sh: created quick daily logging tool with --yesterday, --edit flags, bash completion (Feb 9)
 - Investor-tracker: fixed indentation bug in `fetch_13f_summary()` — 13F processing only ran in fallback case (Feb 7)
@@ -361,10 +408,44 @@ The spare capacity cron runs at noon daily. Priority order:
 - **Spare capacity cron works** — Good pattern for using downtime productively
 - **Research compounds** — Each topic builds on previous (MCP → HA → Ollama → all connect)
 - **Small code fixes matter** — Timeouts, retries, and proper error handling prevent silent failures
+- **Don't bet with early momentum** — In short-term crypto markets, mean reversion dominates; pros fade retail
+- **Cap bet sizes** — Uncapped percentage betting compounds losses; always set max bet limits
+- **Race conditions hide** — File operations and session management need proper mutex locking
 
 ## Weekly Archive
 
 _Automated summaries of archived daily memory files._
+
+### 2026-02-17
+- **Polymarket bot major audit** — Fixed 12+ race conditions, added FileMutex/SessionMutex for thread safety, patched command injection vulnerability
+- **Profitability filter** — New module ensuring every trade has positive EV after fees (min $5 bet, 53% probability, 3% edge)
+- **Transaction analysis** — Analyzed wallet CSV: 17 trades, 7 redemptions, net -$15.10 (-7.1% ROI)
+- **Best strategies identified** — vol-regime (88.5%), ensemble (76.5%), breakout (100%) — all in paper mode
+- **Daily research** — VectorBT recommended for backtesting, Pi 5 compatible at 300-500MB RAM
+
+### 2026-02-16
+- **Critical bug fixes** — Redemption using wrong contract (NEG_RISK_CTF vs STANDARD_CTF), over-betting bug (no cap)
+- **RPC strategy** — Split reads (public) vs writes (premium: Alchemy → Tatum → public fallback)
+- **Wallet damage** — $180 → $75 due to over-betting before fix applied; added 42% max bet cap
+
+### 2026-02-15
+- **Polymarket V2 strategies** — Built anti-retail approach after V1 got crushed by mean reversion
+- **Key insight** — Only 12.7% of Polymarket wallets profitable; pros fade retail momentum
+- **Multi-market expansion** — 6 markets (BTC/ETH/SOL × 5min/15min), 16 strategies each = $9,600 paper trading
+- **Control features** — Global stop, per-market halt, per-strategy halt, paper/live toggle
+
+### 2026-02-14
+- **Cloudflare deploy skill** — Created skill for Pages deployment with password protection
+- **Polymarket dashboard deployed** — https://polymarket-dashboard-d48.pages.dev (admin/polymarket2024)
+
+### 2026-02-13
+- **investor-tracker status command** — Added cache health monitoring (age, entry counts, DB state)
+- **React Native New Architecture research** — JSI replaces bridge, 15-40% faster iOS rendering, SDK 55+ mandatory
+
+### 2026-02-12
+- **Komod AI UX overhaul** — Wardrobe cards with favorites, sticky CTA bar, 3-screen onboarding, completion animations
+- **PWA support** — Added manifest.json, service worker for offline caching
+- **EAS Build research** — Cloud builds bypass Pi OOM issues, 30 free builds/month
 
 ### 2026-02-01
 - **Set up Claude quota monitoring** — Cron job at 9am/3pm/9pm; goal is 80% usage at each reset (session ~5hrs, weekly All Models Thu 10:59pm, Sonnet Sat 4:59pm)
