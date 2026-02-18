@@ -4,3 +4,5 @@ bambu.log
 artifacts/*
 !artifacts/README.md
 !artifacts/.gitkeep
+node_modules/
+**/node_modules/
