@@ -94,6 +94,18 @@ Priority queue of tasks for automated sessions. Pick from top.
 - Add security notes to AGENTS.md
 - Flag any that need confirmation before use
 
+### 6. Cron Job Cost Optimization — NEW
+**Source:** cron-audit.sh findings (Feb 17)
+**Goal:** Switch appropriate cron jobs from default→Haiku for cost savings
+
+**Jobs to review:**
+- [ ] Pill Reminder → Haiku (simple notification)
+- [ ] Spare Capacity Work → Review complexity
+- [ ] Polymarket Reports (3 jobs) → Review if Haiku sufficient
+- [ ] Daily Market Brief → Review complexity
+
+**Script created:** `./scripts/cron-audit.sh --suggest`
+
 ---
 
 ## 🟢 Low Priority / Ideas
