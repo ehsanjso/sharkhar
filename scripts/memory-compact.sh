@@ -28,6 +28,7 @@ MEMORY_DIR="${HOME}/clawd/memory"
 ARCHIVE_DIR="${MEMORY_DIR}/archive"
 MEMORY_FILE="${HOME}/clawd/MEMORY.md"
 DEFAULT_DAYS=7
+DEFAULT_MODEL="haiku"  # Use cheap model for summarization
 
 # Colors
 RED='\033[0;31m'
@@ -47,15 +48,18 @@ Usage: $(basename "$0") [OPTIONS]
 Summarize and archive old daily memory files.
 
 Options:
-  --dry-run     Preview changes without modifying files
-  --days N      Process files older than N days (default: 7)
-  --verbose     Show detailed output
-  --help        Show this help message
+  --dry-run       Preview changes without modifying files
+  --days N        Process files older than N days (default: 7)
+  --model MODEL   Model for summarization (default: haiku)
+                  Options: haiku, sonnet, default
+  --verbose       Show detailed output
+  --help          Show this help message
 
 Examples:
-  $(basename "$0")              # Process files >7 days old
-  $(basename "$0") --dry-run    # Preview what would be archived
-  $(basename "$0") --days 14    # Archive files >14 days old
+  $(basename "$0")                   # Process files >7 days old
+  $(basename "$0") --dry-run         # Preview what would be archived
+  $(basename "$0") --days 14         # Archive files >14 days old
+  $(basename "$0") --model haiku     # Use Haiku for cheap summarization
 EOF
     exit 0
 }
@@ -96,9 +100,17 @@ summarize_file() {
     local filename
     filename=$(basename "$filepath")
     local content
+    local model="${COMPACT_MODEL:-haiku}"
     
     # Read file content
     content=$(cat "$filepath")
+    
+    # Truncate very long files (>10KB) to avoid token limits
+    if [[ ${#content} -gt 10000 ]]; then
+        content="${content:0:10000}
+
+[... truncated ...]"
+    fi
     
     # Call clawdbot agent with summarization prompt
     local prompt="Summarize this daily memory file into 3-5 bullet points of key learnings, decisions, or notable events. Be concise. Skip routine entries. Output ONLY the bullet points, no preamble.
@@ -110,10 +122,31 @@ ${content}
 ---"
 
     local result
-    result=$(clawdbot agent --message "$prompt" --session-id "memory-compact-$(date +%Y%m%d)" --json --timeout 60 2>/dev/null)
+    local exit_code
     
-    # Extract the text from JSON response
-    echo "$result" | jq -r '.result.payloads[0].text // "Failed to summarize"' 2>/dev/null || echo "Failed to summarize"
+    # Try up to 3 times with exponential backoff
+    for attempt in 1 2 3; do
+        result=$(clawdbot agent --message "$prompt" --session-id "memory-compact-$(date +%Y%m%d)" --model "$model" --json --timeout 120 2>&1)
+        exit_code=$?
+        
+        if [[ $exit_code -eq 0 ]]; then
+            # Check for valid JSON response
+            if echo "$result" | jq -e '.result.payloads[0].text' > /dev/null 2>&1; then
+                echo "$result" | jq -r '.result.payloads[0].text'
+                return 0
+            fi
+        fi
+        
+        # Log retry
+        if [[ $attempt -lt 3 ]]; then
+            warn "  Attempt ${attempt} failed, retrying in $((attempt * 5))s..."
+            sleep $((attempt * 5))
+        fi
+    done
+    
+    # All attempts failed
+    echo "Failed to summarize (exit: ${exit_code})"
+    return 1
 }
 
 # Ensure MEMORY.md has the Weekly Archive section
@@ -173,6 +206,7 @@ main() {
     local dry_run=false
     local days=$DEFAULT_DAYS
     local verbose=false
+    local model=$DEFAULT_MODEL
     
     # Parse arguments
     while [[ $# -gt 0 ]]; do
@@ -183,6 +217,10 @@ main() {
                 ;;
             --days)
                 days=$2
+                shift 2
+                ;;
+            --model)
+                model=$2
                 shift 2
                 ;;
             --verbose)
@@ -199,10 +237,14 @@ main() {
         esac
     done
     
+    # Export model for summarize function
+    export COMPACT_MODEL="$model"
+    
     # Ensure archive directory exists
     mkdir -p "$ARCHIVE_DIR"
     
     log "Scanning for files older than ${days} days..."
+    log "Using model: ${model}"
     
     # Get files to process
     local files

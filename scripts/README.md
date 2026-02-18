@@ -250,13 +250,21 @@ cost-efficient summarization, then archives processed files.
 ./memory-compact.sh              # Process files >7 days old
 ./memory-compact.sh --dry-run    # Preview without changes
 ./memory-compact.sh --days 14    # Process files >14 days old
+./memory-compact.sh --model haiku  # Use Haiku (default, cheapest)
+./memory-compact.sh --model sonnet # Use Sonnet for better summaries
+./memory-compact.sh --verbose    # Show detailed progress
 ```
 
 **What it does:**
 1. Finds daily memory files older than threshold
-2. Summarizes each using Haiku (LLM)
+2. Summarizes each using the specified model (default: Haiku)
 3. Appends summaries to MEMORY.md under "## Weekly Archive"
 4. Moves processed files to `memory/archive/`
+
+**Error handling:**
+- Retries up to 3 times with exponential backoff
+- Truncates large files (>10KB) to avoid token limits
+- Skips files that fail summarization (keeps original)
 
 **Designed for weekly cron:** Sunday 11 PM
 ```bash
