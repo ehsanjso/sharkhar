@@ -1,6 +1,7 @@
 {
-  "session": { "used": 29, "resetIn": "3 hr 57 min" },
-  "weeklyAll": { "used": 62, "resetAt": "Thu 11:00 PM" },
+  "session": { "used": 43, "resetIn": "2 hr 59 min" },
+  "weeklyAll": { "used": 71, "resetAt": "Thu 11:00 PM" },
   "weeklySonnet": { "used": 0, "resetAt": "Thu 11:00 PM" },
-  "lastChecked": "2026-02-18T09:02:00-05:00"
+  "extraUsage": { "spent": "CA$0.80", "limit": "CA$70", "resetAt": "Mar 1" },
+  "lastChecked": "2026-02-18T15:00:00-05:00"
 }

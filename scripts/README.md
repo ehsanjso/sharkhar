@@ -266,10 +266,18 @@ cost-efficient summarization, then archives processed files.
 - Truncates large files (>10KB) to avoid token limits
 - Skips files that fail summarization (keeps original)
 
-**Designed for weekly cron:** Sunday 11 PM
+**Setup:** Run `./setup-memory-cron.sh` from main session to create the weekly cron job.
+
+### setup-memory-cron.sh
+Set up the weekly memory compaction cron job. Must be run from main session
+(not from within a cron job due to gateway restrictions).
+
 ```bash
-0 23 * * 0 cd ~/clawd && ./scripts/memory-compact.sh
+./setup-memory-cron.sh           # Create the cron job
+./setup-memory-cron.sh --check   # Just check if it exists
 ```
+
+Creates a Sunday 11 PM cron job using Haiku model for cost efficiency.
 
 ### memory-stats.sh
 Quick overview of memory folder health and maintenance status. Shows file counts,

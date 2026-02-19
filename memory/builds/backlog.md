@@ -63,30 +63,30 @@ Priority queue of tasks for automated sessions. Pick from top.
 
 ## 🟡 Medium Priority
 
-### 4. Auto-Compaction Cron Job — IN PROGRESS
+### 4. Auto-Compaction Cron Job — NEEDS MAIN SESSION
 **Goal:** Automatically summarize old daily memory files
-**Status:** Script complete (Feb 17 Session 2)
-**Next:** Test on real files and add cron job
+**Status:** Script complete, setup helper ready (Feb 18 Session 1)
 
-**Spec:**
-- Run weekly (Sunday night)
-- Summarize memory/*.md files older than 7 days
-- Append key learnings to MEMORY.md
-- Archive or delete summarized files
+**Setup script created:** `scripts/setup-memory-cron.sh`
+
+**To complete (from main session):**
+```bash
+cd ~/clawd/scripts && ./setup-memory-cron.sh
+```
+
+Or ask in Telegram: "Set up weekly memory compaction cron, Sunday 11 PM, haiku model"
 
 **Done:**
 - [x] Created `scripts/memory-compact.sh` with structure
 - [x] Created `memory/archive/` directory
-- [x] Dry-run works (8 files would be processed)
+- [x] Dry-run works (no files >7 days currently)
 - [x] Added --model flag (default: haiku for cost savings)
 - [x] Added retry logic with exponential backoff
 - [x] Added file truncation for large files
 - [x] Updated README documentation
+- [x] Created setup helper script (Feb 18)
 
-**TODO:**
-- [ ] Test on real files (run without --dry-run)
-- [ ] Add cron job for Sunday 11 PM
-- [ ] Verify MEMORY.md updates correctly
+**Blocked by:** Gateway timeout when modifying cron from cron sessions
 
 ---
 
