@@ -82,10 +82,29 @@ success() {
 
 # Get list of daily memory files older than threshold
 # Returns: list of filenames (YYYY-MM-DD.md format only, not other files)
+# Note: Uses filename date, NOT file modification time
 get_old_files() {
     local days=$1
-    # Match only YYYY-MM-DD.md format
-    find "$MEMORY_DIR" -maxdepth 1 -type f -name "20[0-9][0-9]-[0-9][0-9]-[0-9][0-9].md" -mtime +"$days" | sort
+    local today_epoch
+    today_epoch=$(date +%s)
+    local threshold=$((days * 86400))  # days in seconds
+    
+    # Find all daily files and filter by filename date
+    find "$MEMORY_DIR" -maxdepth 1 -type f -name "20[0-9][0-9]-[0-9][0-9]-[0-9][0-9].md" -print0 | \
+    while IFS= read -r -d '' filepath; do
+        local filename
+        filename=$(basename "$filepath" .md)
+        
+        # Parse date from filename (YYYY-MM-DD)
+        local file_epoch
+        file_epoch=$(date -d "$filename" +%s 2>/dev/null) || continue
+        
+        local age=$((today_epoch - file_epoch))
+        
+        if [[ $age -gt $threshold ]]; then
+            echo "$filepath"
+        fi
+    done | sort
 }
 
 # Check if file is already archived
