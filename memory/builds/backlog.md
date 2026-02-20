@@ -52,12 +52,12 @@ Priority queue of tasks for automated sessions. Pick from top.
 
 ---
 
-### 3. Add Templates to Key Skills
+### 3. Add Templates to Key Skills — ✅ COMPLETE (Feb 19)
 **Goal:** Move recurring templates into skills (lazy-loaded)
-**Skills to enhance:**
-- [ ] task-tracker: weekly report template
-- [ ] frontend-design: component checklist template
-- [ ] conventional-commits: expanded examples
+**Skills enhanced:**
+- [x] task-tracker: STANDUP.md + WEEKLY_REPORT.md templates
+- [x] frontend-design: COMPONENT_CHECKLIST.md template  
+- [x] conventional-commits: real-world examples by file type
 
 ---
 
