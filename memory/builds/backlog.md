@@ -97,21 +97,31 @@ Or ask in Telegram: "Set up weekly memory compaction cron, Sunday 11 PM, haiku m
 - Add security notes to AGENTS.md
 - Flag any that need confirmation before use
 
-### 6. Cron Job Cost Optimization — BLOCKED
+### 6. Cron Job Cost Optimization — READY FOR MAIN SESSION
 **Source:** cron-audit.sh findings (Feb 17)
 **Goal:** Switch appropriate cron jobs from default→Haiku for cost savings
 
-**Jobs to review:**
-- [ ] Pill Reminder → Haiku (simple notification)
-- [ ] Spare Capacity Work → Review complexity
-- [ ] Polymarket Reports (3 jobs) → Review if Haiku sufficient
-- [ ] Daily Market Brief → Review complexity
+**NEW: Smart optimizer script created (Feb 19)**
+```bash
+cd ~/clawd/scripts && ./cron-optimize.sh --apply
+```
 
-**Script created:** `./scripts/cron-audit.sh --suggest`
+**Current analysis:**
+- ✅ 5 jobs already on Haiku (optimized)
+- ⏳ 1 job ready to switch: **Pill Reminder**
+- ○ 11 complex jobs correctly kept on Sonnet
 
-**Note (Feb 17):** Gateway timeout when trying to modify cron jobs from within
-a cron session. Needs manual intervention or main session update.
-Commands: `clawdbot cron edit 0aac7693 --model haiku` (Pill Reminder)
+**To apply from main session:**
+```bash
+./scripts/cron-optimize.sh --apply
+# Then: clawdbot gateway restart
+```
+
+**Script features:**
+- Pattern-based detection (simple vs complex tasks)
+- Dry run by default (safe preview)
+- Creates backup before changes
+- Shows rollback instructions
 
 ---
 

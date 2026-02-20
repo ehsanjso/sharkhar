@@ -220,6 +220,29 @@ models and suggests which could be switched to Haiku for savings.
 - Recommends Haiku for simple tasks, keeps current for complex (analyze, code, review)
 - Jobs already on Haiku show "already-optimal"
 
+### cron-optimize.sh
+Smart cron job optimizer that combines audit + apply in one command. Uses
+pattern-based detection to identify which jobs can safely use Haiku.
+
+```bash
+./cron-optimize.sh              # Dry run (preview changes)
+./cron-optimize.sh --apply      # Apply changes
+./cron-optimize.sh --verbose    # Show detection reasoning
+./cron-optimize.sh --help       # Show full usage
+```
+
+**Detection logic:**
+- **Simple tasks (→ Haiku):** reminder, backup, prune, cleanup, status, check, monitor
+- **Complex tasks (→ keep Sonnet):** report, analysis, research, code, review, strategy
+
+**Safety features:**
+- Creates backup before changes
+- Dry run by default
+- Shows exact commands for manual application
+- Provides rollback instructions
+
+**Note:** Must be run from main session (not from within a cron job).
+
 ### memory-search.sh
 Simple grep-based search for memory files. Stopgap until RAG/semantic search 
 is set up. Searches all memory/*.md files plus MEMORY.md.
