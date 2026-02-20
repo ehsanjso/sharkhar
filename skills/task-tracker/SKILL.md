@@ -279,3 +279,5 @@ python3 scripts/init.py
 | `scripts/init.py` | Initialize new TASKS.md from template |
 | `references/task-format.md` | Task format specification |
 | `assets/templates/TASKS.md` | Template for new task files |
+| `assets/templates/STANDUP.md` | Daily standup output template |
+| `assets/templates/WEEKLY_REPORT.md` | Weekly report output template |

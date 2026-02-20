@@ -183,6 +183,59 @@ Use this format for:
 - Pull request merge commits
 - When the user asks about commit messages or git commits
 
+## Real-World Examples by File Type
+
+### Multiple Files Changed
+
+When changing multiple files, describe the logical change, not the files:
+
+```
+# ❌ Bad: Lists files
+chore: update package.json, tsconfig.json, and build.sh
+
+# ✅ Good: Describes the change
+build: add TypeScript strict mode with updated deps
+```
+
+### Config Changes
+
+```
+ci: enable parallel test execution
+build: upgrade to Node 20 LTS
+chore: add .env.example with required variables
+```
+
+### Refactoring
+
+```
+refactor(auth): extract token validation into service
+refactor: simplify error handling using Result type
+refactor!: rename User to Account across codebase
+```
+
+### Dependency Updates
+
+```
+build(deps): bump axios from 0.21.1 to 1.6.0
+build(deps-dev): upgrade jest to v29
+chore(deps): pin transitive dependencies
+```
+
+### Database/Migration
+
+```
+feat(db): add user preferences table
+fix(migration): correct foreign key constraint
+```
+
+### Skills/Plugins
+
+```
+feat(skill): add weather forecasting capability
+fix(skill): handle API rate limiting gracefully
+docs(skill): add troubleshooting section
+```
+
 ## Common Mistakes to Avoid
 
 ❌ `Added new feature` (past tense, capitalized)
