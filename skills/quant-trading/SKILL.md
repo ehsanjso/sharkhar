@@ -1,3 +1,8 @@
+---
+name: quant-trading
+description: Quantitative trading frameworks from Ernest Chan. Use for position sizing (Kelly formula), strategy selection (mean-reversion vs momentum), regime detection, exit strategies, and backtesting best practices. Essential for making trading decisions with statistical edge.
+---
+
 # Quantitative Trading Skill
 
 > Extracted from Ernest Chan's "Quantitative Trading: How to Build Your Own Algorithmic Trading Business"
