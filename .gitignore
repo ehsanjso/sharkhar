@@ -6,3 +6,4 @@ artifacts/*
 !artifacts/.gitkeep
 node_modules/
 **/node_modules/
+polymarket-dashboard/node_modules/
